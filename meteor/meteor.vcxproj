@@ -103,6 +103,7 @@
     <ClCompile Include="src\network.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\messages.hpp" />
     <ClInclude Include="include\network.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
