@@ -21,16 +21,16 @@ print_error_code()
 
 int main(int argc, char **argv)
 {
-	const int window_width = 420, window_height = 360;
+	const int window_width = 1280, window_height = 720;
 	const std::string_view window_title = "Drawing over IP client";
 	InitWindow(window_width, window_height, window_title.data());
-	SetTargetFPS(45);
+	SetTargetFPS(60);
 	SetExitKey(0);		// Esc
 
 	using namespace meteor;
 	network::startup netboot;
 
-	ip_address local_adress(10, 12, 210, 137);
+	ip_address local_adress(192, 168, 0, 113);
 	ip_endpoint local_endpoint(local_adress, 54321);
 	udp_socket socket;
 	if (!socket.open_and_bind(local_endpoint)) {
@@ -45,35 +45,39 @@ int main(int argc, char **argv)
 		local_endpoint.address().d(),
 		local_endpoint.port());
 
-	// my IP at-time-of-writing: 10.12.210.137
-	// Sebbe IP at-time-of-writing: 10.12.163.192
-	// designated port: 54321
 	const ip_address SERVER_IP = ip_address(10, 12, 163, 192);	
-	
 	ip_endpoint server_endpoint{ SERVER_IP , 54321};
-
-	std::string_view message = "Hello!";
 
 	int my_x = 0, my_y = 0, server_x = 0, server_y = 0;
 
 	int game_frame = 0;
+	double prev_send_time = GetTime();
+	const double TARGET_DELTA_MS = 0.5;
+
 	bool running = true;
 	while (running) {
 		const float dt = GetFrameTime();
 		running &= !WindowShouldClose();
-		
 		game_frame += 1;
+		
+		if (prev_send_time + TARGET_DELTA_MS < GetTime()) {
+			prev_send_time = GetTime();
 
-		// Send
-		byte_stream stream_send;
-		byte_stream_writer writer(stream_send);
+			mouse_position_message message((float)GetMouseX(), (float)GetMouseY());
+			ping_message ping_message(GetTime());
 
-		writer.serialize(GetMouseX());
-		writer.serialize(GetMouseY());
+			byte_stream stream_send;
+			byte_stream_writer writer(stream_send);
 
-		if (!socket.send_to(server_endpoint, stream_send)) {
-			print_error_code();
+			message.serialize<byte_stream_writer>(writer);
+			ping_message.serialize<byte_stream_writer>(writer);
+
+			const ip_endpoint TEACHER_ENDPOINT{ ip_address(192,168,0,101), 54321 };
+			if (!socket.send_to(TEACHER_ENDPOINT, stream_send)) {
+				print_error_code();
+			}
 		}
+		
 
 		// Recieve
 		while (socket.has_data()){
@@ -82,6 +86,7 @@ int main(int argc, char **argv)
 			if (socket.receive_from(sender_endpoint, stream_recieve)) {
 
 				byte_stream_reader reader(stream_recieve);
+				/*
 				debug::info("%d - recieving from endpoint: %d.%d.%d.%d:%d, data size: %d",
 					game_frame,
 					sender_endpoint.address().a(),
@@ -90,14 +95,21 @@ int main(int argc, char **argv)
 					sender_endpoint.address().d(),
 					sender_endpoint.port(),
 					stream_recieve.size());
+					*/
 
-				// Check size of package. Server constantly sends own pos (8 bytes), but sends both their/mine less frequently.
-				if (stream_recieve.size() > 8) {
-					reader.serialize<int>(my_x);
-					reader.serialize<int>(my_y);
+				uint8 type = reader.peek();
+
+				switch(type){
+				case((uint8)message_type::PING):
+					ping_message message;
+					if (!message.read(reader)) {
+						print_error_code();
+					}
+					debug::info("latency: %f ", (GetTime() - message.m_time));
+					break;
 				}
-				reader.serialize<int>(server_x);
-				reader.serialize<int>(server_y);	
+
+					
 			}
 		}
 

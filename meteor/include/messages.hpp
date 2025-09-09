@@ -54,7 +54,7 @@ namespace meteor
 		bool serialize(T& stream) {
 			bool success = true;
 			success &= stream.serialize(m_type);
-			success &= stream.serialize(m_x);
+			success &= stream.serialize(m_time);
 			return success;
 		}
 
