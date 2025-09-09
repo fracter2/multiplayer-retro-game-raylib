@@ -1,6 +1,7 @@
 
 // messages.hpp
 
+#pragma once
 #include "network.hpp"
 
 namespace meteor 
@@ -13,11 +14,20 @@ namespace meteor
 		{
 		}
 
-		bool write(byte_stream_writer& writer) {
+		template<typename T>
+		bool serialize(T& stream) {
 			bool success = true;
-			success &= writer.serialize(m_x);
-			success &= writer.serialize(m_y);
+			success &= stream.serialize(m_x);
+			success &= stream.serialize(m_y);
 			return success;
+		}
+
+		bool write(byte_stream_writer& writer) {
+			return serialize(writer);
+		}
+
+		bool read(byte_stream_reader& reader) {
+			return serialize(reader);
 		}
 
 		float m_x = 0;

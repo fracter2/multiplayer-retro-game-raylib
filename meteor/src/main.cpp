@@ -4,6 +4,7 @@
 #include <thread>
 #include <chrono>
 #include "network.hpp"
+#include "messages.hpp"
 #include "raylib.h"
 
 static void
