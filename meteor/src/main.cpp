@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 	using namespace meteor;
 	network::startup netboot;
 
-	ip_address local_adress(192, 168, 0, 113);
+	ip_address local_adress(192, 168, 1, 225);
 	ip_endpoint local_endpoint(local_adress, 54321);
 	udp_socket socket;
 	if (!socket.open_and_bind(local_endpoint)) {
@@ -45,8 +45,9 @@ int main(int argc, char **argv)
 		local_endpoint.address().d(),
 		local_endpoint.port());
 
-	const ip_address SERVER_IP = ip_address(10, 12, 163, 192);	
+	const ip_address SERVER_IP = ip_address(192, 168, 1, 72);	
 	ip_endpoint server_endpoint{ SERVER_IP , 54321};
+	//const ip_endpoint TEACHER_ENDPOINT{ ip_address(192,168,0,101), 54321 };
 
 	int my_x = 0, my_y = 0, server_x = 0, server_y = 0;
 
@@ -72,8 +73,8 @@ int main(int argc, char **argv)
 			message.serialize<byte_stream_writer>(writer);
 			ping_message.serialize<byte_stream_writer>(writer);
 
-			const ip_endpoint TEACHER_ENDPOINT{ ip_address(192,168,0,101), 54321 };
-			if (!socket.send_to(TEACHER_ENDPOINT, stream_send)) {
+			
+			if (!socket.send_to(server_endpoint, stream_send)) {
 				print_error_code();
 			}
 		}
