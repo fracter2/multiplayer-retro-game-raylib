@@ -99,12 +99,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\connection.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\messages.cpp" />
     <ClCompile Include="src\network.cpp" />
+    <ClCompile Include="src\network_layer.cpp" />
+    <ClCompile Include="src\protocol.cpp" />
+    <ClCompile Include="src\timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\connection.hpp" />
     <ClInclude Include="include\messages.hpp" />
     <ClInclude Include="include\network.hpp" />
+    <ClInclude Include="include\network_layer.hpp" />
+    <ClInclude Include="include\protocol.hpp" />
+    <ClInclude Include="include\timer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

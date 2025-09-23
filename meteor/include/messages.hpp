@@ -1,73 +1,51 @@
-
 // messages.hpp
 
 #pragma once
+
+#include "raylib.h"
 #include "network.hpp"
 
-namespace meteor 
+namespace meteor
 {
-	enum class message_type : uint8 {
-		PING,
-		POSITION
-	};
+   enum class message_type : uint8 {
+      LATENCY,
+      POSITION,
+      ENTITY_STATE,
+   };
 
-	struct mouse_position_message {
-		mouse_position_message() = default;
-		mouse_position_message(float x, float y) 
-			: m_type((uint8)message_type::POSITION)
-			, m_x(x)
-			, m_y(y)
-		{
-		}
+   struct entity_state_message {
+      entity_state_message() = default;
+      entity_state_message(int32 id, Vector2 position, Color color);
 
-		template<typename T>
-		bool serialize(T& stream) {
-			bool success = true;
-			success &= stream.serialize(m_type);
-			success &= stream.serialize(m_x);
-			success &= stream.serialize(m_y);
-			return success;
-		}
+      bool write(byte_stream_writer& writer);
+      bool read(byte_stream_reader& reader);
+      
+      uint8   m_type = 0;
+      int32   m_id = 0;
+      Vector2 m_position = {};
+      Color   m_color = {};
+   };
 
-		bool write(byte_stream_writer& writer) {
-			return serialize(writer);
-		}
+   struct latency_message {
+      latency_message() = default;
+      latency_message(double time);
 
-		bool read(byte_stream_reader& reader) {
-			return serialize(reader);
-		}
+      bool write(byte_stream_writer& writer);
+      bool read(byte_stream_reader& reader);
 
-		uint8 m_type = 0;
-		float m_x = 0;
-		float m_y = 0;
-	};
+      uint8  m_type = 0;
+      double m_time = 0;
+   };
 
-	struct ping_message {
-		ping_message() = default;
-		ping_message(double time)
-			: m_type((uint8)message_type::PING)
-			, m_time(time) 
-		{
-		}
+   struct mouse_position_message {
+      mouse_position_message() = default;
+      mouse_position_message(float x, float y);
 
-		template<typename T>
-		bool serialize(T& stream) {
-			bool success = true;
-			success &= stream.serialize(m_type);
-			success &= stream.serialize(m_time);
-			return success;
-		}
+      bool write(byte_stream_writer& writer);
+      bool read(byte_stream_reader& reader);
 
-		bool write(byte_stream_writer& writer) {
-			return serialize(writer);
-		}
-
-		bool read(byte_stream_reader& reader) {
-			return serialize(reader);
-		}
-
-		uint8 m_type = 0;
-		double m_time = 0;
-	};
-
+      uint8 m_type = 0;
+      float m_x = 0;
+      float m_y = 0;
+   };
 } // !meteor
