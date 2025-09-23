@@ -10,7 +10,7 @@ namespace meteor
    enum class message_type : uint8 {
       LATENCY,
       POSITION,
-      ENTITY_STATE,
+      ENTITY_STATE
    };
 
    struct entity_state_message {

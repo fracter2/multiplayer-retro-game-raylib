@@ -31,14 +31,14 @@ namespace meteor
 		return serialize(*this, reader);
 	}
 
-	disconnect_packet::disconnect_packet(uint8 reason, char message[256])
+	disconnect_packet::disconnect_packet(uint8 reason)//char message[256]
 		: m_type((uint8)protocol_packet_type::DISCONNECT)
-		, m_reason(reason)
+		//, m_reason(reason)
 	{
-		int i = 0;
-		for (char& m : m_message) {
-			m = message[i];
-		}
+		//int i = 0;
+		//for (char& m : m_message) {
+		//	m = message[i];
+		// }
 	}
 
 	template <typename T>
@@ -47,7 +47,7 @@ namespace meteor
 		bool success = true;
 		success &= stream.serialize(message.m_type);
 		success &= stream.serialize(message.m_reason);
-		success &= stream.serialize(message.m_message);
+		//success &= stream.serialize(message.m_message);
 		return success;
 	}
 

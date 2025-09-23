@@ -6,8 +6,8 @@
 
 namespace meteor
 {
-	constexpr uint32 PROTOCOL_MAGIC     = 0Xbaadf00d;
-	constexpr uint32 PROTOCOL_VERSION   = 0X00010000;
+	constexpr uint32 PROTOCOL_MAGIC     = 0xbaadf00d;
+	constexpr uint32 PROTOCOL_VERSION   = 0x00010000;
 	constexpr double TIMEOUT            = 1.0;
 
    enum class protocol_packet_type : uint8 {
@@ -17,7 +17,7 @@ namespace meteor
    };
 
    struct connect_packet {
-	   connect_packet() = default;
+	   connect_packet();
 
 	   bool write(byte_stream_writer& writer);
 	   bool read(byte_stream_reader& reader);
@@ -29,14 +29,14 @@ namespace meteor
 
    struct disconnect_packet {
 	   disconnect_packet() = default;
-	   disconnect_packet(uint8 reason, char message[256]);
+	   disconnect_packet(uint8 reason); //, char message[256]
 
 	   bool write(byte_stream_writer& writer);
 	   bool read(byte_stream_reader& reader);
 
 	   uint8 m_type = 0;
 	   uint8 m_reason = 0;
-	   char m_message[256] = {};
+	   //char m_message[256] = {};
    };
 
    struct payload_packet {
