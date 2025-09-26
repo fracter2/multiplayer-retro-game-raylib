@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 
 	//int game_frame = 0;
 	double prev_send_time = GetTime();
-	const double TARGET_DELTA_S = 1.0;
+	const double TARGET_DELTA_S = 0.1;
 
 	// Game state data
 	game game = {};
