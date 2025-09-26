@@ -39,7 +39,7 @@ namespace meteor
          va_end(args);
          printf("ERR! %s\n", msg);
 
-         assert(false);
+         //assert(false);
       }
    } // !debug
 
