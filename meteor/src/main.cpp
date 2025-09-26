@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 
 	//int game_frame = 0;
 	double prev_send_time = GetTime();
-	const double TARGET_DELTA_S = 0.1;
+	const double TARGET_DELTA_S = 0.3;
 
 	// Game state data
 	game game = {};
@@ -181,25 +181,28 @@ int main(int argc, char **argv)
 				if (!packet.read(reader)) { print_error_code(); break; }
 				server_connection.m_last_recieve_time = GetTime();
 
-				uint8 type = reader.peek();
+				while(reader.has_data())
+				{
+					uint8 type = reader.peek();
 
-				switch (type) {
-				case ((uint8)message_type::LATENCY): {
-					latency_message message;
-					if (!message.read(reader)) { print_error_code(); break; }
-					debug::info("latency: %f ", (GetTime() - message.m_time));
-					break;
+					switch (type) {
+					case ((uint8)message_type::LATENCY): {
+						latency_message message;
+						if (!message.read(reader)) { print_error_code(); break; }
+						debug::info("latency: %f ", (GetTime() - message.m_time));
+						break;
+					}
+
+					case ((uint8)message_type::ENTITY_STATE): {
+						entity_state_message message;
+						if (!message.read(reader)) { print_error_code(); break; }
+
+						game.update_entity(message);
+
+						break;
+					}
+					} // !payload switch
 				}
-
-				case ((uint8)message_type::ENTITY_STATE): {
-					entity_state_message message;
-					if (!message.read(reader)) { print_error_code(); break; }
-
-					game.update_entity(message);
-
-					break;
-				} 
-				} // !payload switch
 			}
 			} // !protocol switch
 				
@@ -220,7 +223,7 @@ int main(int argc, char **argv)
 			Vector2 pos = game.m_entities[i].m_position;
 			DrawRectangle((int)pos.x, (int)pos.y, 10, 10, game.m_entities[i].m_color);
 		}
-
+		
 		DrawFPS(2, 2);
 		EndDrawing();
 
