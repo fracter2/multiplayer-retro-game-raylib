@@ -41,9 +41,11 @@ int main(int argc, char **argv)
 	const ip_endpoint LOCAL_ENDPOINT    (ip_address(192, 168, 1, 225),  54321);
 	const ip_endpoint SERVER_ENDPOINT   (ip_address(192, 168, 1, 72),   54321);
 
-	connection server_connection;
+	connection	server_connection;
 	server_connection.m_status = connection::status::CONNECTING;
 	debug::info("attempting to connect by default...");
+
+	uint32 send_sequence = 0;
 
 	udp_socket socket;
 	if (!socket.open_and_bind(LOCAL_ENDPOINT)) {
@@ -60,7 +62,12 @@ int main(int argc, char **argv)
 
 	//int game_frame = 0;
 	double prev_send_time = GetTime();
+	double target_time = GetTime();
 	const double TARGET_DELTA_S = 0.3;
+	const double CONNECTING_TARGET_DELTA_S = 1.5;
+
+	bool auto_reconnect = true;
+
 
 	// Game state data
 	game game = {};
@@ -76,7 +83,7 @@ int main(int argc, char **argv)
 		
 
 		// note: network update
-		if (prev_send_time + TARGET_DELTA_S < GetTime()) {
+		if (GetTime() > target_time) {
 			prev_send_time = GetTime();
 
 			byte_stream stream_send;
@@ -88,11 +95,13 @@ int main(int argc, char **argv)
 				message.write(writer);
 				if (!socket.send_to(SERVER_ENDPOINT, stream_send)) { print_error_code(); }
 				debug::info("sending connect package");
+				target_time = GetTime() + CONNECTING_TARGET_DELTA_S;
 				break;
 			}
 
 			case (connection::status::CONNECTED): {
-				payload_packet packet(0);
+				send_sequence += 1;
+				payload_packet packet(send_sequence);
 				packet.write(writer);
 
 				mouse_position_message message((float)GetMouseX(), (float)GetMouseY());
@@ -102,15 +111,35 @@ int main(int argc, char **argv)
 
 				if (!socket.send_to(SERVER_ENDPOINT, stream_send)) { print_error_code(); }
 				debug::info("sending payload package");
+
+				// note: timeout
+				if (GetTime() > server_connection.m_last_recieve_time + TIMEOUT) {
+					server_connection.m_status = connection::status::DISCONNECTED;
+					debug::info("Timeout");
+				}
+
+				target_time = GetTime() + TARGET_DELTA_S;
+
 				break;
 			}
 
-			case (connection::status::DISCONNECTED):
-				break;
-
-			case (connection::status::DISCONNECTING):
+			case (connection::status::DISCONNECTED): {
+				if (auto_reconnect) { 
+					server_connection.m_status = connection::status::CONNECTING; 
+				}
+				game = {};
+				server_connection.m_sequence = 0;
+				send_sequence = 0;
 				break;
 			}
+				
+
+			case (connection::status::DISCONNECTING): {
+				server_connection.m_status = connection::status::DISCONNECTED;
+				break;
+			}
+
+			}// !switch server_connection.m_status
 			
 			
 		} // !network update
@@ -172,6 +201,7 @@ int main(int argc, char **argv)
 					debug::info("%i - Disgracefull disconnect", GetTime());
 
 				server_connection.m_status = connection::status::DISCONNECTED;
+				
 				break;
 			}
 
@@ -180,6 +210,17 @@ int main(int argc, char **argv)
 				payload_packet packet;
 				if (!packet.read(reader)) { print_error_code(); break; }
 				server_connection.m_last_recieve_time = GetTime();
+
+				if (packet.m_sequence <= server_connection.m_sequence) { 
+					debug::info("out-of-order packet dropped. my server sequenece: %d, packet sequence: %d, time: %f "
+						, (server_connection.m_sequence)
+						, (packet.m_sequence)
+						, (GetTime())
+					); 
+					break; 
+				}
+				server_connection.m_sequence = packet.m_sequence;
+				
 
 				while(reader.has_data())
 				{
@@ -210,6 +251,9 @@ int main(int argc, char **argv)
 				
 			
 		} // !while socket.has_data()
+
+		
+		
 
 		// DRAWING
 		BeginDrawing();

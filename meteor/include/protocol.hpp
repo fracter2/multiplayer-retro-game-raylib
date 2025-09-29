@@ -8,7 +8,7 @@ namespace meteor
 {
 	constexpr uint32 PROTOCOL_MAGIC     = 0xbaadf00d;
 	constexpr uint32 PROTOCOL_VERSION   = 0x00010000;
-	constexpr double TIMEOUT            = 1.0;
+	constexpr double TIMEOUT            = 10.0;
 
    enum class protocol_packet_type : uint8 {
 	  CONNECT,
