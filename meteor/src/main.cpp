@@ -210,6 +210,7 @@ int main(int argc, char **argv)
 				payload_packet packet;
 				if (!packet.read(reader)) { print_error_code(); break; }
 				server_connection.m_last_recieve_time = GetTime();
+				game.m_prev_time_sec = GetTime();
 
 				if (packet.m_sequence <= server_connection.m_sequence) { 
 					debug::info("out-of-order packet dropped. my server sequenece: %d, packet sequence: %d, time: %f "
@@ -244,11 +245,10 @@ int main(int argc, char **argv)
 					}
 					} // !payload switch
 				}
+
+				break;
 			}
 			} // !protocol switch
-				
-			break;
-				
 			
 		} // !while socket.has_data()
 
@@ -257,18 +257,15 @@ int main(int argc, char **argv)
 
 		// DRAWING
 		BeginDrawing();
-		ClearBackground(SKYBLUE);
+		
+		game.render_frame();
 
 		// TODO DRAW ALL ENTITIES W COLOR
 		//DrawRectangle(my_x, my_y, 10, 10, GREEN);
 		//DrawRectangle(server_x, server_y, 10, 10, YELLOW);
-		for (int i = 0; i < game.m_entities.size(); i++) {
-			
-			Vector2 pos = game.m_entities[i].m_position;
-			DrawRectangle((int)pos.x, (int)pos.y, 10, 10, game.m_entities[i].m_color);
-		}
 		
-		DrawFPS(2, 2);
+		
+		//DrawFPS(2, 2);
 		EndDrawing();
 
 		// note: save the forest!
