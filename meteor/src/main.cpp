@@ -38,14 +38,14 @@ int main(int argc, char **argv)
 	using namespace meteor;
 	network::startup boot;
 
-	const ip_endpoint LOCAL_ENDPOINT    (ip_address(192, 168, 1, 225),  54321);
-	const ip_endpoint SERVER_ENDPOINT   (ip_address(192, 168, 1, 72),   54321);
+	const ip_endpoint LOCAL_ENDPOINT    (ip_address(10,12,234,103),  54321);
+	const ip_endpoint SERVER_ENDPOINT   (ip_address(10, 12, 190, 110),   54321);
 
-	connection	server_connection;
+	connection server_connection;
 	server_connection.m_status = connection::status::CONNECTING;
 	debug::info("attempting to connect by default...");
 
-	uint32 send_sequence = 0;
+	//uint32 send_sequence = 0;
 
 	udp_socket socket;
 	if (!socket.open_and_bind(LOCAL_ENDPOINT)) {
@@ -91,16 +91,16 @@ int main(int argc, char **argv)
 
 			switch (server_connection.m_status) {
 			case(connection::status::CONNECTING): {
+				debug::info("sending connect package");
 				connect_packet message;
 				message.write(writer);
 				if (!socket.send_to(SERVER_ENDPOINT, stream_send)) { print_error_code(); }
-				debug::info("sending connect package");
 				target_time = GetTime() + CONNECTING_TARGET_DELTA_S;
 				break;
 			}
 
 			case (connection::status::CONNECTED): {
-				send_sequence += 1;
+				//send_sequence += 1;
 				payload_packet packet(send_sequence);
 				packet.write(writer);
 
@@ -129,7 +129,8 @@ int main(int argc, char **argv)
 				}
 				game = {};
 				server_connection.m_sequence = 0;
-				send_sequence = 0;
+				server_connection.m_acknowledge = 0;
+				//send_sequence = 0;
 				break;
 			}
 				
@@ -139,7 +140,7 @@ int main(int argc, char **argv)
 				break;
 			}
 
-			}// !switch server_connection.m_status
+			}// !switch (server_connection.m_status)
 			
 			
 		} // !network update
@@ -172,7 +173,7 @@ int main(int argc, char **argv)
 			uint8 protocol = reader.peek();
 
 			switch (protocol) {
-			case((uint8)protocol_packet_type::CONNECT):
+			case (uint8)protocol_packet_type::CONNECT:
 			{
 				connect_packet packet;
 				if (!packet.read(reader)) { print_error_code(); break; }
@@ -187,7 +188,7 @@ int main(int argc, char **argv)
 				break;
 			}
 
-			case((uint8)protocol_packet_type::DISCONNECT):
+			case (uint8)protocol_packet_type::DISCONNECT:
 			{
 				disconnect_packet packet;
 				if (!packet.read(reader)) { print_error_code(); break; }
@@ -205,12 +206,12 @@ int main(int argc, char **argv)
 				break;
 			}
 
-			case ((uint8)protocol_packet_type::PAYLOAD):
+			case (uint8)protocol_packet_type::PAYLOAD:
 			{
 				payload_packet packet;
 				if (!packet.read(reader)) { print_error_code(); break; }
 				server_connection.m_last_recieve_time = GetTime();
-				game.m_prev_time_sec = GetTime();
+				game.m_time_sec = GetTime();
 
 				if (packet.m_sequence <= server_connection.m_sequence) { 
 					debug::info("out-of-order packet dropped. my server sequenece: %d, packet sequence: %d, time: %f "
@@ -228,14 +229,14 @@ int main(int argc, char **argv)
 					uint8 type = reader.peek();
 
 					switch (type) {
-					case ((uint8)message_type::LATENCY): {
+					case (uint8)message_type::LATENCY: {
 						latency_message message;
 						if (!message.read(reader)) { print_error_code(); break; }
 						debug::info("latency: %f ", (GetTime() - message.m_time));
 						break;
 					}
 
-					case ((uint8)message_type::ENTITY_STATE): {
+					case (uint8)message_type::ENTITY_STATE: {
 						entity_state_message message;
 						if (!message.read(reader)) { print_error_code(); break; }
 

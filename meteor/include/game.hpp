@@ -39,7 +39,6 @@ namespace meteor {
 				m_entities[index].m_position = message.m_position;
 				m_entities[index].m_color = message.m_color;
 			}
-			
 		}
 
 		// returns -1 on not found
@@ -59,26 +58,23 @@ namespace meteor {
 		void render_frame() {
 			ClearBackground(SKYBLUE);
 
-			double lerp_fraction = (GetTime() - m_prev_time_sec) / NETWORK_TICK_SECONDS;
-			lerp_fraction = (double)Clamp((float)lerp_fraction, 0.0f, 1.0f);
-
-			//std::vector<Vector2> lerped_positions = {};
-
+			float lerp_fraction = (float)((GetTime() - m_time_sec) / NETWORK_TICK_SECONDS);
+			lerp_fraction = Clamp(lerp_fraction, 0.0f, 1.0f);
 
 			for (int i = 0; i < m_entities.size(); i++) {
 				Vector2 pos = Vector2Lerp(
 					m_entities[i].m_position_prev, 
 					m_entities[i].m_position, 
-					(float)lerp_fraction);
+					lerp_fraction);
 
-				DrawRectangle((int)pos.x, (int)pos.y, 10, 10, m_entities[i].m_color);
+				DrawRectangleV(pos, Vector2(10, 10), m_entities[i].m_color);
 			}
 
 			DrawFPS(2, 2);
 		}
 
 		std::vector<entity> m_entities = {};
-		double m_prev_time_sec = 0;
+		double m_time_sec = 0;
 
 
 	};

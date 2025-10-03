@@ -29,5 +29,6 @@ namespace meteor {
 		status		m_status = {};
 		double		m_last_recieve_time = 0;
 		uint32		m_sequence = 0;
+		uint32		m_acknowledge = 0;
 	};
 } // !meteor
