@@ -101,7 +101,7 @@ int main(int argc, char **argv)
 
 			case (connection::status::CONNECTED): {
 				//send_sequence += 1;
-				payload_packet packet(send_sequence);
+				payload_packet packet(send_sequence);	// TODO Sequence is just for recieve. SEND should user game tick!!
 				packet.write(writer);
 
 				mouse_position_message message((float)GetMouseX(), (float)GetMouseY());
