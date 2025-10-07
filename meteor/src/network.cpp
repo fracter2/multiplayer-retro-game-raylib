@@ -6,6 +6,8 @@
 #include <WS2tcpip.h>
 #include <iphlpapi.h>
 
+#define SET_BROADCAST false
+
 namespace meteor
 {
    namespace debug
@@ -298,6 +300,15 @@ namespace meteor
          ::closesocket(fd);
          return false;
       }
+
+#ifdef SET_BROADCAST
+      char broadcast = 1;
+      if (setsockopt(fd, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast)) < 0) {
+          //std::cout << "Error in setting Broadcast option";
+          closesocket(fd);
+          return false;
+      }
+#endif
 
       m_handle = fd;
 
