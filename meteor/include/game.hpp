@@ -34,7 +34,9 @@ namespace meteor {
 		void update_process() {
 			m_tick += 1;
 
-			// TODO Update entities. DOES INPUT NEED TO BE HERE? OR CAN IT BE SAMLED WITH NETWORKING?
+
+
+			// TODO Update entities.
 		}
 
 		void update_entity(entity_state_message message) {
@@ -85,5 +87,7 @@ namespace meteor {
 		std::vector<entity> m_entities = {};
 		double m_time_sec = 0;
 		int32 m_tick = 0;
+
+		int32 m_player_id = -1;
 	};
 }

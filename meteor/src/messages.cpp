@@ -9,6 +9,7 @@ namespace meteor
       , m_id(id)
       , m_position(position)
       , m_color(color)
+      , m_move_request(move_request)
    {
    }
 
@@ -88,5 +89,7 @@ namespace meteor
    {
       return serialize(*this, reader);
    }
+
+   
 
 } // !meteor

@@ -13,6 +13,14 @@ namespace meteor
       ENTITY_STATE
    };
 
+   enum class movement_request : uint8 {
+       RIGHT,
+       LEFT,
+       UP,
+       DOWN,
+       NEUTRAL
+   };
+
    struct entity_state_message {
       entity_state_message() = default;
       entity_state_message(int32 id, Vector2 position, Color color);
@@ -24,6 +32,7 @@ namespace meteor
       int32   m_id = 0;
       Vector2 m_position = {};
       Color   m_color = {};
+      uint8   m_move_request = 0;
    };
 
    struct latency_message {

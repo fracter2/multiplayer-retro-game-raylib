@@ -109,9 +109,16 @@ int main(int argc, char **argv)
 				packet.write(writer);
 
 				mouse_position_message message((float)GetMouseX(), (float)GetMouseY());
-				latency_message ping_message(GetTime());
 				message.write(writer);
+
+				latency_message ping_message(GetTime());
 				ping_message.write(writer);
+
+				// TODO MAKE THIS INTO A QUEUE FROM INPUT STATES CHECK
+				// TODO GET INPUT IN SEPERATE SYSTEM BEFORE THIS
+				// TODO SEND USERS CLIENT using PLAYER_ID 
+				entity_state_message state_message(player_id, player_input, misc player stuff);
+				state_message.write(writer);
 
 				if (!socket.send_to(SERVER_ENDPOINT, stream_send)) { print_error_code(); }
 				debug::info("sending payload package");
@@ -276,6 +283,8 @@ int main(int argc, char **argv)
 		// TODO USE GAME STATES
 		// TODO USE LATENCY STATE for CLIENT PREDICTION
 		m_game.update_process();
+
+		// TODO MOVE SEND CHECK HERE
 
 
 		// TODO RENDER GAME, 60hz or vsync (need lerp logic
