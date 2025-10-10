@@ -45,8 +45,6 @@ int main(int argc, char **argv)
 	server_connection.m_status = connection::status::CONNECTING;
 	debug::info("attempting to connect by default...");
 
-	//uint32 send_sequence = 0;
-
 	udp_socket socket;
 	if (!socket.open_and_bind(LOCAL_ENDPOINT)) {
 		print_error_code();
@@ -63,14 +61,15 @@ int main(int argc, char **argv)
 	//int game_frame = 0;
 	double prev_send_time = GetTime();
 	double target_time = GetTime();
-	const double TARGET_DELTA_S = 0.3;
-	const double CONNECTING_TARGET_DELTA_S = 1.5;
+	const double GAME_UPDATE_DELTA = 1 / 60;
+	const double SEND_UPDATE_DELTA = 1 / 20;
+	const double CONNECTING_DELTA = 2;
 
-	bool auto_reconnect = true;
+	const bool auto_reconnect = true;
 
 
 	// Game state data
-	game game = {};
+	game m_game = {};
 	
 
 
@@ -81,8 +80,13 @@ int main(int argc, char **argv)
 		const float dt = GetFrameTime();
 		running &= !WindowShouldClose();
 		
+		double time = GetTime();
+		// TODO USE THIS TIME EVERYWHERE as the CURRENT TICK TIME or similar. Util class?
 
-		// note: network update
+		// TODO MOVE TO FILE, 20hz
+		// TODO Refrence connection status (const), game state (const)
+		// TODO QUEUE SEND DATA, INPUT ACTIONS, WRAP IN TICK CLOSURE
+		// note: network send update
 		if (GetTime() > target_time) {
 			prev_send_time = GetTime();
 
@@ -90,18 +94,18 @@ int main(int argc, char **argv)
 			byte_stream_writer writer(stream_send);
 
 			switch (server_connection.m_status) {
-			case(connection::status::CONNECTING): {
+			case connection::status::CONNECTING: {
 				debug::info("sending connect package");
 				connect_packet message;
 				message.write(writer);
 				if (!socket.send_to(SERVER_ENDPOINT, stream_send)) { print_error_code(); }
-				target_time = GetTime() + CONNECTING_TARGET_DELTA_S;
+				target_time = GetTime() + CONNECTING_DELTA;
 				break;
 			}
 
-			case (connection::status::CONNECTED): {
+			case connection::status::CONNECTED: {
 				//send_sequence += 1;
-				payload_packet packet(send_sequence);	// TODO Sequence is just for recieve. SEND should user game tick!!
+				payload_packet packet(m_game.m_tick);	// TODO Sequence is just for recieve. SEND should user game tick!!
 				packet.write(writer);
 
 				mouse_position_message message((float)GetMouseX(), (float)GetMouseY());
@@ -118,24 +122,25 @@ int main(int argc, char **argv)
 					debug::info("Timeout");
 				}
 
-				target_time = GetTime() + TARGET_DELTA_S;
+				target_time = GetTime() + SEND_UPDATE_DELTA;
 
 				break;
 			}
 
-			case (connection::status::DISCONNECTED): {
+			case connection::status::DISCONNECTED: {
 				if (auto_reconnect) { 
 					server_connection.m_status = connection::status::CONNECTING; 
 				}
-				game = {};
+				m_game = {};
 				server_connection.m_sequence = 0;
 				server_connection.m_acknowledge = 0;
 				//send_sequence = 0;
+				
 				break;
 			}
 				
 
-			case (connection::status::DISCONNECTING): {
+			case connection::status::DISCONNECTING: {
 				server_connection.m_status = connection::status::DISCONNECTED;
 				break;
 			}
@@ -143,7 +148,13 @@ int main(int argc, char **argv)
 			}// !switch (server_connection.m_status)
 			
 			
-		} // !network update
+		} // !network send update
+
+		// TODO MOVE TO FILE, 60hz or more?
+		// more to correct/reconsile next state ASAP
+		// TODO UPDATE GAME STATE AND LATENCY STATE 
+		// (reconsile if mispredicted on specific tick, repeat non-acked INPUTS for client prediciton in latency state)
+		// TODO Refrence connection state and game state
 
 		// note: recieve data
 		while (socket.has_data()) {
@@ -203,15 +214,21 @@ int main(int argc, char **argv)
 
 				server_connection.m_status = connection::status::DISCONNECTED;
 				
+				// TODO RESET GAME STATE or FREEZE AND SHOW DISCONECT POPUP
+
 				break;
 			}
 
+			// TODO DELEGATE TO SEPARATE GAME SYNCER FILE
+			// TODO MIND TICK CLOSURES
+			// TODO MIND LATENCY STATE and RECONCILIATION
+			// TODO MIND SENDER SEQUENCE and ACK
 			case (uint8)protocol_packet_type::PAYLOAD:
 			{
 				payload_packet packet;
 				if (!packet.read(reader)) { print_error_code(); break; }
 				server_connection.m_last_recieve_time = GetTime();
-				game.m_time_sec = GetTime();
+				m_game.m_time_sec = GetTime();
 
 				if (packet.m_sequence <= server_connection.m_sequence) { 
 					debug::info("out-of-order packet dropped. my server sequenece: %d, packet sequence: %d, time: %f "
@@ -240,7 +257,7 @@ int main(int argc, char **argv)
 						entity_state_message message;
 						if (!message.read(reader)) { print_error_code(); break; }
 
-						game.update_entity(message);
+						m_game.update_entity(message);
 
 						break;
 					}
@@ -253,13 +270,24 @@ int main(int argc, char **argv)
 			
 		} // !while socket.has_data()
 
-		
-		
+		// TODO QUERY INPUT
+
+		// TODO GAME UPDATE LOOP, 60hz
+		// TODO USE GAME STATES
+		// TODO USE LATENCY STATE for CLIENT PREDICTION
+		m_game.update_process();
+
+
+		// TODO RENDER GAME, 60hz or vsync (need lerp logic
+
+		// TODO RENDER UI
+
+		// TODO END LOOP, sleep for 1 ms
 
 		// DRAWING
 		BeginDrawing();
 		
-		game.render_frame();
+		m_game.render_frame();
 
 		// TODO DRAW ALL ENTITIES W COLOR
 		//DrawRectangle(my_x, my_y, 10, 10, GREEN);

@@ -25,6 +25,8 @@ namespace meteor {
 		Color m_color = {};
 	};
 
+	// TODO SEPPARATE GAME_STATES INTO GAME_STATE AND LATENCY_STATES (with input history)
+	// TODO SEPARATE UPDATE LOGIC FROM CONTAINER
 	struct game {
 		game() = default;
 
@@ -82,6 +84,6 @@ namespace meteor {
 
 		std::vector<entity> m_entities = {};
 		double m_time_sec = 0;
-		uint32 m_tick = 0;
+		int32 m_tick = 0;
 	};
 }
