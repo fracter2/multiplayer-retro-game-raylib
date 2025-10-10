@@ -28,6 +28,13 @@ namespace meteor {
 	struct game {
 		game() = default;
 
+		// TODO Should be FIXED TIMESTEP delta at 60 or 64 ticks a second
+		void update_process() {
+			m_tick += 1;
+
+			// TODO Update entities. DOES INPUT NEED TO BE HERE? OR CAN IT BE SAMLED WITH NETWORKING?
+		}
+
 		void update_entity(entity_state_message message) {
 
 			int index = get_entity_index(message.m_id);
@@ -75,7 +82,6 @@ namespace meteor {
 
 		std::vector<entity> m_entities = {};
 		double m_time_sec = 0;
-
-
+		uint32 m_tick = 0;
 	};
 }
