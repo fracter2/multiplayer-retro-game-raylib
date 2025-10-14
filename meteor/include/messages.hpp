@@ -21,6 +21,8 @@ namespace meteor
        NEUTRAL
    };
 
+   // TODO input action message
+
    struct entity_state_message {
       entity_state_message() = default;
       entity_state_message(int32 id, Vector2 position, Color color, movement_request move_request);

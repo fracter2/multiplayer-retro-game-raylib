@@ -24,14 +24,15 @@ namespace meteor {
 		{
 		}
 
-		uint32		m_id = 0;
+		uint32		m_id			 = 0;
 		ip_endpoint m_endpoint;
-		status		m_status = {};
+		status		m_status		 = {};
 		double		m_last_recieve_time = 0;
-		uint32		m_sequence = 0;
-		uint32		m_acknowledge = 0;
+		uint32		m_sequence		 = 0; // What we sent
+		uint32		m_acknowledge	 = 0; // recieved sequence, used as ack
 	};
 
+	// Client -> server
 	struct server_connection_syncer {
 		server_connection_syncer() = default;
 

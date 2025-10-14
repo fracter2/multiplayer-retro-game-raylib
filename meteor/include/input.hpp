@@ -25,7 +25,7 @@ namespace meteor::input {
 		{
 		}
 
-		/* TODO make compat with this. low prio.
+		/* TODO make it use induvidual bits like below. low prio.
 		uint8 m_bits = 0;
 
 		void set_true(input_type input) {
@@ -46,6 +46,10 @@ namespace meteor::input {
 		bool m_place_bomb;
 
 	};
+
+	// Consider input history singleton with ticks
+	// Consider resolving move inputs into single result, enum
+
 
 	input_state get_current_input() {
 		input_state state;

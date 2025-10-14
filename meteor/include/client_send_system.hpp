@@ -11,6 +11,7 @@
 
 #include "input.hpp"
 
+// Consider client namespace? separate project?
 namespace meteor::client_send_system {
 
 	const double UPDATE_DELTA		 = 1 / 20;
@@ -60,10 +61,18 @@ namespace meteor::client_send_system {
 				// TODO SEND USERS CLIENT using PLAYER_ID 
 				// TODO SEND USER INPUT IN DEDICATED INPUT MESSAGE
 
+				// TODO Use input history singleton instead of quering
 				input::input_state input = input::get_current_input();
-				// if (up) moverequestup ... and so on
+				movement_request move_request = movement_request::NEUTRAL;
 
-				entity_state_message state_message(game_instance.m_player_id, Vector2(0, 0), Color(0, 0, 0, 0), );
+				int x_axis = input.m_right - input.m_left;
+				int y_axis = input.m_up - input.m_down;
+				if		(x_axis == 1)	move_request = movement_request::RIGHT;
+				else if (x_axis == -1)	move_request = movement_request::LEFT;
+				else if (y_axis == 1)	move_request = movement_request::DOWN;
+				else if (y_axis == -1)	move_request = movement_request::UP;
+
+				entity_state_message state_message(game_instance.m_player_id, Vector2(0, 0), Color(0, 0, 0, 0), move_request);
 				state_message.write(writer);
 
 				if (!socket.send_to(server_endpoint, stream_send)) { print_error_code(); }
