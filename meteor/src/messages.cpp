@@ -4,12 +4,12 @@
 
 namespace meteor
 {
-   entity_state_message::entity_state_message(int32 id, Vector2 position, Color color)
+   entity_state_message::entity_state_message(int32 id, Vector2 position, Color color, movement_request move_request)
       : m_type((uint8)message_type::ENTITY_STATE)
       , m_id(id)
       , m_position(position)
       , m_color(color)
-      , m_move_request(move_request)
+      , m_move_request((uint8)move_request)
    {
    }
 

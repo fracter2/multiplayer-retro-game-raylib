@@ -31,4 +31,14 @@ namespace meteor {
 		uint32		m_sequence = 0;
 		uint32		m_acknowledge = 0;
 	};
+
+	struct server_connection_syncer {
+		server_connection_syncer() = default;
+
+		connection m_connection		 = {};
+		double m_last_checked_time	 = 0;
+		double m_next_update_time	 = 0;
+		bool m_auto_connect			 = false;
+
+	};
 } // !meteor

@@ -3,15 +3,17 @@
 #include <thread>
 #include <chrono>
 #include <cstdio>
-
 #include <stdio.h>
-#include "raylib.h"
+
+#include "common.hpp"
 #include "timer.hpp"
-#include "network.hpp"
 #include "messages.hpp"
 #include "protocol.hpp"
 #include "connection.hpp"
 #include "game.hpp"
+
+#include "input.hpp"
+#include "client_send_system.hpp"
 
 static void
 print_error_code()
@@ -38,11 +40,13 @@ int main(int argc, char **argv)
 	using namespace meteor;
 	network::startup boot;
 
-	const ip_endpoint LOCAL_ENDPOINT    (ip_address(10,12,234,103),  54321);
-	const ip_endpoint SERVER_ENDPOINT   (ip_address(10, 12, 190, 110),   54321);
+	const ip_endpoint LOCAL_ENDPOINT(ip_address(10, 12, 234, 103), 54321);
+	const ip_endpoint SERVER_ENDPOINT(ip_address(10, 12, 190, 110), 54321);
 
-	connection server_connection;
-	server_connection.m_status = connection::status::CONNECTING;
+	server_connection_syncer server_syncer;
+	connection& serv_con = server_syncer.m_connection;
+
+	server_syncer.m_connection.m_status = connection::status::CONNECTING;
 	debug::info("attempting to connect by default...");
 
 	udp_socket socket;
@@ -58,18 +62,16 @@ int main(int argc, char **argv)
 		LOCAL_ENDPOINT.m_address.d(),
 		LOCAL_ENDPOINT.port());
 
-	//int game_frame = 0;
+	// TODO Move all these to network state
 	double prev_send_time = GetTime();
-	double target_time = GetTime();
+	double target_time = GetTime();				
 	const double GAME_UPDATE_DELTA = 1 / 60;
-	const double SEND_UPDATE_DELTA = 1 / 20;
-	const double CONNECTING_DELTA = 2;
-
+	
 	const bool auto_reconnect = true;
 
 
 	// Game state data
-	game m_game = {};
+	game game_instance = {};
 	
 
 
@@ -83,79 +85,7 @@ int main(int argc, char **argv)
 		double time = GetTime();
 		// TODO USE THIS TIME EVERYWHERE as the CURRENT TICK TIME or similar. Util class?
 
-		// TODO MOVE TO FILE, 20hz
-		// TODO Refrence connection status (const), game state (const)
-		// TODO QUEUE SEND DATA, INPUT ACTIONS, WRAP IN TICK CLOSURE
-		// note: network send update
-		if (GetTime() > target_time) {
-			prev_send_time = GetTime();
-
-			byte_stream stream_send;
-			byte_stream_writer writer(stream_send);
-
-			switch (server_connection.m_status) {
-			case connection::status::CONNECTING: {
-				debug::info("sending connect package");
-				connect_packet message;
-				message.write(writer);
-				if (!socket.send_to(SERVER_ENDPOINT, stream_send)) { print_error_code(); }
-				target_time = GetTime() + CONNECTING_DELTA;
-				break;
-			}
-
-			case connection::status::CONNECTED: {
-				//send_sequence += 1;
-				payload_packet packet(m_game.m_tick);	// TODO Sequence is just for recieve. SEND should user game tick!!
-				packet.write(writer);
-
-				mouse_position_message message((float)GetMouseX(), (float)GetMouseY());
-				message.write(writer);
-
-				latency_message ping_message(GetTime());
-				ping_message.write(writer);
-
-				// TODO MAKE THIS INTO A QUEUE FROM INPUT STATES CHECK
-				// TODO GET INPUT IN SEPERATE SYSTEM BEFORE THIS
-				// TODO SEND USERS CLIENT using PLAYER_ID 
-				entity_state_message state_message(player_id, player_input, misc player stuff);
-				state_message.write(writer);
-
-				if (!socket.send_to(SERVER_ENDPOINT, stream_send)) { print_error_code(); }
-				debug::info("sending payload package");
-
-				// note: timeout
-				if (GetTime() > server_connection.m_last_recieve_time + TIMEOUT) {
-					server_connection.m_status = connection::status::DISCONNECTED;
-					debug::info("Timeout");
-				}
-
-				target_time = GetTime() + SEND_UPDATE_DELTA;
-
-				break;
-			}
-
-			case connection::status::DISCONNECTED: {
-				if (auto_reconnect) { 
-					server_connection.m_status = connection::status::CONNECTING; 
-				}
-				m_game = {};
-				server_connection.m_sequence = 0;
-				server_connection.m_acknowledge = 0;
-				//send_sequence = 0;
-				
-				break;
-			}
-				
-
-			case connection::status::DISCONNECTING: {
-				server_connection.m_status = connection::status::DISCONNECTED;
-				break;
-			}
-
-			}// !switch (server_connection.m_status)
-			
-			
-		} // !network send update
+		
 
 		// TODO MOVE TO FILE, 60hz or more?
 		// more to correct/reconsile next state ASAP
@@ -195,9 +125,9 @@ int main(int argc, char **argv)
 			{
 				connect_packet packet;
 				if (!packet.read(reader)) { print_error_code(); break; }
-				if (server_connection.m_status == connection::status::CONNECTING) {
-					server_connection.m_status = connection::status::CONNECTED;
-					server_connection.m_last_recieve_time = GetTime();
+				if (serv_con.m_status == connection::status::CONNECTING) {
+					serv_con.m_status = connection::status::CONNECTED;
+					serv_con.m_last_recieve_time = GetTime();
 					debug::info("%g - now connected to server", GetTime());
 				}
 				else {
@@ -210,16 +140,16 @@ int main(int argc, char **argv)
 			{
 				disconnect_packet packet;
 				if (!packet.read(reader)) { print_error_code(); break; }
-				server_connection.m_last_recieve_time = GetTime();
+				serv_con.m_last_recieve_time = GetTime();
 
-				if (server_connection.m_status == connection::status::DISCONNECTING)
+				if (serv_con.m_status == connection::status::DISCONNECTING)
 					debug::info("%i - Gracefully disconnected", GetTime());
-				else if (server_connection.m_status == connection::status::DISCONNECTED)
+				else if (serv_con.m_status == connection::status::DISCONNECTED)
 					debug::info("%i - recived disconnect package when already disconneced", GetTime());
 				else
 					debug::info("%i - Disgracefull disconnect", GetTime());
 
-				server_connection.m_status = connection::status::DISCONNECTED;
+				serv_con.m_status = connection::status::DISCONNECTED;
 				
 				// TODO RESET GAME STATE or FREEZE AND SHOW DISCONECT POPUP
 
@@ -234,18 +164,18 @@ int main(int argc, char **argv)
 			{
 				payload_packet packet;
 				if (!packet.read(reader)) { print_error_code(); break; }
-				server_connection.m_last_recieve_time = GetTime();
-				m_game.m_time_sec = GetTime();
+				serv_con.m_last_recieve_time = GetTime();
+				game_instance.m_time_sec = GetTime();
 
-				if (packet.m_sequence <= server_connection.m_sequence) { 
+				if (packet.m_sequence <= serv_con.m_sequence) {
 					debug::info("out-of-order packet dropped. my server sequenece: %d, packet sequence: %d, time: %f "
-						, (server_connection.m_sequence)
+						, (serv_con.m_sequence)
 						, (packet.m_sequence)
 						, (GetTime())
 					); 
 					break; 
 				}
-				server_connection.m_sequence = packet.m_sequence;
+				serv_con.m_sequence = packet.m_sequence;
 				
 
 				while(reader.has_data())
@@ -264,7 +194,7 @@ int main(int argc, char **argv)
 						entity_state_message message;
 						if (!message.read(reader)) { print_error_code(); break; }
 
-						m_game.update_entity(message);
+						game_instance.update_entity(message);
 
 						break;
 					}
@@ -277,35 +207,49 @@ int main(int argc, char **argv)
 			
 		} // !while socket.has_data()
 
-		// TODO QUERY INPUT
+
+		// ---- OVERALL STRUCTURE PLANNING ----
+
+		// RECIEVE PACKETS, every frame
+		// Update game state / other states imidiately
+
+		// TODO QUERY INPUT, 60hz
+		// Use struct for all inputs, like "input_map"
+		// Then convert to input Action, like move_requests
+		input::input_state inputs = input::get_current_input();
+
+		
+
+		// Then save alongside (inside?) game state buffer
+
 
 		// TODO GAME UPDATE LOOP, 60hz
-		// TODO USE GAME STATES
-		// TODO USE LATENCY STATE for CLIENT PREDICTION
-		m_game.update_process();
+		// USE GAME STATES
+		// USE LATENCY STATE for CLIENT PREDICTION
+		game_instance.update_process();
 
-		// TODO MOVE SEND CHECK HERE
-
-
-		// TODO RENDER GAME, 60hz or vsync (need lerp logic
-
-		// TODO RENDER UI
-
-		// TODO END LOOP, sleep for 1 ms
-
-		// DRAWING
-		BeginDrawing();
+		// TODO MOVE SEND CHECK HERE, 20hz
+		// For both GAME STATE and CONNECTING
+		// TODO MOVE TO FILE, 20hz
 		
-		m_game.render_frame();
+		meteor::client_send_system::update(time, socket, server_syncer, LOCAL_ENDPOINT, SERVER_ENDPOINT, game_instance);
+		//client_send_system(time);
+		
+		
+		// TODO RENDER GAME, 60hz or vsync (would need lerp logic)
+		BeginDrawing();
+		game_instance.render_frame();
 
-		// TODO DRAW ALL ENTITIES W COLOR
 		//DrawRectangle(my_x, my_y, 10, 10, GREEN);
 		//DrawRectangle(server_x, server_y, 10, 10, YELLOW);
-		
-		
+
+		// TODO RENDER UI
 		//DrawFPS(2, 2);
+
 		EndDrawing();
 
+
+		// END LOOP, sleep for 1 ms
 		// note: save the forest!
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}

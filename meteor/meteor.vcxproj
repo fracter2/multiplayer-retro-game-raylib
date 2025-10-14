@@ -101,6 +101,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="include\common.hpp" />
     <ClCompile Include="src\connection.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -111,8 +112,10 @@
     <ClCompile Include="src\timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\client_send_system.hpp" />
     <ClInclude Include="include\connection.hpp" />
     <ClInclude Include="include\game.hpp" />
+    <ClInclude Include="include\input.hpp" />
     <ClInclude Include="include\messages.hpp" />
     <ClInclude Include="include\network.hpp" />
     <ClInclude Include="include\network_layer.hpp" />

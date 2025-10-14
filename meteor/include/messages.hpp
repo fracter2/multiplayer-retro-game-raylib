@@ -23,7 +23,7 @@ namespace meteor
 
    struct entity_state_message {
       entity_state_message() = default;
-      entity_state_message(int32 id, Vector2 position, Color color);
+      entity_state_message(int32 id, Vector2 position, Color color, movement_request move_request);
 
       bool write(byte_stream_writer& writer);
       bool read(byte_stream_reader& reader);

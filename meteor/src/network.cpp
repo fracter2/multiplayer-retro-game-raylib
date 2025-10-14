@@ -6,7 +6,7 @@
 #include <WS2tcpip.h>
 #include <iphlpapi.h>
 
-#define SET_BROADCAST false
+
 
 namespace meteor
 {

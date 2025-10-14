@@ -2,21 +2,21 @@
 
 #pragma once
 
-#include <cassert>
-#include <vector>
-#include <string_view>
-#include <type_traits>
+#include "common.hpp"
+//#include <cassert>
+//#include <vector>
+//#include <string_view>
+//#include <type_traits>
+
+#define SET_BROADCAST false
 
 namespace meteor
 {
-   using uint64 = unsigned long long;
-   using  int64 = signed long long;
-   using uint32 = unsigned int;
-   using  int32 = signed int;
-   using uint16 = unsigned short;
-   using  int16 = signed short;
-   using  uint8 = unsigned char;
-   using   int8 = signed char;
+    
+    
+
+    // 
+   
 
    namespace debug
    {
