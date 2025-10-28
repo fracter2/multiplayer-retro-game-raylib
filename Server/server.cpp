@@ -3,6 +3,9 @@
 
 #include <iostream>
 
+
+#define SERVER
+
 int main()
 {
     std::cout << "Hello World!\n";

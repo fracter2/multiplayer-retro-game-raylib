@@ -15,6 +15,8 @@
 #include "input.hpp"
 #include "client_send_system.hpp"
 
+#define CLIENT
+
 static void
 print_error_code()
 {
@@ -34,7 +36,6 @@ int main(int argc, char **argv)
 	const int window_width = 1280, window_height = 720;
 	const std::string_view window_title = "Drawing over IP client";
 	InitWindow(window_width, window_height, window_title.data());
-	//SetTargetFPS(60);
 	SetExitKey(0);		// Esc
 
 	using namespace meteor;
@@ -211,7 +212,9 @@ int main(int argc, char **argv)
 		// ---- OVERALL STRUCTURE PLANNING ----
 
 		// RECIEVE PACKETS, every frame
-		// Update game state / other states imidiately
+		// As client, update game state imidiately
+		// Reply on send check
+		// Queue to make sure we have game-states in a short buffer 
 
 		// TODO QUERY INPUT, 60hz
 		// Use struct for all inputs, like "input_map"
@@ -228,9 +231,12 @@ int main(int argc, char **argv)
 		// USE LATENCY STATE for CLIENT PREDICTION
 		game_instance.update_process();
 
-		// TODO MOVE SEND CHECK HERE, 20hz
+		// TODO MOVE SEND CHECK HERE TO FILE, 20hz
 		// For both GAME STATE and CONNECTING
-		// TODO MOVE TO FILE, 20hz
+		// Reply ACK with latest recieve... (done by sending client game tick? or both, in case of missed server-packages?)
+		// Input and client-prediction is in latency state...
+		// Input is sent ASAP (20hz), whenever the server recieves it, it uses it
+		// INPUT IS TICK-WRAPPED ON THE CLIENT-TICK IT WAS PLAYED (Still would send latest input asap). Latest recieved game tick/package is also sent sepparately (ACK)
 		
 		meteor::client_send_system::update(time, socket, server_syncer, LOCAL_ENDPOINT, SERVER_ENDPOINT, game_instance);
 		//client_send_system(time);

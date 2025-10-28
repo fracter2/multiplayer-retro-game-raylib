@@ -23,4 +23,6 @@ namespace meteor {
 	using yourdad = long double;
 
 	
+	constexpr uint8 TICK_RATE = 60;
+	constexpr double TICK_TIME = 1.0 / TICK_RATE;
 }
