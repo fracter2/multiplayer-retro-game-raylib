@@ -59,7 +59,7 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CLIENT</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>include\;..\vendor\raylib\include\;</AdditionalIncludeDirectories>
@@ -112,14 +112,17 @@
     <ClCompile Include="src\timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\client_recieve_system.hpp" />
     <ClInclude Include="include\client_send_system.hpp" />
     <ClInclude Include="include\connection.hpp" />
     <ClInclude Include="include\game.hpp" />
+    <ClInclude Include="include\game_update_system.hpp" />
     <ClInclude Include="include\input.hpp" />
     <ClInclude Include="include\messages.hpp" />
     <ClInclude Include="include\network.hpp" />
     <ClInclude Include="include\network_layer.hpp" />
     <ClInclude Include="include\protocol.hpp" />
+    <ClInclude Include="include\render_system.hpp" />
     <ClInclude Include="include\timer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
