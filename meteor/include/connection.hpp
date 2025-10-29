@@ -7,11 +7,11 @@
 namespace meteor {
 	struct connection {
 		enum class status {
-			DISCONNECTED,
-			CONNECTING,
-			CONNECTED,
-			DISCONNECTING,
-			TEXAS,
+			DISCONNECTED,		// not connected, accept broadcasts
+			CONNECTING,			// attempting to connect to endpoint (sent connect pck, awaiting connect pck response with player index)
+			CONNECTED,			// connected
+			DISCONNECTING,		// attempting gracefull disconnect (sent disconnect pck awaiting response)
+			TEXAS,				// texas
 		};
 
 		connection() = default;
@@ -28,18 +28,20 @@ namespace meteor {
 		ip_endpoint m_endpoint;
 		status		m_status		 = {};
 		double		m_last_recieve_time = 0;
-		uint32		m_sequence		 = 0; // What we sent
+		uint32		m_sequence		 = 0; // What we send
 		uint32		m_acknowledge	 = 0; // recieved sequence, used as ack
 	};
 
-	// Client -> server
+	// Client -> server system state
+	/*
 	struct server_connection_syncer {
 		server_connection_syncer() = default;
 
-		connection m_connection		 = {};
-		double m_last_checked_time	 = 0;
-		double m_next_update_time	 = 0;
-		bool m_auto_connect			 = false;
+		connection m_connection		   = {};
+		double	   m_last_checked_time = 0;
+		//double	   m_next_update_time  = 0;
+		//bool	   m_auto_connect	   = false;
 
 	};
+	*/
 } // !meteor
