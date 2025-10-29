@@ -15,20 +15,6 @@
 #include "input.hpp"
 #include "client_send_system.hpp"
 
-#define CLIENT
-
-static void
-print_error_code()
-{
-	using namespace meteor;
-	auto now = time::get_current_time_ms();
-	auto error = network::get_last_error();
-	debug::error("%3.2fs - %5d: %s",
-		time::elapsed_seconds(now),
-		error.code(),
-		error.c_str());
-}
-
 
 
 int main(int argc, char **argv)
