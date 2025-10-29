@@ -23,6 +23,8 @@ namespace meteor::game {
 
 	constexpr int	 MAX_PLAYERS			 = 4;
 
+	// If we use a uint8, this is how it could be divided.
+	// Alternatively, we use a bitmask for breakable / unbreakable tiles, to save space.
 	enum class tile_type : uint8 {
 		INVALID,
 		EMPTY,
@@ -37,6 +39,7 @@ namespace meteor::game {
 		POST_GAME
 	};
 
+	// Player-user state, to keep track of game player slots.
 	enum class player_state : uint8 {
 		EMPTY,
 		JOINING,
@@ -49,6 +52,7 @@ namespace meteor::game {
 	// All player character actions, can only be performed one at a time per tick.
 	// Should have a predictable way of being applied, used for latency state
 	enum class player_actions : uint8 {
+		INVALID,
 		STAND_STILL,
 		MOVE_RIGHT,
 		MOVE_LEFT,
@@ -162,14 +166,22 @@ namespace meteor::game {
 		game_state  m_current = {};
 		uint32		m_current_tick = 0;
 
-//#ifdef CLIENT					// rn im scared to use cause i dont understand
+#ifdef _CLIENT
 		int m_user_index = -1;	// index of local user client
-		// queued (un-acked) actions 
-		game_state  m_latency_state = {}; // m_current with un-acked input_actions
-//#endif
+		// TODO add queued input actions for each tick from current and latency state
+		//player_actions m_predicted_actions[MAX_PREDICTED_ACTIONS] = {} (un-acked) actions 
+		//game_state m_latency_state = {}; // m_current with un-acked input_actions
+#endif
+
+#ifdef _SERVER
+		// game_state or game_state_delta history for a couple ticks (half a sec worth?)
+#endif
+
+
 
 	};
 
+	// ---- OLD CODE for mouse-syncing tests ----
 
 	// TODO SEPPARATE GAME_STATES INTO GAME_STATE AND LATENCY_STATES (with input history)
 	// TODO SEPARATE UPDATE LOGIC FROM CONTAINER
