@@ -6,7 +6,9 @@ namespace meteor
 {
 	// ---- game_state_message ----
 	
-
+	game_state_message::game_state_message()
+	{
+	}
 	game_state_message::game_state_message(game::game_state state)
 		: m_type(message_type::GAME_STATE)
 		, m_game_state(state)
@@ -21,6 +23,7 @@ namespace meteor
 	{
 		bool success = true;
 		success &= stream.serialize(message.m_type);
+		success &= stream.serialize(message.m_tick);
 		success &= stream.serialize(message.m_game_state);
 		return success;
 	}
@@ -75,10 +78,11 @@ namespace meteor
    bool serialize(input_action_message& message, T& stream) {
 	   bool success = true;
 	   success &= stream.serialize(message.m_type);
-	   success &= stream.serialize(player.m_position.x);
-	   success &= stream.serialize(player.m_position.y);
-	   success &= stream.serialize(player.m_velocity.x);
-	   success &= stream.serialize(player.m_velocity.y);
+	   success &= stream.serialize(message.m_tick);
+	   success &= stream.serialize(message.player.m_position.x);
+	   success &= stream.serialize(message.player.m_position.y);
+	   success &= stream.serialize(message.player.m_velocity.x);
+	   success &= stream.serialize(message.player.m_velocity.y);
 	   return success;
    }
 

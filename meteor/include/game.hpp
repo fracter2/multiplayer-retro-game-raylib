@@ -22,7 +22,8 @@ namespace meteor::game {
 	constexpr uint8  MAP_HEIGHT				 = 16;
 
 	constexpr int	 MAX_PLAYERS			 = 4;
-
+	constexpr int	 ACTIONS_BUFFER_LENGTH	 = 12;
+	constexpr int    STATE_HISTORY_LENGTH	 = 30;
 	// If we use a uint8, this is how it could be divided.
 	// Alternatively, we use a bitmask for breakable / unbreakable tiles, to save space.
 	enum class tile_type : uint8 {
@@ -163,18 +164,20 @@ namespace meteor::game {
 
 		player_info m_player_info[MAX_PLAYERS] = {};
 
-		game_state  m_current = {};
-		uint32		m_current_tick = 0;
+		game_state  m_state = {};
+		uint32		m_tick = 0;
 
 #ifdef _CLIENT
 		int m_user_index = -1;	// index of local user client
-		// TODO add queued input actions for each tick from current and latency state
-		//player_actions m_predicted_actions[MAX_PREDICTED_ACTIONS] = {} (un-acked) actions 
-		//game_state m_latency_state = {}; // m_current with un-acked input_actions
+		player_actions m_predict_actions[ACTIONS_BUFFER_LENGTH] = {};	// un-acked actions by player, used to client-side-predict
+		game_state	   m_predicted_state = {};							// result state from m_state having predicted actions applied.
+		game_state	   m_state_queue[STATE_HISTORY_LENGTH] = {};
+		int			   m_queued_states = 0
 #endif
 
 #ifdef _SERVER
 		// game_state or game_state_delta history for a couple ticks (half a sec worth?)
+		game_state m_state_history[STATE_HISTORY_LENGTH] = {};
 #endif
 
 

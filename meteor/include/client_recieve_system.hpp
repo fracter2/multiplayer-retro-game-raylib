@@ -53,8 +53,6 @@ namespace meteor::client_recieve_system {
 			stream_recieve.size());
 
 		uint8 p = reader.peek();
-
-		// TODO Add switch / array for connection state function pointers, that will handle 
 		if (p > (uint8)protocol_packet_type::PAYLOAD) {	// check if it's above max protocol uint8
 			debug::info("%g ignoring - recieved unknown protocol.", GetTime());
 			continue;
@@ -153,15 +151,13 @@ namespace meteor::client_recieve_system {
 				continue;
 			}
 
-			//game.m_time_sec = GetTime();
-
 			if (packet.m_sequence <= conn.m_sequence) {
 				debug::info("out-of-order packet dropped. my server sequenece: %d, packet sequence: %d, time: %f "
 					, (conn.m_sequence)
 					, (packet.m_sequence)
 					, (GetTime())
 				);
-				break;
+				continue;
 			}
 			conn.m_sequence = packet.m_sequence;
 
@@ -169,17 +165,33 @@ namespace meteor::client_recieve_system {
 
 			while (reader.has_data())
 			{
-				uint8 type = reader.peek();
+				uint8 t = reader.peek();
+				if (t > (uint8)message_type::INPUT_ACTION) {	// check if it's above max type uint8
+					debug::info("%g - recieved unknown message type.", GetTime());
+					continue;
+				}
+				message_type type = (message_type)t;
 
 				switch (type) {
-				case (uint8)message_type::LATENCY: {
+				case message_type::GAME_STATE: 
+				{
+					game_state_message message;		// WHY ERROR
+					if (!message.read(reader)) { print_error_code(); break; }
+					
+					game.m_state
+
+					break;
+				}
+
+					/*
+				case message_type::LATENCY: {
 					latency_message message;
 					if (!message.read(reader)) { print_error_code(); break; }
 					debug::info("latency: %f ", (GetTime() - message.m_time));
 					break;
 				}
 
-				case (uint8)message_type::ENTITY_STATE: {
+				case message_type::ENTITY_STATE: {
 					entity_state_message message;
 					if (!message.read(reader)) { print_error_code(); break; }
 
@@ -187,6 +199,8 @@ namespace meteor::client_recieve_system {
 
 					break;
 				}
+				*/
+
 				} // !payload switch
 			}
 

@@ -17,23 +17,26 @@ namespace meteor
 
    struct game_state_message {
 	   //game_state_message() = default;
+	   game_state_message() = default;
 	   game_state_message(game::game_state state);
 
 	   bool write(byte_stream_writer& writer);
 	   bool read(byte_stream_reader& reader);
 
 	   message_type		m_type = message_type::GAME_STATE;
+	   uint32			m_tick = 0;
 	   game::game_state m_game_state = {};
    };
 
    struct input_action_message {
-	   //game_state_message() = default;
+	   input_action_message() = default;
 	   input_action_message(game::player_actions action);
 
 	   bool write(byte_stream_writer& writer);
 	   bool read(byte_stream_reader& reader);
 
 	   message_type			m_type = message_type::INPUT_ACTION;
+	   uint32				m_tick = 0;
 	   game::player_actions m_action = game::player_actions::INVALID;
    };
 
