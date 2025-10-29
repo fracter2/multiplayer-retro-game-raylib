@@ -4,6 +4,8 @@
 
 #include "network.hpp"
 
+
+// TODO MOVE TO "meteor::network" or similar
 namespace meteor
 {
 	constexpr uint32 PROTOCOL_MAGIC     = 0xbaadf00d;

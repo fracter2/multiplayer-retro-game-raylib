@@ -12,18 +12,14 @@
 
 namespace meteor
 {
-    
-    
-
-    // 
-   
-
    namespace debug
    {
       void info(const char *format, ...);
       void warn(const char *format, ...);
       void error(const char *format, ...);
    } // !debug
+
+   static void print_error_code();
 
    namespace time
    {
