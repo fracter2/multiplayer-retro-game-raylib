@@ -11,11 +11,10 @@
 
 #include "input.hpp"
 
-// Consider client namespace? separate project?
 namespace meteor::client_send_system {
 
-	const double UPDATE_DELTA		 = 1 / 20;
-	const double CONNECTING_DELTA	 = 2;
+	constexpr double PHYS_TICKS_PER_NETWORK_TICK   = 3;	// 60hz / 3 = 20hz
+	constexpr double CONNECTING_RESEND_DELAY_TICKS = 5; // 5 network-ticks
 
 	
 
@@ -23,9 +22,8 @@ namespace meteor::client_send_system {
 	// TODO Refrence connection status (const), game state (const)
 	// TODO QUEUE SEND DATA, INPUT ACTIONS, WRAP IN TICK CLOSURE
 	// note: network send update
-	void update(const double time, udp_socket& socket, server_connection_syncer& syncer, const ip_endpoint& client_endpoint, const ip_endpoint& server_endpoint, game& game_instance) {
+	void update(const double time, udp_socket& socket, server_connection_syncer& syncer, const ip_endpoint& client_endpoint, const ip_endpoint& server_endpoint, game::game& game_instance) {
 
-		//if (time < server.m_last_checked + )
 		
 		if (time > syncer.m_next_update_time) {
 			syncer.m_last_checked_time = time;
@@ -62,7 +60,7 @@ namespace meteor::client_send_system {
 				// TODO SEND USER INPUT IN DEDICATED INPUT MESSAGE
 
 				// TODO Use input history singleton instead of quering
-				input::input_state input = input::get_current_input();
+				//input::input_state input = input::get_current_input();
 				movement_request move_request = movement_request::NEUTRAL;
 
 				int x_axis = input.m_right - input.m_left;
