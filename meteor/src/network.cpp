@@ -45,7 +45,7 @@ namespace meteor
       }
    } // !debug
 
-   static void print_error_code()
+   void print_error_code()
    {
        using namespace meteor;
        auto now = time::get_current_time_ms();

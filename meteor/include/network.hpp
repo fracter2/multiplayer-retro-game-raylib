@@ -8,7 +8,7 @@
 //#include <string_view>
 //#include <type_traits>
 
-#define SET_BROADCAST false
+//#define SET_BROADCAST false
 
 namespace meteor
 {
@@ -21,7 +21,7 @@ namespace meteor
       void error(const char *format, ...);
    } // !debug
 
-   static void print_error_code();
+   void print_error_code();
 
    namespace time
    {

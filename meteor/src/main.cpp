@@ -18,8 +18,35 @@
 #include "game_update_system.hpp"
 #include "render_system.hpp"
 
-#define _CLIENT // This is also added in project settings, making it "global"
+//#define _CLIENT // This is also added in project settings, making it "global"
 
+
+bool setup_socket_endpoint(meteor::udp_socket& socket, meteor::ip_endpoint& local_endpoint, const meteor::uint16 port) {
+	using namespace meteor;
+	std::vector<ip_address> local_adresses = {};
+	if (network::query_local_addresses(local_adresses)) {
+		debug::info("no local adresses found!");
+		return false;
+	}
+
+	for (ip_address addr : local_adresses)
+	{
+		local_endpoint = ip_endpoint(addr, port);
+		if (!socket.open_and_bind(local_endpoint)) {
+			debug::info("local address bind failed: %d.%d.%d.%d: %d",
+				local_endpoint.m_address.a(),
+				local_endpoint.m_address.b(),
+				local_endpoint.m_address.c(),
+				local_endpoint.m_address.d(),
+				local_endpoint.port());
+			print_error_code();
+			continue;
+		}
+		else { break; }
+	}
+
+	return true;
+}
 
 int main(int argc, char **argv)
 {
@@ -34,9 +61,9 @@ int main(int argc, char **argv)
 	// ==== APP DATA ====
 	constexpr uint16 PORT = 54321;
 	//const ip_endpoint LOCAL_ENDPOINT(ip_address(10, 12, 234, 103), PORT);	// TODO make use of pre-made local adress getter func
-	//const ip_endpoint SERVER_ENDPOINT(ip_address(10, 12, 190, 110), PORT);	// TODO Add way of inputting adresses after start...
+	const ip_endpoint SERVER_ENDPOINT(ip_address(192, 168, 1, 53), PORT);	// TODO Add way of inputting adresses after start...
 	ip_endpoint local_endpoint = {};
-	ip_endpoint server_endpoint = {};
+	ip_endpoint server_endpoint = SERVER_ENDPOINT;
 	udp_socket socket;
 	connection server_connection;
 
@@ -76,6 +103,12 @@ int main(int argc, char **argv)
 
 		client_recieve_system::update(time, socket, server_connection, game);
 
+		byte_stream stream_send;
+		byte_stream_writer writer(stream_send);
+		connect_packet message;
+		message.write(writer);
+		if (!socket.send_to(server_endpoint, stream_send)) { print_error_code(); }
+
 		// tick loop
 		if (time >= next_tick_time) {
 			next_tick_time += TICK_TIME;
@@ -94,7 +127,8 @@ int main(int argc, char **argv)
 			// Input is sent ASAP (20hz), whenever the server recieves it, it uses it
 			// INPUT IS TICK-WRAPPED ON THE CLIENT-TICK IT WAS PLAYED (Still would send latest input asap). Latest recieved game tick/package is also sent sepparately (ACK)
 
-			client_send_system::update(time, socket, server_connection, local_endpoint, server_endpoint, game);
+			// TODO 
+			//client_send_system::update(time, socket, server_connection, local_endpoint, server_endpoint, game);
 
 
 			BeginDrawing();
@@ -113,29 +147,3 @@ int main(int argc, char **argv)
 }//!main
 
 
-bool setup_socket_endpoint(meteor::udp_socket& socket, meteor::ip_endpoint& local_endpoint, const meteor::uint16 port) {
-	using namespace meteor;
-	std::vector<ip_address> local_adresses = {};
-	if (network::query_local_addresses(local_adresses)) {
-		debug::info("no local adresses found!");
-		return false;
-	}
-
-	for (ip_address addr : local_adresses)
-	{
-		local_endpoint = ip_endpoint(addr, port);
-		if (!socket.open_and_bind(local_endpoint)) {
-			debug::info("local address bind failed: %d.%d.%d.%d: %d",
-				local_endpoint.m_address.a(),
-				local_endpoint.m_address.b(),
-				local_endpoint.m_address.c(),
-				local_endpoint.m_address.d(),
-				local_endpoint.port());
-			print_error_code();
-			continue;
-		}
-		else { break; }
-	}
-
-	return true;
-}

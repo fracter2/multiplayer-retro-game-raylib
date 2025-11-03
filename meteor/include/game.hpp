@@ -13,10 +13,10 @@ namespace meteor::game {
 
 	// TODO Consider making a "game_config" class that is sent before game starts. Would need maps to be created/deleted each game (convinience thing)
 
-	constexpr uint8  NAME_LENGTH_MAX		 = 16;
-	constexpr double BOMB_EXPLOSION_TIME	 = 3.0;
-	constexpr uint8	 BOMB_TIMER_TICKS		 = BOMB_EXPLOSION_TIME * TICK_RATE;
-	constexpr double BOMB_PLACE_INTERVAL_MIN = 1.0;
+	constexpr uint32 NAME_LENGTH_MAX		 = 16;
+	constexpr double BOMB_FUSE_TIME			 = 3.0;
+	constexpr uint32 BOMB_FUSE_TICKS		 = (uint32)(BOMB_FUSE_TIME * (double)TICK_RATE);
+	constexpr uint32 BOMB_COOLDOWN_TICKS	 = (uint32)(1.0 * (double)TICK_RATE);
 
 	constexpr uint8  MAP_WIDTH				 = 16;
 	constexpr uint8  MAP_HEIGHT				 = 16;
@@ -25,71 +25,66 @@ namespace meteor::game {
 	constexpr int	 ACTIONS_BUFFER_LENGTH	 = 12;
 	constexpr int    STATE_HISTORY_LENGTH	 = 30;
 
+	// Right now map sizes are hard coded to simplify implementation (especially for network messages)
 	constexpr int    TILEMAP_TILES			 = MAP_WIDTH * MAP_HEIGHT;
 	constexpr int    TILEMAP_BYTES			 = 
 		MAP_WIDTH * MAP_HEIGHT / 8 
 		+ (((MAP_WIDTH * MAP_HEIGHT) % 8) == 0 ? 0 : 1);		// Add 1 if there's remainder, since "/" rounds down
 
-	// If we use a uint8, this is how it could be divided.
-	// Alternatively, we use a bitmask for breakable / unbreakable tiles, to save space.
-	/*
-	enum class tile_type : uint8 {
-		INVALID,
-		EMPTY,
-		BREAKABLE,
-		UNBREAKABLE
-	};
-	*/
+	// Vec2 to tile coordniate system. Not clamped by tilemap size
+	void vec2_to_tile (const Vector2& pos, uint8& x, uint8& y) { 
+		uint8 new_x = (uint8)pos.x;
+		uint8 new_y = (uint8)pos.y;
 
-	enum class gameplay_state : uint8 {
-		INVALID,
-		PRE_GAME,
-		IN_GAME,
-		POST_GAME
-	};
+		x = new_x;
+		y = new_y;
+	}
+
+	bool valid_tile(const uint8 x, const uint8 y) 
+	
 
 	// Player-user state, to keep track of game player slots.
-	enum class player_state : uint8 {
-		EMPTY,
-		JOINING,
-		ACTIVE,
-		AFK,
-		DISCONNECTED,
-		TIMEOUT
-	};
-
-	// All player character actions, can only be performed one at a time per tick.
-	// Should have a predictable way of being applied, used for latency state
-	enum class player_actions : uint8 {
-		INVALID,
-		STAND_STILL,
-		MOVE_RIGHT,
-		MOVE_LEFT,
-		MOVE_UP,
-		MOVE_DOWN,
-		PLACE_BOMB
-	};
-
 	struct player_info {
+		enum class status : uint8 {
+			EMPTY,
+			JOINING,
+			ACTIVE,
+			AFK,
+			DISCONNECTED,
+			TIMEOUT
+		};
+
 		player_info() = default;
 
 		//bool m_is_host	// noone is host since the server is running on a sepparate exe. 
 							// The server exe could have admin tools, if needed.
-		player_state m_player_state = player_state::EMPTY;
-		char m_name[NAME_LENGTH_MAX] = "";
+		status m_player_state = status::EMPTY;
+		char   m_name[NAME_LENGTH_MAX] = "";
 		// maybe lag info or similar could be here too
 	};
 
 	struct player_entity {
+		// All player character actions, can only be performed one at a time per tick.
+		// Should have a predictable way of being applied, used for latency state
+		enum class action : uint8 {
+			INVALID,		// Used to check validity of state
+			STAND_STILL,
+			MOVE_RIGHT,
+			MOVE_LEFT,
+			MOVE_UP,
+			MOVE_DOWN,
+			PLACE_BOMB
+		};
+
 		player_entity() = default;
 		player_entity(Vector2 position)
 			: m_position(position)
 		{
 		}
 		
-		bool		   m_dead = true;
-		player_actions m_prev_action = {};
-		Vector2		   m_position = {};
+		bool	m_dead = true;
+		action	m_prev_action = action::INVALID;
+		Vector2	m_position = {};
 	};
 
 	struct bomb {
@@ -107,42 +102,11 @@ namespace meteor::game {
 
 	struct tilemap {
 		tilemap() = default;
-
-		// No dynamic map for now, to maintain simplicity
-		/*
-		tilemap() 
-			//: m_width(MAP_WIDTH)
-			//, m_height(MAP_HEIGHT)
-		{
-			//m_tiles = new uint8[total_bytes()];
-		}
-
-
-		//const uint8 m_width;
-		//const uint8 m_height;
-		
-
-		const int total_tiles() const { return MAP_WIDTH * MAP_HEIGHT; }
-		
-		const int total_bytes() const {
-			return
-				MAP_WIDTH * MAP_HEIGHT / 8
-				+ ((MAP_WIDTH * MAP_HEIGHT) % 8) == 0 ? 0 : 1;		// Add 1 if there's remainder, since "/" rounds down
-		}
-
-		//uint8* m_tiles;
-		*/
 		
 		uint8 m_tiles[TILEMAP_BYTES] = {};
 
-		const bool valid_tile(const uint8 x, const uint8 y) const {
-			if (x >= MAP_WIDTH
-			 || y >= MAP_HEIGHT
-			 || (x + y * MAP_WIDTH) >= TILEMAP_TILES) return false;
-			else return true;
-		}
-
-		const bool get_tile(const uint8 x, const uint8 y) const {
+		// Returns if tile is active (not broken)
+		bool get_tile(const uint8 x, const uint8 y) const {
 			assert(valid_tile(x, y));
 			uint8 byte	  = *(m_tiles + ((x + y * MAP_WIDTH) / 8));
 			uint8 bitmask = (uint8)1 << ((x + y * MAP_WIDTH) % 8);
@@ -185,29 +149,43 @@ namespace meteor::game {
 		const tilemap& get_tilemap() const { return m_tilemap; }
 		
 		const bool is_default() const {
-			return m_players[0].m_prev_action == player_actions::INVALID;
+			return m_players[0].m_prev_action == player_entity::action::INVALID;
 		}
 	};
 
+
 	struct game {
+		enum class status : uint8 {
+			INVALID,
+			PRE_GAME,
+			IN_GAME,
+			POST_GAME
+		};
+		
 		game() = default;
 
 		player_info m_player_info[MAX_PLAYERS] = {};
 
 		game_state  m_state = {};
 		uint32		m_tick = 0;
+		status		m_status = status::INVALID;
 
 #ifdef _CLIENT
-		int m_user_index = -1;	// index of local user client
-		player_actions m_predict_actions[ACTIONS_BUFFER_LENGTH] = {};	// un-acked actions by player, used to client-side-predict
-		game_state	   m_predicted_state = {};							// result state from m_state having predicted actions applied.
-		game_state	   m_state_queue[STATE_HISTORY_LENGTH] = {};
-		int			   m_queued_states = 0;
+		int					  m_user_index = -1;								// index of local user client
+		//player_entity::action m_predict_actions[ACTIONS_BUFFER_LENGTH] = {};	// un-acked actions by player, used to client-side-predict
+
+		std::vector<player_entity::action> m_predict_actions = std::vector<player_entity::action>();
+
+		game_state				m_predicted_state = {};							// result state from m_state having predicted actions applied.
+		//game_state				m_state_queue[STATE_HISTORY_LENGTH] = {};
+		std::vector<game_state> m_state_queue = std::vector<game_state>();
+		//int						m_queued_states = 0;
 #endif
 
 #ifdef _SERVER
 		// game_state or game_state_delta history for a couple ticks (half a sec worth?)
-		game_state m_state_history[STATE_HISTORY_LENGTH] = {};
+		//game_state m_state_history[STATE_HISTORY_LENGTH] = {};
+		std::vector<game_state> m_state_history = std::vector<game_state>();
 #endif
 
 

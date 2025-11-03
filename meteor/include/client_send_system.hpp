@@ -18,17 +18,15 @@ namespace meteor::client_send_system {
 
 	
 
-
+	/*
 	// TODO Refrence connection status (const), game state (const)
 	// TODO QUEUE SEND DATA, INPUT ACTIONS, WRAP IN TICK CLOSURE
 	// note: network send update
-	void update(const double time, udp_socket& socket, server_connection_syncer& syncer, const ip_endpoint& client_endpoint, const ip_endpoint& server_endpoint, game::game& game_instance) {
+	void update(const double time, udp_socket& socket, connection& connection, const ip_endpoint& client_endpoint, const ip_endpoint& server_endpoint, game::game& game_instance) {
 
 		
 		if (time > syncer.m_next_update_time) {
 			syncer.m_last_checked_time = time;
-
-			connection& serv_con = syncer.m_connection;
 
 			byte_stream stream_send;
 			byte_stream_writer writer(stream_send);
@@ -110,4 +108,5 @@ namespace meteor::client_send_system {
 
 		} // !network send update
 	}
+	*/
 }

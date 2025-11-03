@@ -30,14 +30,14 @@ namespace meteor
 
    struct input_action_message {
 	   input_action_message() = default;
-	   input_action_message(game::player_actions action);
+	   input_action_message(game::player_entity::action action);
 
 	   bool write(byte_stream_writer& writer);
 	   bool read(byte_stream_reader& reader);
 
 	   message_type			m_type = message_type::INPUT_ACTION;
 	   uint32				m_tick = 0;
-	   game::player_actions m_action = game::player_actions::INVALID;
+	   game::player_entity::action m_action = game::player_entity::action::INVALID;
    };
 
    

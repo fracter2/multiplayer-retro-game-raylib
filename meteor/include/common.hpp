@@ -7,7 +7,7 @@
 #include <vector>
 #include <string_view>
 #include <type_traits>
-#include "raylib.h"
+
 
 namespace meteor {
 	using uint64 = unsigned long long;
