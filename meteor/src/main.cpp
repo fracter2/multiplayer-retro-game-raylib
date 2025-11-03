@@ -29,41 +29,41 @@ int main(int argc, char **argv)
 	SetExitKey(0);		// Esc
 
 	using namespace meteor;
-	network::startup boot;
-
-	
-	const ip_endpoint LOCAL_ENDPOINT(ip_address(10, 12, 234, 103), 54321);	// TODO make use of pre-made local adress getter func
-	const ip_endpoint SERVER_ENDPOINT(ip_address(10, 12, 190, 110), 54321);	// TODO Add way of inputting adresses after start...
 
 
-	server_connection_syncer server_syncer;
-	connection& serv_con = server_syncer.m_connection;
-
-	server_syncer.m_connection.m_status = connection::status::CONNECTING;		// TODO Move to system or dedicated INIT
-	debug::info("attempting to connect by default...");
-
+	// ==== APP DATA ====
+	constexpr uint16 PORT = 54321;
+	//const ip_endpoint LOCAL_ENDPOINT(ip_address(10, 12, 234, 103), PORT);	// TODO make use of pre-made local adress getter func
+	//const ip_endpoint SERVER_ENDPOINT(ip_address(10, 12, 190, 110), PORT);	// TODO Add way of inputting adresses after start...
+	ip_endpoint local_endpoint = {};
+	ip_endpoint server_endpoint = {};
 	udp_socket socket;
-	if (!socket.open_and_bind(LOCAL_ENDPOINT)) {
-		print_error_code();
-		return 0;
-	}
+	connection server_connection;
+
+	game::game		   game = {};
+	input::input_state input = {};
+
+	//uint32 ticks_since_start = 0;
+	double next_tick_time = GetTime();
+
+
+	// ==== INIT ====
+	network::startup boot;
+	setup_socket_endpoint(socket, local_endpoint, PORT);
 
 	debug::info("local endpoint: %d.%d.%d.%d:%d",
-		LOCAL_ENDPOINT.m_address.a(),
-		LOCAL_ENDPOINT.m_address.b(),
-		LOCAL_ENDPOINT.m_address.c(),
-		LOCAL_ENDPOINT.m_address.d(),
-		LOCAL_ENDPOINT.port());
+		local_endpoint.m_address.a(),
+		local_endpoint.m_address.b(),
+		local_endpoint.m_address.c(),
+		local_endpoint.m_address.d(),
+		local_endpoint.port());
 
-	// TODO Move all these to network state
-	double prev_send_time = GetTime();
-	double target_time = GetTime();				
-	//const double GAME_UPDATE_DELTA = 1 / 60;
-	const bool auto_reconnect = true;
+	//server_connection.m_status = connection::status::CONNECTING;		// TODO Move to system or dedicated INIT
+	//debug::info("attempting to connect by default...");
 
 
-	game::game		   game	 = {};
-	input::input_state input = {};
+	// 
+	
 
 	// update loop
 	bool running = true;
@@ -72,21 +72,17 @@ int main(int argc, char **argv)
 		running &= !WindowShouldClose();
 		
 		double time = GetTime();
-		double next_tick_time = time;
 
-		
 
-		
-		client_recieve_system::update(socket);
+		client_recieve_system::update(time, socket, server_connection, game);
 
 		// tick loop
-		if (time > next_tick_time) {
+		if (time >= next_tick_time) {
 			next_tick_time += TICK_TIME;
 
 			// Use struct for all inputs, like "input_map"
 			// Then convert to input Action, like move_requests
 			input::update(input);
-			// Then save alongside (inside?) game state buffer
 
 
 			game_update_system::update(game, input);
@@ -98,19 +94,48 @@ int main(int argc, char **argv)
 			// Input is sent ASAP (20hz), whenever the server recieves it, it uses it
 			// INPUT IS TICK-WRAPPED ON THE CLIENT-TICK IT WAS PLAYED (Still would send latest input asap). Latest recieved game tick/package is also sent sepparately (ACK)
 
-			client_send_system::update(time, socket, server_syncer, LOCAL_ENDPOINT, SERVER_ENDPOINT, game);
-
+			client_send_system::update(time, socket, server_connection, local_endpoint, server_endpoint, game);
 
 
 			BeginDrawing();
 			render_system::render();
 			EndDrawing();
+
 		} //!tick loop
 
 		// note: save the forest!
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
 	} //!update loop
 
 	CloseWindow();
 	return 0;
 }//!main
+
+
+bool setup_socket_endpoint(meteor::udp_socket& socket, meteor::ip_endpoint& local_endpoint, const meteor::uint16 port) {
+	using namespace meteor;
+	std::vector<ip_address> local_adresses = {};
+	if (network::query_local_addresses(local_adresses)) {
+		debug::info("no local adresses found!");
+		return false;
+	}
+
+	for (ip_address addr : local_adresses)
+	{
+		local_endpoint = ip_endpoint(addr, port);
+		if (!socket.open_and_bind(local_endpoint)) {
+			debug::info("local address bind failed: %d.%d.%d.%d: %d",
+				local_endpoint.m_address.a(),
+				local_endpoint.m_address.b(),
+				local_endpoint.m_address.c(),
+				local_endpoint.m_address.d(),
+				local_endpoint.port());
+			print_error_code();
+			continue;
+		}
+		else { break; }
+	}
+
+	return true;
+}
