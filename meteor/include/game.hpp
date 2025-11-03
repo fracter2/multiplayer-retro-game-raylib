@@ -24,14 +24,22 @@ namespace meteor::game {
 	constexpr int	 MAX_PLAYERS			 = 4;
 	constexpr int	 ACTIONS_BUFFER_LENGTH	 = 12;
 	constexpr int    STATE_HISTORY_LENGTH	 = 30;
+
+	constexpr int    TILEMAP_TILES			 = MAP_WIDTH * MAP_HEIGHT;
+	constexpr int    TILEMAP_BYTES			 = 
+		MAP_WIDTH * MAP_HEIGHT / 8 
+		+ (((MAP_WIDTH * MAP_HEIGHT) % 8) == 0 ? 0 : 1);		// Add 1 if there's remainder, since "/" rounds down
+
 	// If we use a uint8, this is how it could be divided.
 	// Alternatively, we use a bitmask for breakable / unbreakable tiles, to save space.
+	/*
 	enum class tile_type : uint8 {
 		INVALID,
 		EMPTY,
 		BREAKABLE,
 		UNBREAKABLE
 	};
+	*/
 
 	enum class gameplay_state : uint8 {
 		INVALID,
@@ -79,64 +87,83 @@ namespace meteor::game {
 		{
 		}
 		
-		bool	m_dead = false;
-		Vector2 m_position = {};
-		Vector2 m_velocity = {};
+		bool		   m_dead = true;
+		player_actions m_prev_action = {};
+		Vector2		   m_position = {};
 	};
 
 	struct bomb {
 		bomb() = default;
-		bomb(Vector2 position, int32 explosion_tick)
-			: m_position(position)
+		bomb(uint8 x, uint8 y, int32 explosion_tick)
+			: m_x(x)
+			, m_y(y)
 			, m_explosion_tick(explosion_tick)
 		{
 		}
-		Vector2 m_position = {};
+		uint8   m_x = 0;
+		uint8   m_y = 0;
 		uint32	m_explosion_tick = 0;
 	};
 
 	struct tilemap {
-		//tilemap() = default;
+		tilemap() = default;
 
+		// No dynamic map for now, to maintain simplicity
+		/*
 		tilemap() 
-			: m_width(MAP_WIDTH)
-			, m_height(MAP_HEIGHT)
+			//: m_width(MAP_WIDTH)
+			//, m_height(MAP_HEIGHT)
 		{
-			m_tiles = new uint8[m_width * m_height];
+			//m_tiles = new uint8[total_bytes()];
 		}
-		/*	// We dont need a dynamic-size map now. If we do, we should consider the same for 
-			   all other "game settings", and make a game_config class.
-		tilemap(uint8 width, uint8 height)
-			: m_width(width)
-			, m_height(height)
-		{
-			m_tiles = new uint8[m_width * m_height];
+
+
+		//const uint8 m_width;
+		//const uint8 m_height;
+		
+
+		const int total_tiles() const { return MAP_WIDTH * MAP_HEIGHT; }
+		
+		const int total_bytes() const {
+			return
+				MAP_WIDTH * MAP_HEIGHT / 8
+				+ ((MAP_WIDTH * MAP_HEIGHT) % 8) == 0 ? 0 : 1;		// Add 1 if there's remainder, since "/" rounds down
 		}
+
+		//uint8* m_tiles;
 		*/
+		
+		uint8 m_tiles[TILEMAP_BYTES] = {};
 
-		const uint8 m_width;
-		const uint8 m_height;
-		uint8*		m_tiles;
-		// Consider using bitmasks instead to reduce memory consumption
-		//uint8* m_bits_breakable;
-		//uint8* m_bits_unbreakable;
-
-		const tile_type get_tile(const uint8 x, const uint8 y) const {
-			if (x >= m_width || y >= m_height) return tile_type::INVALID;
-			return (tile_type)(*(m_tiles + (x + y * m_width)));
+		const bool valid_tile(const uint8 x, const uint8 y) const {
+			if (x >= MAP_WIDTH
+			 || y >= MAP_HEIGHT
+			 || (x + y * MAP_WIDTH) >= TILEMAP_TILES) return false;
+			else return true;
 		}
 
-		void set_tile(const uint8 x, const uint8 y, const tile_type type) {
-			assert(x < m_width && y < m_height);
-			if (x >= m_width || y >= m_height) return;
-			*(m_tiles + (x + y * m_width)) = (uint8)type;
+		const bool get_tile(const uint8 x, const uint8 y) const {
+			assert(valid_tile(x, y));
+			uint8 byte	  = *(m_tiles + ((x + y * MAP_WIDTH) / 8));
+			uint8 bitmask = (uint8)1 << ((x + y * MAP_WIDTH) % 8);
+
+			return (byte & bitmask) != 0;	// & is the bitwise "and" operator, so if the result is higher than 0, that bit is active.
+		}
+
+		void set_tile(const uint8 x, const uint8 y, bool value) {
+			assert(valid_tile(x, y));
+			uint8 byte = *(m_tiles + ((x + y * MAP_WIDTH) / 8));
+			uint8 bitmask = (uint8)1 << ((x + y * MAP_WIDTH) % 8);
+
+			if (value) { byte = byte | bitmask; }			// | is bitwise "or", resulting in all 1s being kept from both
+			else	   { byte = byte & (~bitmask); }		// ~ is bitwise complement operator, flipping all bits 1->0 and 0->1
 		}
 	};
 
 
 	struct game_state {
 		game_state() = default;
-		
+
 		player_entity m_players[MAX_PLAYERS] = {};
 		bomb		  m_bombs[MAX_PLAYERS] = {};
 		tilemap		  m_tilemap = {};
@@ -157,6 +184,9 @@ namespace meteor::game {
 
 		const tilemap& get_tilemap() const { return m_tilemap; }
 		
+		const bool is_default() const {
+			return m_players[0].m_prev_action == player_actions::INVALID;
+		}
 	};
 
 	struct game {
@@ -172,7 +202,7 @@ namespace meteor::game {
 		player_actions m_predict_actions[ACTIONS_BUFFER_LENGTH] = {};	// un-acked actions by player, used to client-side-predict
 		game_state	   m_predicted_state = {};							// result state from m_state having predicted actions applied.
 		game_state	   m_state_queue[STATE_HISTORY_LENGTH] = {};
-		int			   m_queued_states = 0
+		int			   m_queued_states = 0;
 #endif
 
 #ifdef _SERVER

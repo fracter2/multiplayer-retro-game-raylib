@@ -105,18 +105,18 @@ namespace meteor::client_recieve_system {
 			switch (conn.m_status) {
 			case connection::status::DISCONNECTING:
 			{
-				debug::info("%i - Gracefully disconnected", GetTime());
+				debug::info("%g - Gracefully disconnected", GetTime());
 				break;
 			}
 			case connection::status::CONNECTING:
 			{
-				debug::info("%i - Denied connection", GetTime());
+				debug::info("%g - Denied connection", GetTime());
 				break;
 			}
 			case connection::status::CONNECTED:
 			{
 				// note: I assume this does not need to be gracefull, as it is more rare and gracefullness wouldn't help the kicked / unkicked players
-				debug::info("%i - Got kicked (server initiated disconnect. disgracefull)", GetTime());
+				debug::info("%g - Got kicked (server initiated disconnect. disgracefull)", GetTime());
 				break;
 			}
 
@@ -131,15 +131,12 @@ namespace meteor::client_recieve_system {
 			conn.m_status = connection::status::DISCONNECTED;
 
 			// TODO RESET GAME STATE or FREEZE AND SHOW DISCONECT POPUP
+			//game = game::game(); // Reset on restart maybe? let game be frozen?
 
 			break;
 		}//!Disconnect
 
 
-		// TODO DELEGATE TO SEPARATE GAME SYNCER FILE
-		// TODO MIND TICK CLOSURES
-		// TODO MIND LATENCY STATE and RECONCILIATION
-		// TODO MIND SENDER SEQUENCE and ACK
 		case protocol_packet_type::PAYLOAD:
 		{
 			payload_packet packet;
@@ -162,7 +159,7 @@ namespace meteor::client_recieve_system {
 			conn.m_sequence = packet.m_sequence;
 
 			
-
+			// Read messages
 			while (reader.has_data())
 			{
 				uint8 t = reader.peek();
@@ -178,28 +175,30 @@ namespace meteor::client_recieve_system {
 					game_state_message message;		// WHY ERROR
 					if (!message.read(reader)) { print_error_code(); break; }
 					
-					game.m_state
+					int ticks_ahead = message.m_tick - game.m_tick;
+
+					if (ticks_ahead < 0) {
+						debug::info("%g - recieved gamestate that is behind at tick: %d, local tick: %d, ignoring", GetTime(), message.m_tick, game.m_tick);
+						break;
+					}
+					
+					if (ticks_ahead == 0)						  debug::info("%g - recieved gamestate that is on current tick: %d", GetTime(), message.m_tick);
+					else if (ticks_ahead < game.m_queued_states)  debug::info("%g - recieved state for upcoming tick inbetween newest and current", GetTime());
+					else if (ticks_ahead == game.m_queued_states) debug::info("%g - recieved state for already queued, newest tick", GetTime());
+					//else // ticks_ahead > game.m_queued_states
+
+					if (game.m_state_queue[ticks_ahead - 1].is_default())	// .is_default() means that tick is empty
+						debug::info("overriding already queued tick");
+
+					game.m_state_queue[ticks_ahead - 1] = message.m_game_state;
 
 					break;
 				}
-
-					/*
-				case message_type::LATENCY: {
-					latency_message message;
-					if (!message.read(reader)) { print_error_code(); break; }
-					debug::info("latency: %f ", (GetTime() - message.m_time));
+				case message_type::INPUT_ACTION:
+				{
+					debug::info("%g - recieved input message as client... ignoring", GetTime());
 					break;
 				}
-
-				case message_type::ENTITY_STATE: {
-					entity_state_message message;
-					if (!message.read(reader)) { print_error_code(); break; }
-
-					game_instance.update_entity(message);
-
-					break;
-				}
-				*/
 
 				} // !payload switch
 			}
