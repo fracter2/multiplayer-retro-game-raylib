@@ -12,6 +12,8 @@
 
 namespace meteor
 {
+    constexpr int MAX_PACKET_SIZE = 1024;
+
    namespace debug
    {
       void info(const char *format, ...);
