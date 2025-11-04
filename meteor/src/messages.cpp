@@ -1,5 +1,6 @@
 // messages.cpp
 
+# pragma once
 #include "messages.hpp"
 
 namespace meteor

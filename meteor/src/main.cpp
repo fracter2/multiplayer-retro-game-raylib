@@ -10,7 +10,7 @@
 #include "messages.hpp"
 #include "protocol.hpp"
 #include "connection.hpp"
-#include "game.hpp"
+//#include "game.hpp"
 
 #include "input.hpp"
 #include "client_send_system.hpp"
@@ -21,7 +21,7 @@
 //#define _CLIENT // This is also added in project settings, making it "global"
 
 
-bool setup_socket_endpoint(meteor::udp_socket& socket, meteor::ip_endpoint& local_endpoint, const meteor::uint16 port) {
+static bool setup_socket_endpoint(meteor::udp_socket& socket, meteor::ip_endpoint& local_endpoint, const meteor::uint16 port) {
 	using namespace meteor;
 	std::vector<ip_address> local_adresses = {};
 	if (network::query_local_addresses(local_adresses)) {

@@ -3,9 +3,10 @@
 #pragma once
 
 #include "raylib.h"
-#include "raymath.h"
-#include "network.hpp"
-#include "messages.hpp"
+//#include "raymath.h"
+#include "common.hpp"
+//#include "network.hpp"
+//#include "messages.hpp"
 
 //#define CLIENT
 
@@ -32,16 +33,20 @@ namespace meteor::game {
 		+ (((MAP_WIDTH * MAP_HEIGHT) % 8) == 0 ? 0 : 1);		// Add 1 if there's remainder, since "/" rounds down
 
 	// Vec2 to tile coordniate system. Not clamped by tilemap size
-	void vec2_to_tile (const Vector2& pos, uint8& x, uint8& y) { 
+	static void vec2_to_tile(const Vector2& pos, uint8& x, uint8& y) {
 		uint8 new_x = (uint8)pos.x;
 		uint8 new_y = (uint8)pos.y;
 
 		x = new_x;
 		y = new_y;
 	}
+	static bool valid_tile(const uint8 x, const uint8 y) {
+		if (x >= MAP_WIDTH
+			|| y >= MAP_HEIGHT
+			|| (x + y * MAP_WIDTH) >= TILEMAP_TILES) return false;
+		else return true;
+	}
 
-	bool valid_tile(const uint8 x, const uint8 y) 
-	
 
 	// Player-user state, to keep track of game player slots.
 	struct player_info {
@@ -77,10 +82,7 @@ namespace meteor::game {
 		};
 
 		player_entity() = default;
-		player_entity(Vector2 position)
-			: m_position(position)
-		{
-		}
+		player_entity(Vector2 position);
 		
 		bool	m_dead = true;
 		action	m_prev_action = action::INVALID;
@@ -89,12 +91,7 @@ namespace meteor::game {
 
 	struct bomb {
 		bomb() = default;
-		bomb(uint8 x, uint8 y, int32 explosion_tick)
-			: m_x(x)
-			, m_y(y)
-			, m_explosion_tick(explosion_tick)
-		{
-		}
+		bomb(uint8 x, uint8 y, int32 explosion_tick);
 		uint8   m_x = 0;
 		uint8   m_y = 0;
 		uint32	m_explosion_tick = 0;
@@ -106,22 +103,9 @@ namespace meteor::game {
 		uint8 m_tiles[TILEMAP_BYTES] = {};
 
 		// Returns if tile is active (not broken)
-		bool get_tile(const uint8 x, const uint8 y) const {
-			assert(valid_tile(x, y));
-			uint8 byte	  = *(m_tiles + ((x + y * MAP_WIDTH) / 8));
-			uint8 bitmask = (uint8)1 << ((x + y * MAP_WIDTH) % 8);
+		bool get_tile(const uint8 x, const uint8 y) const;
 
-			return (byte & bitmask) != 0;	// & is the bitwise "and" operator, so if the result is higher than 0, that bit is active.
-		}
-
-		void set_tile(const uint8 x, const uint8 y, bool value) {
-			assert(valid_tile(x, y));
-			uint8 byte = *(m_tiles + ((x + y * MAP_WIDTH) / 8));
-			uint8 bitmask = (uint8)1 << ((x + y * MAP_WIDTH) % 8);
-
-			if (value) { byte = byte | bitmask; }			// | is bitwise "or", resulting in all 1s being kept from both
-			else	   { byte = byte & (~bitmask); }		// ~ is bitwise complement operator, flipping all bits 1->0 and 0->1
-		}
+		void set_tile(const uint8 x, const uint8 y, bool value);
 	};
 
 
@@ -132,25 +116,12 @@ namespace meteor::game {
 		bomb		  m_bombs[MAX_PLAYERS] = {};
 		tilemap		  m_tilemap = {};
 
-		const player_entity& get_player(const int index) const {
-			assert(index < MAX_PLAYERS && index >= 0);
-			if (index >= MAX_PLAYERS) return m_players[MAX_PLAYERS - 1];
-			else if (index < 0)		  return m_players[0];
-			else					  return m_players[index];
-		}
+		const player_entity& get_player(const int index) const;
+		const bomb& get_bomb(const int index) const;
 
-		const bomb& get_bomb(const int index) const {
-			assert(index < MAX_PLAYERS && index >= 0);
-			if (index >= MAX_PLAYERS) return m_bombs[MAX_PLAYERS - 1];
-			else if (index < 0)		  return m_bombs[0];
-			else					  return m_bombs[index];
-		}
-
-		const tilemap& get_tilemap() const { return m_tilemap; }
+		const tilemap& get_tilemap() const;
 		
-		const bool is_default() const {
-			return m_players[0].m_prev_action == player_entity::action::INVALID;
-		}
+		const bool is_default() const;
 	};
 
 
@@ -192,73 +163,5 @@ namespace meteor::game {
 
 	};
 
-	// ---- OLD CODE for mouse-syncing tests ----
-
-	// TODO SEPPARATE GAME_STATES INTO GAME_STATE AND LATENCY_STATES (with input history)
-	// TODO SEPARATE UPDATE LOGIC FROM CONTAINER
-	/*
-	struct game {
-		game() = default;
-
-		// TODO Should be FIXED TIMESTEP delta at 60 or 64 ticks a second
-		void update_process() {
-			m_tick += 1;
-
-
-
-			// TODO Update entities.
-		}
-
-		void update_entity(entity_state_message message) {
-
-			int index = get_entity_index(message.m_id);
-			if (index == -1) {
-				add_entity(entity(message.m_id, message.m_position, message.m_color));
-			}
-			else {
-				m_entities[index].m_position_prev = m_entities[index].m_position;
-				m_entities[index].m_position = message.m_position;
-				m_entities[index].m_color = message.m_color;
-			}
-		}
-
-		// returns -1 on not found
-		int get_entity_index(int32 id) const {
-			for (int i = 0; i < m_entities.size(); i++) {
-				if (m_entities[i].m_id == id) return i;
-			}
-
-			return -1;
-		}
-
-		void add_entity(entity entity) {
-
-			m_entities.push_back(entity);
-		}
-
-		void render_frame() {
-			ClearBackground(SKYBLUE);
-
-			float lerp_fraction = (float)((GetTime() - m_time_sec) / NETWORK_TICK_SECONDS);
-			lerp_fraction = Clamp(lerp_fraction, 0.0f, 1.0f);
-
-			for (int i = 0; i < m_entities.size(); i++) {
-				Vector2 pos = Vector2Lerp(
-					m_entities[i].m_position_prev, 
-					m_entities[i].m_position, 
-					lerp_fraction);
-
-				DrawRectangleV(pos, Vector2(10, 10), m_entities[i].m_color);
-			}
-
-			DrawFPS(2, 2);
-		}
-
-		std::vector<entity> m_entities = {};
-		double m_time_sec = 0;
-		int32 m_tick = 0;
-
-		int32 m_player_id = -1;
-	};
-	*/
+	
 }
