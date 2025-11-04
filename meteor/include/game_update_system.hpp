@@ -39,21 +39,20 @@ namespace meteor::game_update_system {
 
 	void update(game::game game, const input::input_state input_state) {
 		
-		// TODO Increment tick
 		
-
-
-		/*
-		if (game.m_state_queue[0].is_default()) {
-			if (game.m_state_queue == 0) {	
-				// TODO Extrapolate from prev
-			}
-			else {
-				// TODO Interpolate state
-			}
+		if (game.m_state_queue.size() == 0) { // Extrapolate
 			
 		}
-		*/
+		else if (game.m_state_queue[0].is_default()) { // Interpolate between current and next valid state
+
+		}
+		else { // set state normally
+			game.m_state = game.m_state_queue[0];
+			game.m_state_queue.erase(game.m_state_queue.begin());
+		}
+
+		game.m_tick += 1;
+		
 
 		// INPUT PARSING
 		const game::player_entity& user_player = game.m_state.m_players[game.m_user_index];
