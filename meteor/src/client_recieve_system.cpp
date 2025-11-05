@@ -17,6 +17,14 @@ namespace meteor::client_recieve_system {
 		// Reply on send check
 		// Queue to make sure we have game-states in a short buffer 
 
+		// note: timeout
+		if (conn.m_status != connection::status::DISCONNECTED
+			&& time > conn.m_last_recieve_time + TIMEOUT) 
+		{
+			debug::info("Timeout");
+			disconnect(conn);
+		}
+
 
 		while (socket.has_data()) {
 
@@ -56,28 +64,33 @@ namespace meteor::client_recieve_system {
 
 			// Protocol switch
 			switch (protocol) {
+
+			// ======== CONNECT ========
 			case protocol_packet_type::CONNECT:
 			{
-				// Make packet
 				connect_packet packet;
 				if (!packet.read(reader)) { debug::info("%g - error reading connect package", GetTime()); print_error_code(); break; }
 				if (packet.m_version != PROTOCOL_VERSION) { debug::info("%g - recieved bad connect protocol version", GetTime()); break; }
 				if (packet.m_magic != PROTOCOL_MAGIC) { debug::info("%g - recieved bad connect magic version", GetTime()); break; }
-				conn.m_last_recieve_time = time;
 
-				// Status switch	// TODO Consider delegating switch into inline func, for readability (protocol switch with nested status switch is confusing)
+				
 				switch (conn.m_status) {
 				case connection::status::DISCONNECTED:
 				{
-					conn.m_endpoint = sender_endpoint;
+					conn = connection(sender_endpoint);
 					conn.m_status = connection::status::CONNECTING;
-					debug::info("%g - recieved broadcast", GetTime());
+					debug::info("%g - recieved broadcast from server with %f player, attempting join", GetTime(), packet.m_player_id);
 					break;
 				}
 				case connection::status::CONNECTING:
 				{
 					conn.m_status = connection::status::CONNECTED;
-					debug::info("%g - gracefully connected to server", GetTime());
+					debug::info("%g - gracefully connected to server as player %f", GetTime(), packet.m_player_id);
+
+					game = game::game();		// Reset game. note that we aren't allocating with "new", so no memory leaks.
+					game.m_user_index = packet.m_player_id;
+					game.m_status = game::game::status::PRE_GAME;
+
 					break;
 				}
 				default:
@@ -90,13 +103,13 @@ namespace meteor::client_recieve_system {
 				break;
 			}//!CONNECT
 
+
+			// ======== DISCONNECT ========
 			case protocol_packet_type::DISCONNECT:
 			{
 				disconnect_packet packet;
 				if (!packet.read(reader)) { debug::info("%g - error reading disconnect package", GetTime()); print_error_code(); break; }
-				conn.m_last_recieve_time = time;
 
-				// Status switch	// TODO Consider delegating switch into inline func, for readability (protocol switch with nested status switch is confusing)
 				switch (conn.m_status) {
 				case connection::status::DISCONNECTING:
 				{
@@ -122,49 +135,51 @@ namespace meteor::client_recieve_system {
 				}
 				}//!Status switch
 
-
-				conn.m_status = connection::status::DISCONNECTED;
-
-				// TODO RESET GAME STATE or FREEZE AND SHOW DISCONECT POPUP
-				//game = game::game(); // Reset on restart maybe? let game be frozen?
-
+				conn.m_last_recieve_time = time;
+				disconnect(conn);
+				
 				break;
 			}//!Disconnect
 
 
+			// ======== PAYLOAD ========
 			case protocol_packet_type::PAYLOAD:
 			{
 				payload_packet packet;
 				if (!packet.read(reader)) { debug::info("%g - error reading payload package", GetTime()); print_error_code(); break; }
-				conn.m_last_recieve_time = time;
+				
 
 				if (conn.m_status != connection::status::CONNECTED) {
 					debug::info("%g - recieved payload package when irrelevant", GetTime());
 					continue;
 				}
 
-				if (packet.m_sequence <= conn.m_sequence) {
-					debug::info("out-of-order packet dropped. my server sequenece: %d, packet sequence: %d, time: %f "
-						, (conn.m_sequence)
+				if (packet.m_sequence <= conn.m_recieve_sequence) {
+					debug::info("out-of-order packet dropped. my recieve_sequenece: %d, packet sequence: %d, time: %f "
+						, (conn.m_recieve_sequence)
 						, (packet.m_sequence)
 						, (GetTime())
 					);
 					continue;
 				}
-				conn.m_sequence = packet.m_sequence;
+				conn.m_last_recieve_time = time;
+				conn.m_recieve_sequence = packet.m_sequence;
+				conn.m_recieve_acknowledge = packet.m_acknowledge;
 
 
-				// Read messages
+				// ---- MESSAGES ----
 				while (reader.has_data())
 				{
 					uint8 t = reader.peek();
-					if (t > (uint8)message_type::INPUT_ACTION) {	// check if it's above max type uint8
+					if (t > (uint8)message_type::GAME_LOBBY) {	// check if it's above max message_type value
 						debug::info("%g - recieved unknown message type.", GetTime());
 						continue;
 					}
+
 					message_type type = (message_type)t;
 
 					switch (type) {
+					// ---- GAME_STATE ----
 					case message_type::GAME_STATE:
 					{
 						game_state_message message;		// WHY ERROR
@@ -189,20 +204,30 @@ namespace meteor::client_recieve_system {
 
 						break;
 					}
+					// ---- GAME_STATE ----
 					case message_type::INPUT_ACTION:
 					{
 						debug::info("%g - recieved input message as client... ignoring", GetTime());
 						break;
 					}
 
-					} // !payload switch
-				}
+					} // !messages switch
+				} // !messages loop
 
 				break;
-			}
-			} // !protocol switch
+			} // !payload case
 
+			} // !protocol switch
 		} // !while socket.has_data()
+	} // !update()
+
+
+	void disconnect(connection& conn) {
+		conn.m_endpoint = {};
+		conn.m_status = connection::status::DISCONNECTED;
+		conn.m_send_sequence = 0;
+		conn.m_recieve_sequence = 0;
+		conn.m_recieve_acknowledge = 0;
 	}
 
 }//!namespace
