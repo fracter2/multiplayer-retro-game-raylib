@@ -16,6 +16,7 @@ namespace meteor
 	  CONNECT,
 	  DISCONNECT,
 	  PAYLOAD,
+	  MAX		// Used to check if its out-of-range. Keep as highest value
    };
 
    struct connect_packet {
