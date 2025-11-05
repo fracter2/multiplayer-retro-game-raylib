@@ -103,6 +103,7 @@
   <ItemGroup>
     <ClCompile Include="include\common.hpp" />
     <ClCompile Include="src\client_recieve_system.cpp" />
+    <ClCompile Include="src\client_send_system.cpp" />
     <ClCompile Include="src\connection.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\main.cpp" />
