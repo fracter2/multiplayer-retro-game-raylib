@@ -20,6 +20,7 @@ namespace meteor
 
    struct connect_packet {
 	   connect_packet();
+	   connect_packet(uint8 id);
 
 	   bool write(byte_stream_writer& writer);
 	   bool read(byte_stream_reader& reader);
@@ -27,6 +28,7 @@ namespace meteor
 	   uint8 m_type = 0;
 	   uint32 m_magic = 0;
 	   uint32 m_version = 0; 
+	   uint8 m_player_id = 0;			// client player index, or when sent from server as broadcast: players already in lobby
    };
 
    struct disconnect_packet {
@@ -43,12 +45,13 @@ namespace meteor
 
    struct payload_packet {
 	   payload_packet() = default;
-	   payload_packet(uint32 sequence);
+	   payload_packet(uint32 sequence, uint32 acknowledge);
 
 	   bool write(byte_stream_writer& writer);
 	   bool read(byte_stream_reader& reader);
 
 	   uint8 m_type = 0;
 	   uint32 m_sequence = 0;
+	   uint32 m_acknowledge = 0;
    };
 } // !meteor
