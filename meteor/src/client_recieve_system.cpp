@@ -9,13 +9,6 @@
 namespace meteor::client_recieve_system {
 
 	void update(double time, udp_socket& socket, connection& conn, game::game& game) {
-		// TODO UPDATE GAME STATE AND LATENCY STATE 
-		// (reconsile if mispredicted on specific tick, repeat non-acked INPUTS for client prediciton in latency state)
-		// TODO Refrence connection state and game state
-
-		// As client, update game state imidiately
-		// Reply on send check
-		// Queue to make sure we have game-states in a short buffer 
 
 		// note: timeout
 		if (conn.m_status != connection::status::DISCONNECTED
@@ -124,7 +117,7 @@ namespace meteor::client_recieve_system {
 				case connection::status::CONNECTED:
 				{
 					// note: I assume this does not need to be gracefull, as it is more rare and gracefullness wouldn't help the kicked / unkicked players
-					debug::info("%g - Got kicked (server initiated disconnect. disgracefull)", GetTime());
+					debug::info("%g - Got kicked (server initiated disconnect)", GetTime());
 					break;
 				}
 
