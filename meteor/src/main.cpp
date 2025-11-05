@@ -69,11 +69,10 @@ int main(int argc, char **argv)
 	//debug::info("attempting to connect by default...");
 
 
-	// 
+	
 	
 
 	// update loop
-	
 	while (running) {
 		dt = GetFrameTime();
 		running &= !WindowShouldClose();
@@ -83,33 +82,15 @@ int main(int argc, char **argv)
 
 		client_recieve_system::update(time, socket, server_connection, game);
 
-		byte_stream stream_send;
-		byte_stream_writer writer(stream_send);
-		connect_packet message;
-		message.write(writer);
-		if (!socket.send_to(server_endpoint, stream_send)) { print_error_code(); }
-
 		// tick loop
 		if (time >= next_tick_time) {
 			next_tick_time += TICK_TIME;
 
-			// Use struct for all inputs, like "input_map"
-			// Then convert to input Action, like move_requests
 			input::update(input);
-
 
 			game_update_system::update(game, input);
 
-
-			// TODO MOVE SEND CHECK HERE TO FILE, 20hz
-			// Reply ACK with latest recieve... (done by sending client game tick? or both, in case of missed server-packages?)
-			// Input and client-prediction is in latency state...
-			// Input is sent ASAP (20hz), whenever the server recieves it, it uses it
-			// INPUT IS TICK-WRAPPED ON THE CLIENT-TICK IT WAS PLAYED (Still would send latest input asap). Latest recieved game tick/package is also sent sepparately (ACK)
-
-			// TODO 
 			client_send_system::update(ticks, time, socket, server_connection, local_endpoint, server_endpoint, game);
-
 
 			BeginDrawing();
 			render_system::render(ticks, time, game, server_connection, texture);
