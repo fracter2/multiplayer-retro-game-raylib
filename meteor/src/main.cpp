@@ -1,7 +1,7 @@
 // main.cpp
 
 #include <thread>
-#include <chrono>
+//#include <chrono>
 #include <cstdio>
 #include <stdio.h>
 
@@ -24,7 +24,7 @@
 int main(int argc, char **argv)
 {
 	const int window_width = 1280, window_height = 720;
-	const std::string_view window_title = "Bomberman Client";
+	const std::string_view window_title = "Bomberman CLIENT";
 
 	InitWindow(window_width, window_height, window_title.data());
 	//InitAudioDevice();	// No audio (yet)
