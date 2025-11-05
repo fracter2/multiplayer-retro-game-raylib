@@ -12,7 +12,7 @@
 #include "connection.hpp"
 //#include "game.hpp"
 
-#include "input.hpp"
+//#include "input.hpp"
 #include "client_send_system.hpp"
 #include "client_recieve_system.hpp"
 #include "game_update_system.hpp"
@@ -24,9 +24,11 @@
 int main(int argc, char **argv)
 {
 	const int window_width = 1280, window_height = 720;
-	const std::string_view window_title = "Drawing over IP client";
+	const std::string_view window_title = "Bomberman Client";
+
 	InitWindow(window_width, window_height, window_title.data());
-	SetExitKey(0);		// Esc
+	//InitAudioDevice();	// No audio (yet)
+	SetExitKey(0);			// Esc
 
 	using namespace meteor;
 
@@ -37,15 +39,20 @@ int main(int argc, char **argv)
 	const ip_endpoint SERVER_ENDPOINT(ip_address(192, 168, 1, 53), PORT);	// TODO Add way of inputting adresses after start...
 	ip_endpoint local_endpoint = {};
 	ip_endpoint server_endpoint = SERVER_ENDPOINT;
-	udp_socket socket;
-	connection server_connection;
+	udp_socket socket = {};
+	connection server_connection = {};
 
 	game::game		   game = {};
 	input::input_state input = {};
 
-	//uint32 ticks_since_start = 0;
-	double next_tick_time = GetTime();
 
+	double next_tick_time = GetTime();
+	uint32 ticks = 0;
+	float dt = GetFrameTime();
+	double time = GetTime();
+	bool running = true;
+
+	Texture texture = LoadTexture("data/tiles.png");
 
 	// ==== INIT ====
 	network::startup boot;
@@ -66,12 +73,12 @@ int main(int argc, char **argv)
 	
 
 	// update loop
-	bool running = true;
+	
 	while (running) {
-		const float dt = GetFrameTime();
+		dt = GetFrameTime();
 		running &= !WindowShouldClose();
+		time = GetTime();
 		
-		double time = GetTime();
 
 
 		client_recieve_system::update(time, socket, server_connection, game);
@@ -101,11 +108,11 @@ int main(int argc, char **argv)
 			// INPUT IS TICK-WRAPPED ON THE CLIENT-TICK IT WAS PLAYED (Still would send latest input asap). Latest recieved game tick/package is also sent sepparately (ACK)
 
 			// TODO 
-			//client_send_system::update(time, socket, server_connection, local_endpoint, server_endpoint, game);
+			client_send_system::update(ticks, time, socket, server_connection, local_endpoint, server_endpoint, game);
 
 
 			BeginDrawing();
-			render_system::render();
+			render_system::render(ticks, time, game, server_connection, texture);
 			EndDrawing();
 
 		} //!tick loop
