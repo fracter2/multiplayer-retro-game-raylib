@@ -40,7 +40,10 @@ namespace meteor {
 		uint32		m_recieve_sequence	  = 0;	// Used as send-ack
 		uint32		m_recieve_acknowledge = 0;
 
-		
+		// Reliable messages history here? allow any message
+		// std::vector<any message> m_reliable_messages_history		// maybe one std::vector for each message type?
+		//std::vector<game_lobby_message> m_reliable_game_lobby_message = std::vector<game_lobby_message>();
+		// Remove everything that has been ACKed
 	};
 
 	
