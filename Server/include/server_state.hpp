@@ -34,6 +34,16 @@ namespace meteor {
 			return false;
 		}
 
+		bool has_client(const ip_endpoint& endpoint) {
+			for (connection& conn : m_clients) {
+				if (conn.m_endpoint == endpoint
+					&& conn.m_status != connection::status::DISCONNECTED) {
+					return true;
+				}
+			}
+			return false;
+		}
+
 		/*
 		uint8 get_client_index(const ip_endpoint& endpoint) const {
 			uint8 i = 0;
