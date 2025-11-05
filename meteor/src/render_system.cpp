@@ -12,7 +12,7 @@ namespace meteor::render_system{
 	namespace atlass {	// Texture atlass sources coordinates, hand-aligned via code
 		constexpr Rectangle WALL = { 0, 0, 16, 16 };
 		constexpr Rectangle PLAYER = { 0, 0, 16, 16 };
-		constexpr Rectangle player_dead = { 0, 0, 16, 16 };
+		constexpr Rectangle PLAYER_DEAD = { 0, 0, 16, 16 };
 		constexpr Rectangle BOMB = { 0, 0, 16, 16 };
 
 	}
