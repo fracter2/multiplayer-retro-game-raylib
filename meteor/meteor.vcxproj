@@ -106,6 +106,7 @@
     <ClCompile Include="src\client_send_system.cpp" />
     <ClCompile Include="src\connection.cpp" />
     <ClCompile Include="src\game.cpp" />
+    <ClCompile Include="src\input.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\menu.cpp" />
     <ClCompile Include="src\messages.cpp" />

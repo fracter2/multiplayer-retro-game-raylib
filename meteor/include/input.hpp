@@ -18,18 +18,7 @@ namespace meteor::input {
 	struct input_state {
 		input_state() = default;
 
-		input_state(bool up, bool down, bool left, bool right, bool place_bomb, bool lmb, bool esc)
-			: m_up(up)
-			, m_down(down)
-			, m_left(left)
-			, m_right(right)
-			, m_place_bomb(place_bomb)
-			, m_lmb(lmb)
-			, m_lmb_just_pressed(lmb)
-			, m_esc(esc)
-			, m_esc_just_pressed(esc)
-		{
-		}
+		input_state(bool up, bool down, bool left, bool right, bool place_bomb, bool lmb, bool esc);
 
 		/* TODO make it use induvidual bits like below, to save space. low prio as it's shouldn't be sent over network anyway.
 		uint8 m_bits = 0;
@@ -56,21 +45,6 @@ namespace meteor::input {
 		bool m_esc_just_pressed;
 	};
 
-	// Consider input history singleton with ticks
-	// Consider resolving move inputs into single result, enum
 
-
-	void update(input_state& state) {
-		//input_state state;
-		state.m_up				 = IsKeyDown(KEY_W) or IsKeyDown(KEY_UP);
-		state.m_down			 = IsKeyDown(KEY_S) or IsKeyDown(KEY_DOWN);
-		state.m_left			 = IsKeyDown(KEY_A) or IsKeyDown(KEY_LEFT);
-		state.m_right			 = IsKeyDown(KEY_D) or IsKeyDown(KEY_RIGHT);
-		state.m_place_bomb		 = IsKeyDown(KEY_SPACE);
-		state.m_lmb_just_pressed = (!state.m_lmb) and IsMouseButtonDown(MOUSE_BUTTON_LEFT);
-		state.m_lmb				 = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
-		state.m_esc_just_pressed = (!state.m_esc) and IsKeyDown(KEY_ESCAPE);
-		state.m_esc				 = IsKeyDown(KEY_ESCAPE);
-		
-	}
+	void update(input_state& state);
 }
