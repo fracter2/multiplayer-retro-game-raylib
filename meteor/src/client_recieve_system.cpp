@@ -204,10 +204,25 @@ namespace meteor::client_recieve_system {
 
 						break;
 					}
-					// ---- GAME_STATE ----
+					// ---- INPUT_ACTION ----
 					case message_type::INPUT_ACTION:
 					{
 						debug::info("%g - recieved input message as client... ignoring", GetTime());
+						input_action_message message;	
+						if (!message.read(reader)) { print_error_code(); break; }	// Read it so it gets consumed
+						
+						break;
+					}
+					// ---- GAME_LOBBY ----
+					case message_type::GAME_LOBBY:
+					{
+						debug::info("%g - recieved game lobby state", GetTime());
+						game_lobby_message message;
+						if (!message.read(reader)) { print_error_code(); break; }
+
+						if (message.m_start_now && game.m_status == game::game::status::PRE_GAME) { 
+							game.m_status = game::game::status::IN_GAME; 
+						}
 						break;
 					}
 
