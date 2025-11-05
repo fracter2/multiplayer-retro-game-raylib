@@ -73,6 +73,12 @@ namespace meteor::client_recieve_system {
 					conn = connection(sender_endpoint);
 					conn.m_status = connection::status::CONNECTING;
 					debug::info("%g - recieved broadcast from server with %f player, attempting join", GetTime(), packet.m_player_id);
+					debug::info("server endpoint: %d.%d.%d.%d:%d",
+						sender_endpoint.m_address.a(),
+						sender_endpoint.m_address.b(),
+						sender_endpoint.m_address.c(),
+						sender_endpoint.m_address.d(),
+						sender_endpoint.port());
 					break;
 				}
 				case connection::status::CONNECTING:
