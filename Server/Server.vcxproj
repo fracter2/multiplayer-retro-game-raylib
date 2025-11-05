@@ -18,6 +18,16 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\meteor\src\connection.cpp" />
+    <ClCompile Include="..\meteor\src\game.cpp" />
+    <ClCompile Include="..\meteor\src\input.cpp" />
+    <ClCompile Include="..\meteor\src\messages.cpp" />
+    <ClCompile Include="..\meteor\src\network.cpp" />
+    <ClCompile Include="..\meteor\src\network_layer.cpp" />
+    <ClCompile Include="..\meteor\src\protocol.cpp" />
+    <ClCompile Include="src\server.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
