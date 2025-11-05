@@ -78,7 +78,7 @@ namespace meteor
    bool setup_socket_endpoint(meteor::udp_socket& socket, meteor::ip_endpoint& local_endpoint, const meteor::uint16 port) {
        using namespace meteor;
        std::vector<ip_address> local_adresses = {};
-       if (network::query_local_addresses(local_adresses)) {
+       if (!network::query_local_addresses(local_adresses)) {
            debug::info("no local adresses found!");
            return false;
        }
