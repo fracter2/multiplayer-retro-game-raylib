@@ -34,8 +34,8 @@ namespace meteor {
 
 		//uint32		m_id				  = 0;
 		ip_endpoint m_endpoint			  = {};
-		status		m_status			  = status::DISCONNECTED;
 		double		m_last_recieve_time   = 0;
+		status		m_status			  = status::DISCONNECTED;
 		uint32		m_send_sequence		  = 0;
 		uint32		m_recieve_sequence	  = 0;	// Used as send-ack
 		uint32		m_recieve_acknowledge = 0;
