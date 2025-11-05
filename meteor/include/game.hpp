@@ -13,43 +13,66 @@
 namespace meteor::game {
 
 	// TODO Consider making a "game_config" class that is sent before game starts. Would need maps to be created/deleted each game (convinience thing)
+	static constexpr int MAX_PLAYERS = 4;
+	
 
-	constexpr uint32 NAME_LENGTH_MAX		 = 16;
-	constexpr double BOMB_FUSE_TIME			 = 3.0;
-	constexpr uint32 BOMB_FUSE_TICKS		 = (uint32)(BOMB_FUSE_TIME * (double)TICK_RATE);
-	constexpr uint32 BOMB_COOLDOWN_TICKS	 = (uint32)(1.0 * (double)TICK_RATE);
+	struct tilemap {
+		static constexpr uint32 TILE_SIZE = 32;
+		static constexpr uint8  WIDTH = 16;
+		static constexpr uint8  HEIGHT = 16;
+		static constexpr Vector2 SIZE_V = Vector2(WIDTH, HEIGHT);
 
-	constexpr uint8  MAP_WIDTH				 = 16;
-	constexpr uint8  MAP_HEIGHT				 = 16;
+		// Right now map sizes are hard coded to simplify implementation (especially for network messages)
+		static constexpr int COUNT = WIDTH * HEIGHT;
+		static constexpr int TILEMAP_BYTES =
+			WIDTH * HEIGHT / 8
+			+ (((WIDTH * HEIGHT) % 8) == 0 ? 0 : 1);		// Add 1 if there's remainder, since "/" rounds down
 
-	constexpr int	 MAX_PLAYERS			 = 4;
-	constexpr int	 ACTIONS_BUFFER_LENGTH	 = 12;
-	constexpr int    STATE_HISTORY_LENGTH	 = 30;
 
-	// Right now map sizes are hard coded to simplify implementation (especially for network messages)
-	constexpr int    TILEMAP_TILES			 = MAP_WIDTH * MAP_HEIGHT;
-	constexpr int    TILEMAP_BYTES			 = 
-		MAP_WIDTH * MAP_HEIGHT / 8 
-		+ (((MAP_WIDTH * MAP_HEIGHT) % 8) == 0 ? 0 : 1);		// Add 1 if there's remainder, since "/" rounds down
+		tilemap() = default;
+
+		uint8 m_tiles[TILEMAP_BYTES] = {};
+
+		// Returns if tile is active (aka not destroyed)
+		bool is_tile_active(const uint8 x, const uint8 y) const;
+		bool is_tile_active(const uint32 index) const;
+
+		void set_tile(const uint8 x, const uint8 y, bool value);
+	};
+
+	// if it's inside the map boundries
+	static bool valid_tile(const uint8 x, const uint8 y) {
+		if (x >= tilemap::WIDTH
+			|| y >= tilemap::HEIGHT
+			|| (x + y * tilemap::WIDTH) >= tilemap::COUNT) return false;
+		else return true;
+	}
+
+	static uint32 coord_to_index(const uint8 x, const uint8 y) {
+		if (!valid_tile(x, y)) return UINT32_MAX;
+		return (x + y * tilemap::WIDTH);
+	}
+
+	static void index_to_coord(const uint32 index, uint8& x, uint8& y) {
+		if (index >= tilemap::COUNT) return;
+		y = (uint8)index / tilemap::WIDTH;
+		x = (uint8)index % tilemap::WIDTH;
+	}
 
 	// Vec2 to tile coordniate system. Not clamped by tilemap size
-	static void vec2_to_tile(const Vector2& pos, uint8& x, uint8& y) {
+	static void vec2_to_coord(const Vector2& pos, uint8& x, uint8& y) {
 		uint8 new_x = (uint8)pos.x;
 		uint8 new_y = (uint8)pos.y;
 
 		x = new_x;
 		y = new_y;
 	}
-	static bool valid_tile(const uint8 x, const uint8 y) {
-		if (x >= MAP_WIDTH
-			|| y >= MAP_HEIGHT
-			|| (x + y * MAP_WIDTH) >= TILEMAP_TILES) return false;
-		else return true;
-	}
 
 
 	// Player-user state, to keep track of game player slots.
 	struct player_info {
+		static constexpr uint32 NAME_LENGTH_MAX = 16;
+
 		enum class status : uint8 {
 			EMPTY,
 			JOINING,
@@ -86,10 +109,15 @@ namespace meteor::game {
 		
 		bool	m_dead = true;
 		action	m_prev_action = action::INVALID;
+		uint32  m_prev_action_tick = 0;		// The tick the player client input that action. Used to know how delayed input is, and what local input has been "used"
 		Vector2	m_position = {};
 	};
 
 	struct bomb {
+		static constexpr double FUSE_TIME = 3.0;
+		static constexpr uint32 FUSE_TICKS = (uint32)(FUSE_TIME * (double)TICK_RATE);
+		static constexpr uint32 COOLDOWN_TICKS = (uint32)(1.0 * (double)TICK_RATE);
+
 		bomb() = default;
 		bomb(uint8 x, uint8 y, int32 explosion_tick);
 		uint8   m_x = 0;
@@ -97,16 +125,7 @@ namespace meteor::game {
 		uint32	m_explosion_tick = 0;
 	};
 
-	struct tilemap {
-		tilemap() = default;
-		
-		uint8 m_tiles[TILEMAP_BYTES] = {};
 
-		// Returns if tile is active (not broken)
-		bool get_tile(const uint8 x, const uint8 y) const;
-
-		void set_tile(const uint8 x, const uint8 y, bool value);
-	};
 
 
 	struct game_state {
@@ -126,6 +145,10 @@ namespace meteor::game {
 
 
 	struct game {
+		static constexpr int ACTIONS_BUFFER_LENGTH = 12;
+		static constexpr int STATE_HISTORY_LENGTH = 30;
+		
+
 		enum class status : uint8 {
 			INVALID,
 			PRE_GAME,
@@ -146,6 +169,7 @@ namespace meteor::game {
 		//player_entity::action m_predict_actions[ACTIONS_BUFFER_LENGTH] = {};	// un-acked actions by player, used to client-side-predict
 
 		std::vector<player_entity::action> m_predict_actions = std::vector<player_entity::action>();
+		mutable uint8							   m_actions_not_sent = 0;				// Used by the send system to know what is queued. Mutable so send system can modify despite const refrence, for type safety
 
 		game_state				m_predicted_state = {};							// result state from m_state having predicted actions applied.
 		//game_state				m_state_queue[STATE_HISTORY_LENGTH] = {};

@@ -19,19 +19,28 @@ namespace meteor::game {
 	{
 	}
 
-	bool tilemap::get_tile(const uint8 x, const uint8 y) const {
+	bool tilemap::is_tile_active(const uint8 x, const uint8 y) const {
 		assert(valid_tile(x, y));
 
-		uint8 byte = *(m_tiles + ((x + y * MAP_WIDTH) / 8));
-		uint8 bitmask = (uint8)1 << ((x + y * MAP_WIDTH) % 8);
+		uint8 byte = *(m_tiles + ((x + y * WIDTH) / 8));
+		uint8 bitmask = (uint8)1 << ((x + y * WIDTH) % 8);
+
+		return (byte & bitmask) != 0;	// & is the bitwise "and" operator, so if the result is higher than 0, that bit is active.
+	}
+
+	bool tilemap::is_tile_active(const uint32 index) const {
+		assert(index < tilemap::COUNT);
+
+		uint8 byte = *(m_tiles + (index / 8));
+		uint8 bitmask = (uint8)1 << (index % 8);
 
 		return (byte & bitmask) != 0;	// & is the bitwise "and" operator, so if the result is higher than 0, that bit is active.
 	}
 
 	void tilemap::set_tile(const uint8 x, const uint8 y, bool value) {
 		assert(valid_tile(x, y));
-		uint8& byte = *(m_tiles + ((x + y * MAP_WIDTH) / 8));
-		uint8 bitmask = (uint8)1 << ((x + y * MAP_WIDTH) % 8);
+		uint8& byte = *(m_tiles + ((x + y * WIDTH) / 8));
+		uint8 bitmask = (uint8)1 << ((x + y * WIDTH) % 8);
 
 		if (value) { byte = byte | bitmask; }			// | is bitwise "or", resulting in all 1s being kept from both
 		else { byte = byte & (~bitmask); }		// ~ is bitwise complement operator, flipping all bits 1->0 and 0->1
