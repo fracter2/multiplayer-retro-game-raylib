@@ -21,33 +21,6 @@
 //#define _CLIENT // This is also added in project settings, making it "global"
 
 
-static bool setup_socket_endpoint(meteor::udp_socket& socket, meteor::ip_endpoint& local_endpoint, const meteor::uint16 port) {
-	using namespace meteor;
-	std::vector<ip_address> local_adresses = {};
-	if (network::query_local_addresses(local_adresses)) {
-		debug::info("no local adresses found!");
-		return false;
-	}
-
-	for (ip_address addr : local_adresses)
-	{
-		local_endpoint = ip_endpoint(addr, port);
-		if (!socket.open_and_bind(local_endpoint)) {
-			debug::info("local address bind failed: %d.%d.%d.%d: %d",
-				local_endpoint.m_address.a(),
-				local_endpoint.m_address.b(),
-				local_endpoint.m_address.c(),
-				local_endpoint.m_address.d(),
-				local_endpoint.port());
-			print_error_code();
-			continue;
-		}
-		else { break; }
-	}
-
-	return true;
-}
-
 int main(int argc, char **argv)
 {
 	const int window_width = 1280, window_height = 720;

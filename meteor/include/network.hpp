@@ -186,4 +186,9 @@ namespace meteor
       bool query_local_addresses(std::vector<ip_address> &addresses);
       bool get_bound_address(const udp_socket &socket, ip_endpoint &endpoint);
    } // !network
+
+
+   bool setup_socket_endpoint(udp_socket& socket, ip_endpoint& local_endpoint, const uint16 port);
+
+
 } // !meteor
