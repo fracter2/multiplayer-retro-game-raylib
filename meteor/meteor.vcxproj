@@ -111,6 +111,7 @@
     <ClCompile Include="src\network.cpp" />
     <ClCompile Include="src\network_layer.cpp" />
     <ClCompile Include="src\protocol.cpp" />
+    <ClCompile Include="src\render_system.cpp" />
     <ClCompile Include="src\timer.cpp" />
   </ItemGroup>
   <ItemGroup>
