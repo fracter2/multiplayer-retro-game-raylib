@@ -2,8 +2,8 @@
 //
 
 
-//#include <thread>
-//#include <chrono>
+#include <thread>
+#include <chrono>
 #include <cstdio>
 #include <stdio.h>
 #include <iostream>
@@ -16,6 +16,9 @@
 #include "protocol.hpp"
 #include "connection.hpp"
 #include "network.hpp"
+
+#include "server_state.hpp"
+#include "server_recieve_system.hpp"
 
 //#define _SERVER   // Already defined as a "global" macro in server proj file
 
@@ -32,11 +35,13 @@ int main()
 	// ==== APP DATA ====
 	constexpr uint16 PORT = 54321;
 	//const ip_endpoint LOCAL_ENDPOINT(ip_address(10, 12, 234, 103), PORT);	// TODO make use of pre-made local adress getter func
-	const ip_endpoint SERVER_ENDPOINT(ip_address(192, 168, 1, 53), PORT);	// TODO Add way of inputting adresses after start...
 	ip_endpoint local_endpoint = {};
-	ip_endpoint server_endpoint = SERVER_ENDPOINT;
 	udp_socket socket = {};
-	connection server_connection = {};
+
+
+	//connection server_connection = {};
+	//connection clients[game::MAX_PLAYERS] = {};
+	server_state server = {};
 
 	game::game		   game = {};
 	input::input_state input = {};
@@ -49,7 +54,8 @@ int main()
 	bool running = true;
 
 	Texture texture = LoadTexture("data/tiles.png");
-
+	// TODO assert texture is actually loaded
+	
 	// ==== INIT ====
 	network::startup boot;
 	setup_socket_endpoint(socket, local_endpoint, PORT);
@@ -63,7 +69,47 @@ int main()
 
 
     //std::cout << "Hello World!\n";
-}
+
+	// update loop
+	while (running) {
+		dt = GetFrameTime();
+		running &= !WindowShouldClose();
+		time = GetTime();
+
+		//client_recieve_system::update(time, socket, server_connection, game);
+
+		
+
+		// tick loop
+		if (time >= next_tick_time) {
+			next_tick_time += TICK_TIME;
+
+			// Use struct for all inputs, like "input_map"
+			// Then convert to input Action, like move_requests
+			input::update(input);
+
+			
+			//game_update_system::update(game, input);
+
+			// TODO Check if to start the game (start game btn or something), send lobby state with "start game" thing and start updating game state
+			//client_send_system::update(ticks, time, socket, server_connection, local_endpoint, server_endpoint, game);
+
+
+			BeginDrawing();
+			//render_system::render(ticks, time, game, server_connection, texture);
+
+			EndDrawing();
+
+		} //!tick loop
+
+		// note: save the forest!
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+	} //!update loop
+
+	CloseWindow();
+	return 0;
+} // !server
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
 // Debug program: F5 or Debug > Start Debugging menu
