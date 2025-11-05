@@ -56,7 +56,7 @@ namespace meteor
       const uint8 *data() const;
 
       int32 m_size = 0;
-      uint8 m_data[1024] = {};
+      uint8 m_data[MAX_PACKET_SIZE] = {};
    };
 
    struct byte_stream_writer {
