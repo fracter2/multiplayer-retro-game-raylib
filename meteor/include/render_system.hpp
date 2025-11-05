@@ -10,15 +10,9 @@
 #include "connection.hpp"
 #include "game.hpp"
 
-#include "input.hpp"
+//#include "input.hpp"
 
 
 namespace meteor::render_system {
-	void render() {
-
-		//game_instance.render_frame();
-
-		// TODO RENDER UI
-		//DrawFPS(2, 2);
-	}
+	void render(const uint32& tick, const double time, const game::game& game_instance, const connection& conn, const Texture& m_texture);
 }
