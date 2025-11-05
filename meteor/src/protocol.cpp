@@ -8,6 +8,15 @@ namespace meteor
 		: m_type((uint8)protocol_packet_type::CONNECT)
 		, m_magic(PROTOCOL_MAGIC)
 		, m_version(PROTOCOL_VERSION)
+		, m_player_id(0)
+	{
+	}
+
+	connect_packet::connect_packet(uint8 id)
+		: m_type((uint8)protocol_packet_type::CONNECT)
+		, m_magic(PROTOCOL_MAGIC)
+		, m_version(PROTOCOL_VERSION)
+		, m_player_id(id)
 	{
 	}
 
@@ -18,6 +27,7 @@ namespace meteor
 		success &= stream.serialize(message.m_type);
 		success &= stream.serialize(message.m_magic);
 		success &= stream.serialize(message.m_version);
+		success &= stream.serialize(message.m_player_id);
 		return success;
 	}
 
@@ -61,9 +71,10 @@ namespace meteor
 		return serialize(*this, reader);
 	}
 
-	payload_packet::payload_packet(uint32 sequence)
+	payload_packet::payload_packet(uint32 sequence, uint32 acknowledge)
 		: m_type((uint8)protocol_packet_type::PAYLOAD)
 		, m_sequence(sequence)
+		, m_acknowledge(acknowledge)
 	{
 	}
 
@@ -73,6 +84,7 @@ namespace meteor
 		bool success = true;
 		success &= stream.serialize(message.m_type);
 		success &= stream.serialize(message.m_sequence);
+		success &= stream.serialize(message.m_acknowledge);
 		return success;
 	}
 

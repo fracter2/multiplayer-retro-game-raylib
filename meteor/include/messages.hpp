@@ -12,13 +12,14 @@ namespace meteor
 	  GAME_STATE,
 	  //GAME_DELTA,
 	  //TICK_WRAP,	// Used to state the tick for the following messages	// TODO CONSIDER REMOVING we can just add tick to message...
-	  INPUT_ACTION
+	  INPUT_ACTION,
+	  GAME_LOBBY
    };
 
    struct game_state_message {
 	   //game_state_message() = default;
 	   game_state_message() = default;
-	   game_state_message(game::game_state state);
+	   game_state_message(game::game_state state, uint32 tick);
 
 	   bool write(byte_stream_writer& writer);
 	   bool read(byte_stream_reader& reader);
@@ -30,16 +31,27 @@ namespace meteor
 
    struct input_action_message {
 	   input_action_message() = default;
-	   input_action_message(game::player_entity::action action);
+	   input_action_message(game::player_entity::action action, uint32 tick);
 
 	   bool write(byte_stream_writer& writer);
 	   bool read(byte_stream_reader& reader);
 
-	   message_type			m_type = message_type::INPUT_ACTION;
-	   uint32				m_tick = 0;
+	   message_type				   m_type = message_type::INPUT_ACTION;
+	   uint32					   m_tick = 0;
 	   game::player_entity::action m_action = game::player_entity::action::INVALID;
    };
 
-   
+   struct game_lobby_message {
+	   game_lobby_message() = default;
+	   game_lobby_message(bool start_now);
+
+	   bool write(byte_stream_writer& writer);
+	   bool read(byte_stream_reader& reader);
+
+	   message_type	m_type = message_type::GAME_LOBBY;
+	   bool			m_start_now = false;
+	   // player info here
+	   // messages? with ack confirmation in send system?
+   };
 
 } // !meteor

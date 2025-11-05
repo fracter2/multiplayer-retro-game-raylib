@@ -27,25 +27,9 @@ namespace meteor
 		type = (T_from)v;
 		return success;
 	}
-	/*
-	bool serialize(message_type& type, byte_stream_writer& stream)
-	{
-		bool success = true;
-		success &= stream.serialize((uint8)type);
-		return success;
-	}
-	
-	bool serialize(message_type& type, byte_stream_reader& stream)
-	{
-		bool success = true;
-		uint8 v = 0;
-		success &= stream.serialize(v);
-		type = (message_type)v;
-		return success;
-	}*/
+
 
 	// ---- game_state_message ----
-	
 
 	template <typename T>
 	bool serialize(game::bomb& bomb, T& stream) {
@@ -63,6 +47,7 @@ namespace meteor
 		success &= stream.serialize(player.m_dead);
 		success &= stream.serialize(player.m_position.x);
 		success &= stream.serialize(player.m_position.y);
+		success &= stream.serialize(player.m_prev_action_tick);
 		//success &= stream.serialize(player.m_prev_action);
 		success &= serialize<game::player_entity::action, uint8>(player.m_prev_action, stream);
 		return success;
@@ -78,14 +63,12 @@ namespace meteor
 			success &= serialize(state.m_players[i], stream);
 		}
 		//success &= stream.serialize(state.m_tilemap);
-		for (uint8 tile : state.m_tilemap.m_tiles) {
+		for (uint8 tile : state.m_tilemap.m_tiles) {	// As long as this is constant between sender / reciever, this is fine.
 			success &= stream.serialize(tile);
 		}
 
 		return success;
 	}
-
-
 
 	template <typename T>
 	bool serialize(game_state_message& message, T& stream)
@@ -99,12 +82,15 @@ namespace meteor
 		return success;
 	}
 
+
 	bool game_state_message::write(byte_stream_writer& writer) { return serialize(*this, writer); }
 	bool game_state_message::read(byte_stream_reader& reader) { return serialize(*this, reader); }
 
-	game_state_message::game_state_message(game::game_state state)
+
+	game_state_message::game_state_message(game::game_state state, uint32 tick)
 		: m_type(message_type::GAME_STATE)
 		, m_game_state(state)
+		, m_tick(tick)
 	{
 	}
 
@@ -124,14 +110,34 @@ namespace meteor
 	bool input_action_message::write(byte_stream_writer& writer) { return serialize(*this, writer); }
 	bool input_action_message::read(byte_stream_reader& reader) { return serialize(*this, reader); }
 
-	input_action_message::input_action_message(game::player_entity::action action) 
+	input_action_message::input_action_message(game::player_entity::action action, uint32 tick) 
 		: m_type(message_type::INPUT_ACTION)
 		, m_action(action)
+		, m_tick(tick)
 	{
 	}
 
 
 
+	// ---- game_lobby_message ----
+
+	template <typename T>
+	bool serialize(game_lobby_message& message, T& stream) {
+		bool success = true;
+		success &= serialize<message_type, uint8>(message.m_type, stream);
+		success &= stream.serialize(message.m_start_now);
+		return success;
+	}
+
+	bool game_lobby_message::write(byte_stream_writer& writer) { return serialize(*this, writer); }
+	bool game_lobby_message::read(byte_stream_reader& reader) { return serialize(*this, reader); }
+
+
+	game_lobby_message::game_lobby_message(bool start_now) 
+		: m_type(message_type::GAME_LOBBY)
+		, m_start_now(start_now)
+	{
+	}
    
    
 
