@@ -113,6 +113,11 @@ namespace meteor::game {
 		Vector2	m_position = {};
 	};
 
+	struct player_action_queue {
+		player_action_queue() = default;
+		// TODO
+	};
+
 	struct bomb {
 		static constexpr double FUSE_TIME = 3.0;
 		static constexpr uint32 FUSE_TICKS = (uint32)(FUSE_TIME * (double)TICK_RATE);
@@ -181,8 +186,10 @@ namespace meteor::game {
 		// game_state or game_state_delta history for a couple ticks (half a sec worth?)
 		//game_state m_state_history[STATE_HISTORY_LENGTH] = {};
 		std::vector<game_state> m_state_history = std::vector<game_state>();
-#endif
 
+		// TODO player_action_queue for multiple actions
+#endif
+		
 
 
 	};
