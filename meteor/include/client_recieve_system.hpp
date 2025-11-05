@@ -8,6 +8,14 @@
 #include "game.hpp"
 
 namespace meteor::client_recieve_system {
-	void update(double time, udp_socket& socket, connection& conn, game::game& game);
 
+	
+	void update(
+		double time,
+		udp_socket& socket,
+		connection& conn,
+		game::game& game
+	);
+
+	void disconnect(connection& conn);
 }
