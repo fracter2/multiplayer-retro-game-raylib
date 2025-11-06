@@ -8,11 +8,15 @@ namespace meteor {
 	
 
 	struct connection {
-		enum class status {
-			DISCONNECTED,		// not connected, accepts broadcasts
-			CONNECTING,			// attempting to connect to endpoint (sent connect pck, awaiting connect pck response with player index)
-			CONNECTED,			// connected
-			DISCONNECTING,		// attempting gracefull disconnect (sent disconnect pck awaiting response)
+		enum class status {	// What each status means for their own behaviour on the client / server (has one for each client)
+			DISCONNECTED,		// Client: Looking for game, accepts broadcasts
+								// Server: This connection slot is available ( and possibly recently disconnected )
+			CONNECTING,			// Client: Attempting to connect to server (sent connect pck, awaiting connect pck response with player index)
+								// Server: Recieved connect package, sending connect pck back with his own player index, or disconnect to deny
+			CONNECTED,			// Client: Connected, only sending payloads from now
+								// Server: Connected, only sending payoads from now
+			DISCONNECTING,		// Client: Attempting gracefull disconnect (sent disconnect pck awaiting response)
+								// Server: Set to send a disconnect package, then set to disconnected. 
 			TEXAS,				// texas
 		};
 
