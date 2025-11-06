@@ -179,7 +179,7 @@ namespace meteor::server_recieve_system {
 				}
 				
 
-				debug::info("%g - recieving payload from client %f", GetTime(), client_index);
+				debug::info("%g - recieving payload from client %d", GetTime(), client_index);
 				connection& conn = server.m_clients[client_index];
 				
 				// Conn status check
@@ -188,10 +188,12 @@ namespace meteor::server_recieve_system {
 					debug::info("%g - client %d joined gracefully", GetTime(), client_index);
 				}
 				if (conn.m_status != connection::status::CONNECTED) {
+					
 					debug::info("%g - recieved payload package when irrelevant", GetTime());
 					continue;
 				}
 
+				// Sequence
 				if (packet.m_sequence <= conn.m_recieve_sequence) {
 					debug::info("out-of-order or duplicate packet dropped. my recieve_sequenece: %d, packet sequence: %d, time: %f "
 						, (conn.m_recieve_sequence)
@@ -233,7 +235,7 @@ namespace meteor::server_recieve_system {
 					// ---- INPUT_ACTION ----
 					case message_type::INPUT_ACTION:
 					{
-						debug::info("%g - recieved input message from client %f", GetTime(), client_index);
+						debug::info("%g - recieved input message from client %d", GetTime(), client_index);
 						input_action_message message;
 						if (!message.read(reader)) { print_error_code(); break; }
 
