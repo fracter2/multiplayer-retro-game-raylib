@@ -26,7 +26,7 @@ namespace meteor
 	   bool write(byte_stream_writer& writer);
 	   bool read(byte_stream_reader& reader);
 
-	   uint8 m_type = 0;
+	   uint8 m_type = (uint8)protocol_packet_type::CONNECT;
 	   uint32 m_magic = 0;
 	   uint32 m_version = 0; 
 	   uint8 m_player_id = 0;			// client player index, or when sent from server as broadcast: players already in lobby
@@ -39,7 +39,7 @@ namespace meteor
 	   bool write(byte_stream_writer& writer);
 	   bool read(byte_stream_reader& reader);
 
-	   uint8 m_type = 0;
+	   uint8 m_type = (uint8)protocol_packet_type::DISCONNECT;
 	   uint8 m_reason = 0;
 	   //char m_message[256] = {};
    };
@@ -51,7 +51,7 @@ namespace meteor
 	   bool write(byte_stream_writer& writer);
 	   bool read(byte_stream_reader& reader);
 
-	   uint8 m_type = 0;
+	   uint8 m_type = (uint8)protocol_packet_type::PAYLOAD;
 	   uint32 m_sequence = 0;
 	   uint32 m_acknowledge = 0;
    };
