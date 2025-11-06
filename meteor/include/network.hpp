@@ -185,6 +185,8 @@ namespace meteor
       ip_address resolve_address(std::string_view address);
       bool query_local_addresses(std::vector<ip_address> &addresses);
       bool get_bound_address(const udp_socket &socket, ip_endpoint &endpoint);
+      ip_address get_loopback_address();
+      ip_address get_broadcast_address();
    } // !network
 
 

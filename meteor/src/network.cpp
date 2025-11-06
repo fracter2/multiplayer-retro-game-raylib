@@ -529,5 +529,13 @@ namespace meteor
 
          return true;
       }
+
+      ip_address get_loopback_address() {
+          return ip_address(INADDR_LOOPBACK);
+      }
+
+      ip_address get_broadcast_address() {
+          return ip_address(INADDR_BROADCAST);
+      }
    } // !network
 } // !meteor
