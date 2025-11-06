@@ -125,8 +125,9 @@ namespace meteor::server_recieve_system {
 				disconnect_packet packet;
 				if (!packet.read(reader)) { debug::info("%g - error reading disconnect package", GetTime()); print_error_code(); break; }
 
+				uint32 r_index = 0;
 				uint8 client_index = 0;
-				if (!server.has_client(sender_endpoint, client_index)) {
+				if (!server.has_client(sender_endpoint, r_index)) {
 					debug::info("%g - ignoring irrelevant disconnect packet from unknown sender", GetTime());
 					debug::info("sender endpoint: %d.%d.%d.%d:%d",
 						sender_endpoint.m_address.a(),
@@ -136,6 +137,11 @@ namespace meteor::server_recieve_system {
 						sender_endpoint.port());
 					break;
 				}
+				else {
+					client_index = (uint8)r_index;
+					assert((uint32)client_index == r_index);	// Check incase we have more than uint8 limit clients... *just in case*
+				}
+
 
 				debug::info("%g - Gracefully Disconnecting client %f", GetTime(), client_index);
 				connection& conn = server.m_clients[client_index];
@@ -152,8 +158,9 @@ namespace meteor::server_recieve_system {
 				payload_packet packet;
 				if (!packet.read(reader)) { debug::info("%g - error reading payload package", GetTime()); print_error_code(); break; }
 
+				uint32 r_index = 0;
 				uint8 client_index = 0;
-				if (!server.has_client(sender_endpoint, client_index)) {
+				if (!server.has_client(sender_endpoint, r_index)) {
 					debug::info("%g - ignoring irrelevant payload packet from unknown sender", GetTime());
 					debug::info("sender endpoint: %d.%d.%d.%d:%d",
 						sender_endpoint.m_address.a(),
@@ -161,8 +168,16 @@ namespace meteor::server_recieve_system {
 						sender_endpoint.m_address.c(),
 						sender_endpoint.m_address.d(),
 						sender_endpoint.port());
+					
+					// TODO CONSIDER CHECKING IF RECENTLY LEFT and send another disconnect if so, incase of packet loss
+
 					break;
 				}
+				else {
+					client_index = (uint8)r_index;
+					assert((uint32)client_index == r_index);	// Check incase we have more than uint8 limit clients... *just in case*
+				}
+				
 
 				debug::info("%g - recieving payload from client %f", GetTime(), client_index);
 				connection& conn = server.m_clients[client_index];
