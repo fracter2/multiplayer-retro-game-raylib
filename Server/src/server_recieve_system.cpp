@@ -217,8 +217,10 @@ namespace meteor::server_recieve_system {
 						input_action_message message;
 						if (!message.read(reader)) { print_error_code(); break; }
 
-						game_instance.m_state.m_players[client_index].m_prev_action = message.m_action;
-						game_instance.m_state.m_players[client_index].m_prev_action_tick = message.m_tick;
+						game_instance.m_player_action_queue[client_index].append_new(message.m_action, message.m_tick);
+
+						//game_instance.m_state.m_players[client_index].m_prev_action = message.m_action;
+						//game_instance.m_state.m_players[client_index].m_prev_action_tick = message.m_tick;
 
 						break;
 					}
