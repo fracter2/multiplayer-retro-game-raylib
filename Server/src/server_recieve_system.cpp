@@ -13,6 +13,15 @@
 
 namespace meteor::server_recieve_system {
 
+	void disconnect_conn(connection& conn, server_state& server) {
+		//conn.m_endpoint = {};				// We could let this stay until it is overriden by new player. This way we know who "recently deleted" 
+											// and can reply with more disconnect packets, in case of packet loss.
+		conn.m_status = connection::status::DISCONNECTED;
+		conn.m_send_sequence = 0;
+		conn.m_recieve_sequence = 0;
+		conn.m_recieve_acknowledge = 0;
+	}
+
 	void update(const double time, server_state& server, udp_socket& socket, game::game& game_instance) {
 
 		{// timeout
@@ -22,7 +31,7 @@ namespace meteor::server_recieve_system {
 				&& time > conn.m_last_recieve_time + TIMEOUT)
 				{
 					debug::info("Timeout player: %f", i);
-					disconnect(conn, server);
+					disconnect_conn(conn, server);
 				}
 				i++;
 			}
@@ -255,12 +264,5 @@ namespace meteor::server_recieve_system {
 	}
 
 
-	void disconnect(connection& conn, server_state& server) {
-		//conn.m_endpoint = {};				// We could let this stay until it is overriden by new player. This way we know who "recently deleted" 
-											// and can reply with more disconnect packets, in case of packet loss.
-		conn.m_status = connection::status::DISCONNECTED;
-		conn.m_send_sequence = 0;
-		conn.m_recieve_sequence = 0;
-		conn.m_recieve_acknowledge = 0;
-	}
+
 }
