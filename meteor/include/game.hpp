@@ -224,8 +224,9 @@ namespace meteor::game {
 		// game_state or game_state_delta history for a couple ticks (half a sec worth?)
 		//game_state m_state_history[STATE_HISTORY_LENGTH] = {};
 		std::vector<game_state> m_state_history = std::vector<game_state>();
+		mutable uint8 m_states_not_sent = 0;
+		player_action_queue m_player_action_queue[MAX_PLAYERS] = {};
 
-		// TODO player_action_queue for multiple actions
 #endif
 		
 
