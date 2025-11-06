@@ -72,7 +72,7 @@ namespace meteor::client_recieve_system {
 				{
 					conn = connection(sender_endpoint);
 					conn.m_status = connection::status::CONNECTING;
-					debug::info("%g - recieved broadcast from server with %f player, attempting join", GetTime(), packet.m_player_id);
+					debug::info("%g - recieved broadcast from server with %d player, attempting join", GetTime(), packet.m_player_id);
 					debug::info("server endpoint: %d.%d.%d.%d:%d",
 						sender_endpoint.m_address.a(),
 						sender_endpoint.m_address.b(),
@@ -84,7 +84,7 @@ namespace meteor::client_recieve_system {
 				case connection::status::CONNECTING:
 				{
 					conn.m_status = connection::status::CONNECTED;
-					debug::info("%g - gracefully connected to server as player %f", GetTime(), packet.m_player_id);
+					debug::info("%g - gracefully connected to server as player %d", GetTime(), packet.m_player_id);
 
 					game = game::game();		// Reset game. note that we aren't allocating with "new", so no memory leaks.
 					game.m_user_index = packet.m_player_id;
@@ -154,10 +154,10 @@ namespace meteor::client_recieve_system {
 				}
 
 				if (packet.m_sequence <= conn.m_recieve_sequence) {
-					debug::info("out-of-order packet dropped. my recieve_sequenece: %d, packet sequence: %d, time: %f "
+					debug::info("%g - out-of-order packet dropped. my recieve_sequenece: %d, packet sequence: %d"
+						, (GetTime())
 						, (conn.m_recieve_sequence)
 						, (packet.m_sequence)
-						, (GetTime())
 					);
 					continue;
 				}
@@ -165,6 +165,7 @@ namespace meteor::client_recieve_system {
 				conn.m_recieve_sequence = packet.m_sequence;
 				conn.m_recieve_acknowledge = packet.m_acknowledge;
 
+				uint32 msg_sequence = packet.m_sequence; // TODO FOR RELIABLE MESSAGES, set by message_type::SEQUENCE_WRAP, ignore message if conn.sequence is higher.
 
 				// ---- MESSAGES ----
 				while (reader.has_data())
@@ -218,6 +219,8 @@ namespace meteor::client_recieve_system {
 						debug::info("%g - recieved game lobby state", GetTime());
 						game_lobby_message message;
 						if (!message.read(reader)) { print_error_code(); break; }
+
+						// TODO Apply all game lobby info recieved
 
 						if (message.m_start_now && game.m_status == game::game::status::PRE_GAME) { 
 							game.m_status = game::game::status::IN_GAME; 
