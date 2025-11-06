@@ -6,7 +6,6 @@
 #include "network.hpp"
 #include "protocol.hpp"
 #include "messages.hpp"
-#include "protocol.hpp"
 #include "connection.hpp"
 #include "game.hpp"
 
@@ -21,8 +20,8 @@ namespace meteor {
 
 		server_state() = default;
 
-		bool has_client(const ip_endpoint& endpoint, uint8& r_index) {
-			uint8 i = 0;
+		bool has_client(const ip_endpoint& endpoint, uint32& r_index) {
+			uint32 i = 0;
 			for (connection& conn : m_clients) {
 				if (conn.m_endpoint == endpoint
 				&& conn.m_status != connection::status::DISCONNECTED) { 
@@ -69,6 +68,14 @@ namespace meteor {
 				}
 			}
 			return false;
+		}
+
+		uint32 get_client_count() {
+			uint32 i = 0;
+			for (connection& conn : m_clients) {
+				if (conn.m_status != connection::status::DISCONNECTED) { i++; }
+			}
+			return i;
 		}
 
 		bool m_broadcast = true;
