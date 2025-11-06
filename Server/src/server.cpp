@@ -19,6 +19,7 @@
 
 #include "server_state.hpp"
 #include "server_recieve_system.hpp"
+#include "server_send_system.hpp"
 
 //#define _SERVER   // Already defined as a "global" macro in server proj file
 
@@ -93,7 +94,7 @@ int main()
 
 			// TODO Check if to start the game (start game btn or something), send lobby state with "start game" thing and start updating game state
 			//client_send_system::update(ticks, time, socket, server_connection, local_endpoint, server_endpoint, game);
-
+			server_send_system::update(ticks, time, socket, server, local_endpoint, game_instance);
 
 			BeginDrawing();
 			//render_system::render(ticks, time, game, server_connection, texture);
