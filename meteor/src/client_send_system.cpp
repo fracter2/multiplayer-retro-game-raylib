@@ -8,9 +8,6 @@
 namespace meteor::client_send_system {
 
 
-	// TODO Refrence connection status (const), game state (const)
-	// TODO QUEUE SEND DATA, INPUT ACTIONS, WRAP IN TICK CLOSURE
-	// note: network send update
 	void update(const uint32& ticks, const double time, udp_socket& socket, connection& conn, const ip_endpoint& client_endpoint, const ip_endpoint& server_endpoint, const game::game& game_instance) {
 
 		// Only perform send update once every third tick
@@ -97,6 +94,15 @@ namespace meteor::client_send_system {
 
 		case connection::status::DISCONNECTING: {
 			
+			debug::info("sending disconnect package");
+			disconnect_packet packet;
+			packet.write(writer);
+
+			if (!socket.send_to(server_endpoint, stream_send)) { print_error_code(); }
+			else {
+				// TODO LOG DATA SENT
+			}
+
 			break;
 		}
 
