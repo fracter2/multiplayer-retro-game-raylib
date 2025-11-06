@@ -113,10 +113,48 @@ namespace meteor::game {
 		Vector2	m_position = {};
 	};
 
+#ifdef _SERVER
 	struct player_action_queue {
+		static constexpr uint8 SIZE = 3;
+		
 		player_action_queue() = default;
-		// TODO
+		
+		bool is_empty() { return m_size == 0; }
+		
+		// Reads oldest value and consumes it
+		std::pair<player_entity::action, uint32> read_next() {
+			assert(!is_empty());
+
+			std::pair<player_entity::action, uint32> r = std::pair<player_entity::action, uint32>(m_actions[0], m_ticks[0]);
+
+			return r;
+		}
+
+		// Adds new to the last index, removing the oldest element to make space (if full)
+		void append_new(player_entity::action action, uint32 tick) {
+			if (m_size == SIZE) {
+				m_size--;
+				for (int i = 0; i < m_size; i++) {
+					m_actions[i] = m_actions[i + 1];
+					m_ticks[i] = m_ticks[i + 1];
+				}
+				m_actions[m_size] = {};
+				m_ticks[m_size] = {};
+			}
+			
+			m_actions[m_size] = action;
+			m_ticks[m_size] = tick;
+			m_size++;
+			return;
+		}
+
+	private:	// These properties are not properly invalidated / reset when not in-queue, so we don't let it be checked
+		uint8 m_size = 0;
+		player_entity::action m_actions[SIZE] = {};
+		uint32 m_ticks[SIZE] = {};
+
 	};
+#endif // _SERVER
 
 	struct bomb {
 		static constexpr double FUSE_TIME = 3.0;
