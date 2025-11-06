@@ -91,7 +91,7 @@ namespace meteor::server_recieve_system {
 
 				if (!server.has_client(sender_endpoint)) {
 					if (server.m_status == server_state::status::ONLINE_JOINABLE) {
-						join_lobby(server, socket, game_instance, reader, sender_endpoint, packet);
+						join_lobby(time, server, socket, game_instance, reader, sender_endpoint, packet);
 						break;
 					}
 					// Reply with DISCONNECT packet if in pre-game phase or recently left, to get them to realize theyre disconnected (may help if there's packet loss)
@@ -246,14 +246,25 @@ namespace meteor::server_recieve_system {
 	} // !update()
 
 
-	void join_lobby(server_state& server, udp_socket& socket, game::game& game_instance, byte_stream_reader& reader, ip_endpoint sender_endpoint, connect_packet packet) {
-		//assert(protocol == protocol_packet_type::CONNECT); // This should be checked by caller
+	void join_lobby(const double& time, server_state& server, udp_socket& socket, game::game& game_instance, byte_stream_reader& reader, ip_endpoint sender_endpoint, connect_packet packet) {
 
-		//connect_packet packet;
-		//if (!packet.read(reader)) {					debug::info("%g - error reading connect package", GetTime()); print_error_code(); return; }
-		//if (packet.m_version != PROTOCOL_VERSION) { debug::info("%g - recieved bad connect protocol version", GetTime()); return; }
-		//if (packet.m_magic != PROTOCOL_MAGIC) {		debug::info("%g - recieved bad connect magic version", GetTime()); return; }
-
+		// TODO Insert sender IP and set conn to "Connecting". Set to "Connected" when recieving first payload
+		uint8 i = 0;
+		for (connection& conn : server.m_clients) {
+			if (conn.m_status == connection::status::DISCONNECTED) {
+				conn.m_endpoint = sender_endpoint;
+				conn.m_last_recieve_time = time;
+				break;
+			}
+			i++;
+		}
+		debug::info("%g - client %d is joining", GetTime(), i);
+		debug::info("client endpoint: %d.%d.%d.%d:%d",
+			sender_endpoint.m_address.a(),
+			sender_endpoint.m_address.b(),
+			sender_endpoint.m_address.c(),
+			sender_endpoint.m_address.d(),
+			sender_endpoint.port());
 	}
 
 
