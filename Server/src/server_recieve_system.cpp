@@ -181,7 +181,12 @@ namespace meteor::server_recieve_system {
 
 				debug::info("%g - recieving payload from client %f", GetTime(), client_index);
 				connection& conn = server.m_clients[client_index];
-
+				
+				// Conn status check
+				if (conn.m_status == connection::status::CONNECTING) {
+					conn.m_status = connection::status::CONNECTED;
+					debug::info("%g - client %d joined gracefully", GetTime(), client_index);
+				}
 				if (conn.m_status != connection::status::CONNECTED) {
 					debug::info("%g - recieved payload package when irrelevant", GetTime());
 					continue;
