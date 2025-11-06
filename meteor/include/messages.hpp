@@ -11,9 +11,11 @@ namespace meteor
    enum class message_type : uint8 {
 	  GAME_STATE,
 	  //GAME_DELTA,
-	  //TICK_WRAP,	// Used to state the tick for the following messages	// TODO CONSIDER REMOVING we can just add tick to message...
+	  //TICK_WRAP,		// Used to state the tick for the following messages	// TODO CONSIDER REMOVING we can just add tick to message...
+	  //SEQUENCE_WRAP,	// Used to state the sequence for following messages, (for reliable messages client can check if it already recieved the induvidual message)
 	  INPUT_ACTION,
-	  GAME_LOBBY
+	  GAME_LOBBY,
+	  MAX
    };
 
    struct game_state_message {
