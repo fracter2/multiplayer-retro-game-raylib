@@ -24,6 +24,7 @@ namespace meteor::server_recieve_system {
 		game::game& game);
 
 	void join_lobby(
+		const double& time,
 		server_state& server, 
 		udp_socket& socket, 
 		game::game& game_instance, 
@@ -31,5 +32,4 @@ namespace meteor::server_recieve_system {
 		ip_endpoint sender_endpoint,
 		connect_packet packet);
 
-	void disconnect(connection& conn, server_state& server);
 }
