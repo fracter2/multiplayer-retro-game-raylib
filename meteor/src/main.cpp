@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 	// ==== APP DATA ====
 	constexpr uint16 PORT = 54321;
 	//const ip_endpoint LOCAL_ENDPOINT(ip_address(10, 12, 234, 103), PORT);	// TODO make use of pre-made local adress getter func
-	const ip_endpoint SERVER_ENDPOINT(ip_address(192, 168, 1, 53), PORT);	// TODO Add way of inputting adresses after start...
+	const ip_endpoint SERVER_ENDPOINT(ip_address(192, 168, 1, 72), PORT);	// TODO Add way of inputting adresses after start...
 	ip_endpoint local_endpoint = {};
 	ip_endpoint server_endpoint = SERVER_ENDPOINT;
 	udp_socket socket = {};
@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 		local_endpoint.m_address.d(),
 		local_endpoint.port());
 
-	//server_connection.m_status = connection::status::CONNECTING;		// TODO Move to system or dedicated INIT
+	server_connection.m_status = connection::status::CONNECTING;		// TODO Move to system or dedicated INIT
 	//debug::info("attempting to connect by default...");
 
 

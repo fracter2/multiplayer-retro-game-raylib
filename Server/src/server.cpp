@@ -43,7 +43,7 @@ int main()
 	//connection clients[game::MAX_PLAYERS] = {};
 	server_state server = {};
 
-	game::game		   game = {};
+	game::game		   game_instance = {};
 	input::input_state input = {};
 
 
@@ -77,7 +77,7 @@ int main()
 		time = GetTime();
 
 		//client_recieve_system::update(time, socket, server_connection, game);
-
+		server_recieve_system::update(time, server, socket, game_instance);
 		
 
 		// tick loop
