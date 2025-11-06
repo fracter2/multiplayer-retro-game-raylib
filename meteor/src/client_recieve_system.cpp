@@ -171,7 +171,7 @@ namespace meteor::client_recieve_system {
 				while (reader.has_data())
 				{
 					uint8 t = reader.peek();
-					if (t > (uint8)message_type::GAME_LOBBY) {	// check if it's above max message_type value
+					if (t >= (uint8)message_type::MAX) {	// check if it's above max message_type value
 						debug::info("%g - recieved unknown message type.", GetTime());
 						continue;
 					}
