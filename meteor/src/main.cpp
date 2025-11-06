@@ -17,6 +17,7 @@
 #include "client_recieve_system.hpp"
 #include "game_update_system.hpp"
 #include "render_system.hpp"
+#include "ui.hpp"
 
 //#define _CLIENT // This is also added in project settings, making it "global"
 
@@ -42,10 +43,10 @@ int main(int argc, char **argv)
 	udp_socket socket = {};
 	connection server_connection = {};
 
-	game::game		   game = {};
+	game game_instance = {};
 	input::input_state input = {};
-
-
+	ui::main_menu menu = {};
+	
 	double next_tick_time = GetTime();
 	uint32 ticks = 0;
 	float dt = GetFrameTime();
@@ -80,7 +81,7 @@ int main(int argc, char **argv)
 		
 
 
-		client_recieve_system::update(time, socket, server_connection, game);
+		client_recieve_system::update(time, socket, server_connection, game_instance);
 
 		// tick loop
 		if (time >= next_tick_time) {
@@ -88,12 +89,12 @@ int main(int argc, char **argv)
 
 			input::update(input);
 
-			game_update_system::update(game, input);
+			game_update_system::update(game_instance, input);
 
-			client_send_system::update(ticks, time, socket, server_connection, local_endpoint, server_endpoint, game);
+			client_send_system::update(ticks, time, socket, server_connection, local_endpoint, server_endpoint, game_instance);
 
 			BeginDrawing();
-			render_system::render(ticks, time, game, server_connection, texture);
+			render::client_system(ticks, time, game_instance, server_connection, texture, menu);
 			EndDrawing();
 
 		} //!tick loop

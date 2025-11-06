@@ -8,7 +8,7 @@
 
 namespace meteor::client_recieve_system {
 
-	void update(double time, udp_socket& socket, connection& conn, game::game& game) {
+	void update(double time, udp_socket& socket, connection& conn, game& game_instance) {
 
 		// note: timeout
 		if (conn.m_status != connection::status::DISCONNECTED
@@ -86,9 +86,9 @@ namespace meteor::client_recieve_system {
 					conn.m_status = connection::status::CONNECTED;
 					debug::info("%g - gracefully connected to server as player %d", GetTime(), packet.m_player_id);
 
-					game = game::game();		// Reset game. note that we aren't allocating with "new", so no memory leaks.
-					game.m_user_index = packet.m_player_id;
-					game.m_status = game::game::status::PRE_GAME;
+					game_instance = game();		// Reset game. note that we aren't allocating with "new", so no memory leaks.
+					game_instance.m_user_index = packet.m_player_id;
+					game_instance.m_status = game::status::PRE_GAME;
 
 					break;
 				}
@@ -185,22 +185,22 @@ namespace meteor::client_recieve_system {
 						game_state_message message;		// WHY ERROR
 						if (!message.read(reader)) { print_error_code(); break; }
 
-						int ticks_ahead = message.m_tick - game.m_tick;
+						int ticks_ahead = message.m_tick - game_instance.m_tick;
 
 						if (ticks_ahead < 0) {
-							debug::info("%g - recieved gamestate that is behind at tick: %d, local tick: %d, ignoring", GetTime(), message.m_tick, game.m_tick);
+							debug::info("%g - recieved gamestate that is behind at tick: %d, local tick: %d, ignoring", GetTime(), message.m_tick, game_instance.m_tick);
 							break;
 						}
 
 						if (ticks_ahead == 0)						  debug::info("%g - recieved gamestate that is on current tick: %d", GetTime(), message.m_tick);
-						else if (ticks_ahead < game.m_state_queue.size())  debug::info("%g - recieved state for upcoming tick inbetween newest and current", GetTime());
-						else if (ticks_ahead == game.m_state_queue.size()) debug::info("%g - recieved state for already queued, newest tick", GetTime());
+						else if (ticks_ahead < game_instance.m_state_queue.size())  debug::info("%g - recieved state for upcoming tick inbetween newest and current", GetTime());
+						else if (ticks_ahead == game_instance.m_state_queue.size()) debug::info("%g - recieved state for already queued, newest tick", GetTime());
 						//else // ticks_ahead > game.m_queued_states
 
-						if (game.m_state_queue[ticks_ahead - 1].is_default())	// .is_default() means that tick is empty
+						if (game_instance.m_state_queue[ticks_ahead - 1].is_default())	// .is_default() means that tick is empty
 							debug::info("overriding already queued tick");
 
-						game.m_state_queue[ticks_ahead - 1] = message.m_game_state;
+						game_instance.m_state_queue[ticks_ahead - 1] = message.m_game_state;
 
 						break;
 					}
@@ -222,8 +222,8 @@ namespace meteor::client_recieve_system {
 
 						// TODO Apply all game lobby info recieved
 
-						if (message.m_start_now && game.m_status == game::game::status::PRE_GAME) { 
-							game.m_status = game::game::status::IN_GAME; 
+						if (message.m_start_now && game_instance.m_status == game::status::PRE_GAME) {
+							game_instance.m_status = game::status::IN_GAME;
 						}
 						break;
 					}

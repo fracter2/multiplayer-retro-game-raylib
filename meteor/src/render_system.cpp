@@ -2,30 +2,20 @@
 
 #pragma once
 
-#include "render_system.hpp"
+//#include "render_system.hpp"
+#include "render.hpp"
 #include "raymath.h"
 
-namespace meteor::render_system{
+namespace meteor::render{
 	
-	constexpr Vector2 ZERO = Vector2(0, 0);
-	
-	namespace atlass {	// Texture atlass sources coordinates, hand-aligned via code
-		constexpr Rectangle WALL = { 0, 0, 16, 16 };
-		constexpr Rectangle PLAYER = { 0, 0, 16, 16 };
-		constexpr Rectangle PLAYER_DEAD = { 0, 0, 16, 16 };
-		constexpr Rectangle BOMB = { 0, 0, 16, 16 };
 
-	}
-
-
-	void render(const uint32& tick, const double time, const game::game& game_instance, const connection& conn, const Texture& m_texture) {
+	void client_system(const uint32& tick, const double time, const game& game_instance, const connection& conn, const Texture& texture, ui::main_menu menu) {
 
 		// TODO CLEAR
 		ClearBackground(SKYBLUE);
 
 		// ==== IN GAME ====
-		if (game_instance.m_status == game::game::status::IN_GAME) {
-			using namespace game;
+		if (game_instance.m_status == game::status::IN_GAME) {
 			const tilemap& map = game_instance.m_state.get_tilemap();
 
 
@@ -40,7 +30,7 @@ namespace meteor::render_system{
 
 				const Vector2 position = tilemap::SIZE_V * Vector2(x, y);
 				const Rectangle destination{ position.x, position.y, (float)tilemap::TILE_SIZE, (float)tilemap::TILE_SIZE };
-				DrawTexturePro(m_texture, atlass::WALL, destination, ZERO, 0.0f, WHITE);
+				DrawTexturePro(texture, atlass::WALL, destination, ZERO, 0.0f, WHITE);
 			}
 
 			// TODO RENDER BOMBS
@@ -57,7 +47,7 @@ namespace meteor::render_system{
 		
 
 		// ==== PRE GAME ====
-		else if (game_instance.m_status == game::game::status::PRE_GAME) {
+		else if (game_instance.m_status == game::status::PRE_GAME) {
 			// TODO RENDER GAME LOBBY (if in lobby
 
 		}
@@ -65,7 +55,7 @@ namespace meteor::render_system{
 
 
 		// ==== POST GAME ====
-		else if (game_instance.m_status == game::game::status::POST_GAME) {
+		else if (game_instance.m_status == game::status::POST_GAME) {
 			// TODO RENDER WIN / LOSE
 
 		}

@@ -19,7 +19,7 @@ namespace meteor::server_send_system {
 	void send_broadcast(udp_socket& socket,
 		server_state& server,
 		const ip_endpoint& local_endpoint,
-		const game::game& game_instance) {
+		const game& game_instance) {
 
 		byte_stream stream_send;
 		byte_stream_writer writer(stream_send);
@@ -41,7 +41,7 @@ namespace meteor::server_send_system {
 		udp_socket& socket,
 		server_state& server,
 		const ip_endpoint& local_endpoint,
-		const game::game& game_instance) {
+		const game& game_instance) {
 
 
 		// Only perform send update once every third tick
@@ -60,8 +60,8 @@ namespace meteor::server_send_system {
 		
 		// Broadcast check
 		if (server.m_status == server_state::status::ONLINE_JOINABLE) {
-			assert(game_instance.m_status == game::game::status::PRE_GAME);		// Only allow joinable in PRE_GAME (lobby) state
-			assert(server.get_client_count() < game::MAX_PLAYERS);				// Ensure we've handled player counts correctly
+			assert(game_instance.m_status == game::status::PRE_GAME);		// Only allow joinable in PRE_GAME (lobby) state
+			assert(server.get_client_count() < MAX_PLAYERS);				// Ensure we've handled player counts correctly
 
 			if (server.m_broadcast) {
 				send_broadcast(socket, server, local_endpoint, game_instance);
@@ -97,12 +97,12 @@ namespace meteor::server_send_system {
 
 
 				// Type safe const to reduce word lengths and to emphasise when it's mutable or not (to avoid setting accidently)
-				const uint32			   tick = game_instance.m_tick;
-				const game::game_state&    state = game_instance.m_state;
-				const game::player_entity& player = state.get_player(client_index);
+				const uint32		 tick = game_instance.m_tick;
+				const game_state&    state = game_instance.m_state;
+				const player_entity& player = state.get_player(client_index);
 
 
-				assert(game_instance.m_status != game::game::status::INVALID);	
+				assert(game_instance.m_status != game::status::INVALID);	
 
 
 				// -------- LOBBY STATE MESSAGE --------

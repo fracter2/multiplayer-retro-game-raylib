@@ -10,7 +10,7 @@
 
 //#define CLIENT
 
-namespace meteor::game {
+namespace meteor {
 
 	// TODO Consider making a "game_config" class that is sent before game starts. Would need maps to be created/deleted each game (convinience thing)
 	static constexpr int MAX_PLAYERS = 4;

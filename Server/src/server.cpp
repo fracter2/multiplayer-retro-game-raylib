@@ -20,6 +20,8 @@
 #include "server_state.hpp"
 #include "server_recieve_system.hpp"
 #include "server_send_system.hpp"
+#include "server_render_system.hpp"
+#include "server_game_system.hpp"
 
 //#define _SERVER   // Already defined as a "global" macro in server proj file
 
@@ -41,10 +43,10 @@ int main()
 
 
 	//connection server_connection = {};
-	//connection clients[game::MAX_PLAYERS] = {};
+	//connection clients[MAX_PLAYERS] = {};
 	server_state server = {};
 
-	game::game		   game_instance = {};
+	game		   game_instance = {};
 	input::input_state input = {};
 
 
@@ -92,13 +94,11 @@ int main()
 			
 			//game_update_system::update(game, input);
 
-			// TODO Check if to start the game (start game btn or something), send lobby state with "start game" thing and start updating game state
-			//client_send_system::update(ticks, time, socket, server_connection, local_endpoint, server_endpoint, game);
 			server_send_system::update(ticks, time, socket, server, local_endpoint, game_instance);
 
 			BeginDrawing();
 			//render_system::render(ticks, time, game, server_connection, texture);
-
+			render::server_system(ticks, time, game_instance, server, texture);
 			EndDrawing();
 
 		} //!tick loop

@@ -42,7 +42,7 @@ namespace meteor::client_send_system {
 		connection& connection,
 		const ip_endpoint& client_endpoint,
 		const ip_endpoint& server_endpoint,
-		const game::game& game_instance
+		const game& game_instance
 	);
 	
 	

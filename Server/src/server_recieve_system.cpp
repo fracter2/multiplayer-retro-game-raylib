@@ -22,7 +22,7 @@ namespace meteor::server_recieve_system {
 		conn.m_recieve_acknowledge = 0;
 	}
 
-	void update(const double time, server_state& server, udp_socket& socket, game::game& game_instance) {
+	void update(const double time, server_state& server, udp_socket& socket, game& game_instance) {
 
 		{// timeout
 			uint8 i = 0;
@@ -95,7 +95,7 @@ namespace meteor::server_recieve_system {
 						break;
 					}
 					// Reply with DISCONNECT packet if in pre-game phase or recently left, to get them to realize theyre disconnected (may help if there's packet loss)
-					else if (game_instance.m_status == game::game::status::PRE_GAME || server.has_client_recently_left(sender_endpoint)) {
+					else if (game_instance.m_status == game::status::PRE_GAME || server.has_client_recently_left(sender_endpoint)) {
 						// TODO Use server(?) to queue and then send messages
 						// Otherwise this is still fine, they'll eventually timeout
 						break;
@@ -270,7 +270,7 @@ namespace meteor::server_recieve_system {
 	} // !update()
 
 
-	void join_lobby(const double& time, server_state& server, udp_socket& socket, game::game& game_instance, byte_stream_reader& reader, ip_endpoint sender_endpoint, connect_packet packet) {
+	void join_lobby(const double& time, server_state& server, udp_socket& socket, game& game_instance, byte_stream_reader& reader, ip_endpoint sender_endpoint, connect_packet packet) {
 
 		// TODO Insert sender IP and set conn to "Connecting". Set to "Connected" when recieving first payload
 		uint8 i = 0;
@@ -292,7 +292,7 @@ namespace meteor::server_recieve_system {
 	}
 
 
-	void recieve_packet( const double time, server_state& server, uint8 connection_index, udp_socket& socket, game::game& game) {
+	void recieve_packet( const double time, server_state& server, uint8 connection_index, udp_socket& socket, game& game) {
 		connection& conn = server.m_clients[connection_index];
 
 

@@ -27,12 +27,16 @@
     <ClCompile Include="..\meteor\src\network_layer.cpp" />
     <ClCompile Include="..\meteor\src\protocol.cpp" />
     <ClCompile Include="src\server.cpp" />
+    <ClCompile Include="src\server_game_system.cpp" />
     <ClCompile Include="src\server_recieve_system.cpp" />
+    <ClCompile Include="src\server_render_system.cpp" />
     <ClCompile Include="src\server_send_system.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\meteor\include\game.hpp" />
+    <ClInclude Include="include\server_game_system.hpp" />
     <ClInclude Include="include\server_recieve_system.hpp" />
+    <ClInclude Include="include\server_render_system.hpp" />
     <ClInclude Include="include\server_send_system.hpp" />
     <ClInclude Include="include\server_state.hpp" />
   </ItemGroup>

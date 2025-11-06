@@ -5,7 +5,7 @@
 #include "raylib.h"
 
 
-namespace meteor::menu {
+namespace meteor::ui {
 
 	struct main_menu {
 		main_menu() = default;

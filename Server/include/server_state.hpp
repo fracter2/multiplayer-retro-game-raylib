@@ -80,6 +80,6 @@ namespace meteor {
 
 		bool m_broadcast = true;
 		status m_status = status::OFFLINE;
-		connection m_clients[game::MAX_PLAYERS] = {};
+		connection m_clients[MAX_PLAYERS] = {};
 	};
 }

@@ -108,7 +108,7 @@
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\input.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\menu.cpp" />
+    <ClCompile Include="src\ui.cpp" />
     <ClCompile Include="src\messages.cpp" />
     <ClCompile Include="src\network.cpp" />
     <ClCompile Include="src\network_layer.cpp" />
@@ -123,7 +123,8 @@
     <ClInclude Include="include\game.hpp" />
     <ClInclude Include="include\game_update_system.hpp" />
     <ClInclude Include="include\input.hpp" />
-    <ClInclude Include="include\menu.hpp" />
+    <ClInclude Include="include\render.hpp" />
+    <ClInclude Include="include\ui.hpp" />
     <ClInclude Include="include\messages.hpp" />
     <ClInclude Include="include\network.hpp" />
     <ClInclude Include="include\network_layer.hpp" />

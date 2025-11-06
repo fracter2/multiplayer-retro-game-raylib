@@ -15,42 +15,42 @@
 
 namespace meteor::game_update_system {
 	
-	bool can_place_bomb(const int index, const game::game_state& state, const uint32& tick) {
-		const game::player_entity& user_player = state.m_players[index];
+	bool can_place_bomb(const int index, const game_state& state, const uint32& tick) {
+		const player_entity& user_player = state.m_players[index];
 		uint8 x, y = 0;
 
-		game::vec2_to_coord(user_player.m_position, x, y);
+		vec2_to_coord(user_player.m_position, x, y);
 
 		bool r = true;
 		r &= !user_player.m_dead;							// if not player dead...
-		r &= game::valid_tile(x, y);						// and is inside map...
+		r &= valid_tile(x, y);						// and is inside map...
 		r &= !state.m_tilemap.is_tile_active(x, y);				// and is not wall...
 
-		for (const game::bomb& bomb : state.m_bombs) {		// and no other bombs are there...
+		for (const bomb& bomb : state.m_bombs) {		// and no other bombs are there...
 			r &= !(bomb.m_x == x
 				&& bomb.m_y == y
 				&& bomb.m_explosion_tick > tick);
 		}
 		r &= (state.get_bomb(index).m_explosion_tick
-			+ game::bomb::COOLDOWN_TICKS) < tick;			// and the bomb isn't already placed or in cooldown...
+			+ bomb::COOLDOWN_TICKS) < tick;			// and the bomb isn't already placed or in cooldown...
 
 		return r;
 	}
 
-	void update(game::game game_instance, const input::input_state input_state) {
+	void update(game game_instance, const input::input_state input_state) {
 		
 
-		if (game_instance.m_status == game::game::status::PRE_GAME) {
+		if (game_instance.m_status == game::status::PRE_GAME) {
 			// TODO Lobby? wait to recieve game start message
 
 			return;
 		}
-		else if (game_instance.m_status == game::game::status::POST_GAME) {
+		else if (game_instance.m_status == game::status::POST_GAME) {
 			// TODO Win / lose screen / stats?
 
 			return;
 		}
-		else if (game_instance.m_status == game::game::status::INVALID) {
+		else if (game_instance.m_status == game::status::INVALID) {
 
 			return;
 		}
@@ -74,8 +74,8 @@ namespace meteor::game_update_system {
 		// Type safe const to reduce word lengths and to emphasise when it's mutable or not (to avoid setting accidently)
 		const int				   user_index  = game_instance.m_user_index;
 		const uint32			   tick		   = game_instance.m_tick;
-		const game::game_state&	   state	   = game_instance.m_state;
-		const game::player_entity& user_player = state.get_player(user_index);
+		const game_state&	   state	   = game_instance.m_state;
+		const player_entity& user_player = state.get_player(user_index);
 
 		
 		// Remove predicted actions that have been used by the server
@@ -88,24 +88,24 @@ namespace meteor::game_update_system {
 
 
 		// INPUT PARSING
-		game::player_entity::action current_action = {};
+		player_entity::action current_action = {};
 		const bool vertical_active = input_state.m_up != input_state.m_down;
 		const bool horizontal_active = input_state.m_left != input_state.m_right;
 
 		if (input_state.m_place_bomb && can_place_bomb(user_index, state, tick))
-														   current_action = game::player_entity::action::PLACE_BOMB;
-		else if (input_state.m_up    && vertical_active)   current_action = game::player_entity::action::MOVE_UP;
-		else if (input_state.m_down  && vertical_active)   current_action = game::player_entity::action::MOVE_DOWN;
-		else if (input_state.m_left  && horizontal_active) current_action = game::player_entity::action::MOVE_LEFT;
-		else if (input_state.m_right && horizontal_active) current_action = game::player_entity::action::MOVE_RIGHT;
-		else											   current_action = game::player_entity::action::STAND_STILL;
+														   current_action = player_entity::action::PLACE_BOMB;
+		else if (input_state.m_up    && vertical_active)   current_action = player_entity::action::MOVE_UP;
+		else if (input_state.m_down  && vertical_active)   current_action = player_entity::action::MOVE_DOWN;
+		else if (input_state.m_left  && horizontal_active) current_action = player_entity::action::MOVE_LEFT;
+		else if (input_state.m_right && horizontal_active) current_action = player_entity::action::MOVE_RIGHT;
+		else											   current_action = player_entity::action::STAND_STILL;
 
 		game_instance.m_predict_actions.push_back(current_action);
 		game_instance.m_actions_not_sent += 1;
 
 		
 		// CLIENT SIDE PREDICTION
-		game::game_state p_state = game::game_state(state);	// note: copied, not ref
+		game_state p_state = game_state(state);	// note: copied, not ref
 		
 		// TODO Apply predicted actions to client player and client bomb	// TODO MOVE GAME LOGIC OPERATIONS TO UTILITY CLASS TO SYNC BETWEEN CLIENT/SERVER
 		

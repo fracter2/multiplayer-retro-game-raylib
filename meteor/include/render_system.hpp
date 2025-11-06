@@ -3,16 +3,12 @@
 
 #pragma once
 
-#include "common.hpp"
-#include "network.hpp"
-#include "messages.hpp"
-#include "protocol.hpp"
-#include "connection.hpp"
-#include "game.hpp"
+#include "render.hpp"
+
 
 //#include "input.hpp"
 
 
-namespace meteor::render_system {
-	void render(const uint32& tick, const double time, const game::game& game_instance, const connection& conn, const Texture& m_texture);
+namespace meteor::render {
+	void client_system(const uint32& tick, const double time, const game& game_instance, const connection& conn, const Texture& texture, ui::main_menu menu);
 }

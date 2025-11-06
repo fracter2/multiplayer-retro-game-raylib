@@ -32,7 +32,7 @@ namespace meteor
 	// ---- game_state_message ----
 
 	template <typename T>
-	bool serialize(game::bomb& bomb, T& stream) {
+	bool serialize(bomb& bomb, T& stream) {
 		bool success = true;
 		
 		success &= stream.serialize(bomb.m_explosion_tick);
@@ -42,21 +42,21 @@ namespace meteor
 	}
 
 	template <typename T>
-	bool serialize(game::player_entity& player, T& stream) {
+	bool serialize(player_entity& player, T& stream) {
 		bool success = true;
 		success &= stream.serialize(player.m_dead);
 		success &= stream.serialize(player.m_position.x);
 		success &= stream.serialize(player.m_position.y);
 		success &= stream.serialize(player.m_prev_action_tick);
 		//success &= stream.serialize(player.m_prev_action);
-		success &= serialize<game::player_entity::action, uint8>(player.m_prev_action, stream);
+		success &= serialize<player_entity::action, uint8>(player.m_prev_action, stream);
 		return success;
 	}
 
 	template <typename T>
-	bool serialize(game::game_state& state, T& stream) {
+	bool serialize(game_state& state, T& stream) {
 		bool success = true;
-		for (int i = 0; i < game::MAX_PLAYERS; i++) {
+		for (int i = 0; i <MAX_PLAYERS; i++) {
 			//success &= stream.serialize(state.m_bombs[i]);
 			//success &= stream.serialize(state.m_players[i]);
 			success &= serialize(state.m_bombs[i], stream);
@@ -87,7 +87,7 @@ namespace meteor
 	bool game_state_message::read(byte_stream_reader& reader) { return serialize(*this, reader); }
 
 
-	game_state_message::game_state_message(game::game_state state, uint32 tick)
+	game_state_message::game_state_message(game_state state, uint32 tick)
 		: m_type(message_type::GAME_STATE)
 		, m_game_state(state)
 		, m_tick(tick)
@@ -103,14 +103,14 @@ namespace meteor
 		success &= serialize<message_type, uint8>(message.m_type, stream);
 		success &= stream.serialize(message.m_tick);
 		//success &= stream.serialize(message.m_action);
-		success &= serialize<game::player_entity::action, uint8>(message.m_action, stream);
+		success &= serialize<player_entity::action, uint8>(message.m_action, stream);
 		return success;
 	}
 
 	bool input_action_message::write(byte_stream_writer& writer) { return serialize(*this, writer); }
 	bool input_action_message::read(byte_stream_reader& reader) { return serialize(*this, reader); }
 
-	input_action_message::input_action_message(game::player_entity::action action, uint32 tick) 
+	input_action_message::input_action_message(player_entity::action action, uint32 tick) 
 		: m_type(message_type::INPUT_ACTION)
 		, m_action(action)
 		, m_tick(tick)

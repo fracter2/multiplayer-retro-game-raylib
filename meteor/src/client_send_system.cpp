@@ -8,7 +8,7 @@
 namespace meteor::client_send_system {
 
 
-	void update(const uint32& ticks, const double time, udp_socket& socket, connection& conn, const ip_endpoint& client_endpoint, const ip_endpoint& server_endpoint, const game::game& game_instance) {
+	void update(const uint32& ticks, const double time, udp_socket& socket, connection& conn, const ip_endpoint& client_endpoint, const ip_endpoint& server_endpoint, const game& game_instance) {
 
 		// Only perform send update once every third tick
 		if (ticks % TICKS_PER_UPDATE != 0) {
@@ -40,7 +40,7 @@ namespace meteor::client_send_system {
 			packet.write(writer);
 
 
-			if (game_instance.m_status != game::game::status::IN_GAME) {
+			if (game_instance.m_status != game::status::IN_GAME) {
 				if (!socket.send_to(server_endpoint, stream_send)) { print_error_code(); }
 				else {
 					// TODO LOG DATA SENT
@@ -55,8 +55,8 @@ namespace meteor::client_send_system {
 			// Type safe const to reduce word lengths and to emphasise when it's mutable or not (to avoid setting accidently)
 			const int				   user_index  = game_instance.m_user_index;
 			const uint32			   tick		   = game_instance.m_tick;
-			const game::game_state&	   state	   = game_instance.m_state;
-			const game::player_entity& user_player = state.get_player(user_index);
+			const game_state&	   state	   = game_instance.m_state;
+			const player_entity& user_player = state.get_player(user_index);
 
 
 			// Send unsent input (only unsent input as server ignores older input anyway)

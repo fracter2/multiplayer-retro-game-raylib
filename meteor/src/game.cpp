@@ -5,7 +5,7 @@
 
 
 
-namespace meteor::game {
+namespace meteor {
 
 	player_entity::player_entity(Vector2 position)
 		: m_position(position)
