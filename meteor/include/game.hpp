@@ -3,7 +3,7 @@
 #pragma once
 
 #include "raylib.h"
-//#include "raymath.h"
+#include "raymath.h"
 #include "common.hpp"
 //#include "network.hpp"
 //#include "messages.hpp"
@@ -71,27 +71,33 @@ namespace meteor {
 
 	// Player-user state, to keep track of game player slots.
 	struct player_info {
-		static constexpr uint32 NAME_LENGTH_MAX = 16;
+		static constexpr uint32 NAME_LENGTH_MAX = 12;
 
-		enum class status : uint8 {
+		enum class status : uint8 {	// NOTE: These are also used by the send system to give disconnect reason
 			EMPTY,
 			JOINING,
 			ACTIVE,
 			AFK,
-			DISCONNECTED,
-			TIMEOUT
+			LOSER,
+			WINNER,
+			RAGEQUIT,
+			USER_LEFT,
+			KICKED,
+			TIMED_OUT
 		};
 
 		player_info() = default;
 
 		//bool m_is_host	// noone is host since the server is running on a sepparate exe. 
 							// The server exe could have admin tools, if needed.
-		status m_player_state = status::EMPTY;
+		status m_player_status = status::EMPTY;
 		char   m_name[NAME_LENGTH_MAX] = "";
 		// maybe lag info or similar could be here too
 	};
 
 	struct player_entity {
+		static constexpr double MOVE_SPEED = 20;
+
 		// All player character actions, can only be performed one at a time per tick.
 		// Should have a predictable way of being applied, used for latency state
 		enum class action : uint8 {
@@ -115,7 +121,8 @@ namespace meteor {
 
 #ifdef _SERVER
 	struct player_action_queue {
-		static constexpr uint8 SIZE = 3;
+		static constexpr uint8 SIZE = 3;		// NOTE: The point of this queue is to allow multiple input to be stretched over a longer period sent at 
+												// the same time, but this inherently means adding delay.
 		
 		player_action_queue() = default;
 		
@@ -180,10 +187,16 @@ namespace meteor {
 
 		const player_entity& get_player(const int index) const;
 		const bomb& get_bomb(const int index) const;
-
 		const tilemap& get_tilemap() const;
-		
 		const bool is_default() const;
+
+		bool is_walkable(const Vector2& pos) const;
+		bool is_walkable(const uint8& x, const uint8& y) const;
+		Vector2 move_and_collide(const Vector2& pos, const Vector2& vel) const;
+		void apply_player_action(const uint8& player_index, const double& dt, const uint32& tick);
+		bool can_place_bomb(const uint8& index, const uint32& tick) const;
+		void apply_bomb_explosion(const uint8& index);
+		bool apply_bomb_explosion_to_tile(const bomb& da_bomb, const uint8& x, const uint8& y);
 	};
 
 
@@ -214,19 +227,19 @@ namespace meteor {
 		std::vector<player_entity::action> m_predict_actions = std::vector<player_entity::action>();
 		mutable uint8							   m_actions_not_sent = 0;				// Used by the send system to know what is queued. Mutable so send system can modify despite const refrence, for type safety
 
-		game_state				m_predicted_state = {};							// result state from m_state having predicted actions applied.
+		game_state m_predicted_state = {};							// Result state from m_state having predicted actions applied.
+		game_state m_prev_state = {};								// Previously played state, used for split-frame interpolation (if needed)
 		//game_state				m_state_queue[STATE_HISTORY_LENGTH] = {};
 		std::vector<game_state> m_state_queue = std::vector<game_state>();
 		//int						m_queued_states = 0;
 #endif
 
 #ifdef _SERVER
-		// game_state or game_state_delta history for a couple ticks (half a sec worth?)
-		//game_state m_state_history[STATE_HISTORY_LENGTH] = {};
 		std::vector<game_state> m_state_history = std::vector<game_state>();
 		mutable uint8 m_states_not_sent = 0;
 		player_action_queue m_player_action_queue[MAX_PLAYERS] = {};
-
+		mutable bool game_lobby_changed = false;
+		mutable bool queue_game_start = false;			// If the game should start next send tick
 #endif
 		
 

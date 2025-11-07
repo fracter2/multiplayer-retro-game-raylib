@@ -8,6 +8,8 @@
 
 namespace meteor
 {
+	// NOTE: When serialised into byte stream, the messages take less space due to their alignment not making "gaps" in allocataded space
+
    enum class message_type : uint8 {
 	  GAME_STATE,
 	  //GAME_DELTA,
@@ -45,13 +47,15 @@ namespace meteor
 
    struct game_lobby_message {
 	   game_lobby_message() = default;
-	   game_lobby_message(bool start_now);
+	   game_lobby_message(bool start_now, const game& game_instance, const game::status& status);
 
 	   bool write(byte_stream_writer& writer);
 	   bool read(byte_stream_reader& reader);
 
 	   message_type	m_type = message_type::GAME_LOBBY;
 	   bool			m_start_now = false;
+	   player_info  m_player_info[MAX_PLAYERS] = {};
+	   game::status m_game_status = game::status::INVALID;
 	   // player info here
 	   // messages? with ack confirmation in send system?
    };

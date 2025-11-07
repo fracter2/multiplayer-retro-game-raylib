@@ -12,6 +12,122 @@ namespace meteor {
 	{
 	};
 
+	bool game_state::can_place_bomb(const uint8& index, const uint32& tick) const {
+		const player_entity& user_player = m_players[index];
+		uint8 x, y = 0;
+		vec2_to_coord(user_player.m_position, x, y);
+
+		bool r = true;
+		r &= !user_player.m_dead;							// if not player dead...
+		r &= is_walkable(x, y);								// and is inside map... and is not wall...
+
+		for (const bomb& bomb : m_bombs) {					// and no other bombs are there...
+			r &= !(bomb.m_x == x
+				&& bomb.m_y == y
+				&& bomb.m_explosion_tick > tick);
+		}
+		r &= (get_bomb(index).m_explosion_tick
+			+ bomb::COOLDOWN_TICKS) < tick;					// and the bomb isn't already placed or in cooldown...
+
+		return r;
+	}
+
+	bool game_state::is_walkable(const uint8& x, const uint8& y) const {
+		if (valid_tile(x, y) && !m_tilemap.is_tile_active(x, y)) 
+			return false;
+		else return true;
+	}
+
+	bool game_state::is_walkable(const Vector2& pos) const {
+		uint8 x, y = 0;
+		vec2_to_coord(pos, x, y);
+		return is_walkable(x, y);
+	}
+
+	Vector2 game_state::move_and_collide(const Vector2& pos, const Vector2& vel) const {
+		if (is_walkable(Vector2(pos + vel))) return Vector2(pos + vel);
+		else return pos;
+	}
+
+	void game_state::apply_player_action(const uint8& player_index, const double& dt, const uint32& tick) {
+		const double speed = player_entity::MOVE_SPEED * dt;	// CONSIDER USING STANDARDIZED 1/TICKRATE 
+		player_entity& player = m_players[player_index];
+		
+		switch (player.m_prev_action) {
+		case player_entity::action::INVALID: {
+			// lol
+			break;
+		}
+		case player_entity::action::STAND_STILL: {
+			// lol
+			break;
+		}
+		case player_entity::action::MOVE_UP: {
+			player.m_position = move_and_collide(player.m_position, Vector2(0, -1) * (float)speed);
+			
+			break;
+		}
+		case player_entity::action::MOVE_DOWN: {
+			player.m_position = move_and_collide(player.m_position, Vector2(0, 1) * (float)speed);
+			break;
+		}
+		case player_entity::action::MOVE_LEFT: {
+			player.m_position = move_and_collide(player.m_position, Vector2(-1, 0) * (float)speed);
+			break;
+		}
+		case player_entity::action::MOVE_RIGHT: {
+			player.m_position = move_and_collide(player.m_position, Vector2(1, 0) * (float)speed);
+			break;
+		}
+		case player_entity::action::PLACE_BOMB: {		// TODO CONSIDER SETTING EXPLOSION TIME BASED ON INPUT-TICK player.m_prev_action_tick
+			bomb& da_bomb = m_bombs[player_index];
+			uint8 x, y = 0;
+			vec2_to_coord(player.m_position, x, y);
+			if (can_place_bomb(player_index, tick)) {
+				da_bomb.m_explosion_tick = tick + bomb::FUSE_TICKS;
+				da_bomb.m_x = x;
+				da_bomb.m_y = y;
+			}
+			break;
+		}
+			
+		}
+	}
+
+	// Returns true if it hit a tile, destroying it, and killingany players on the way
+	bool game_state::apply_bomb_explosion_to_tile(const bomb& da_bomb, const uint8& x, const uint8& y) {
+		for (player_entity& player : m_players) {
+			if (!player.m_dead) {
+				uint8 m_x, m_y = 0;
+				vec2_to_coord(player.m_position, m_x, m_y);
+				if (m_x == x && m_y == da_bomb.m_y) { player.m_dead = true; }
+			}
+		}
+		if (m_tilemap.is_tile_active(x, y)) { 
+			m_tilemap.set_tile(x, y, false); 
+			return true; 
+		}
+		return false;
+	}
+
+	void game_state::apply_bomb_explosion(const uint8& index) {
+		bomb& da_bomb = m_bombs[index];
+
+		// Traverse left, right, up and down. Kill any players in the way, and destroy the first hit tile (in each direction)
+		for (uint8 x = da_bomb.m_x; x < tilemap::WIDTH; x++) {
+			if (apply_bomb_explosion_to_tile(da_bomb, x, da_bomb.m_y)) break;
+		}
+		for (uint8 x = da_bomb.m_x; x > 0; x--) {
+			if (apply_bomb_explosion_to_tile(da_bomb, x - 1, da_bomb.m_y)) break;
+		}
+		for (uint8 y = da_bomb.m_y; y < tilemap::HEIGHT; y++) {
+			if (apply_bomb_explosion_to_tile(da_bomb, da_bomb.m_x, y)) break;
+		}
+		for (uint8 y = da_bomb.m_y; y > 0; y--) {
+			if (apply_bomb_explosion_to_tile(da_bomb, da_bomb.m_x, y - 1)) break;
+		}
+	}
+
 	bomb::bomb(uint8 x, uint8 y, int32 explosion_tick)
 		: m_x(x)
 		, m_y(y)

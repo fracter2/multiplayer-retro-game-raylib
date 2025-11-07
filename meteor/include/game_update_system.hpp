@@ -15,27 +15,7 @@
 
 namespace meteor::game_update_system {
 	
-	bool can_place_bomb(const int index, const game_state& state, const uint32& tick) {
-		const player_entity& user_player = state.m_players[index];
-		uint8 x, y = 0;
-
-		vec2_to_coord(user_player.m_position, x, y);
-
-		bool r = true;
-		r &= !user_player.m_dead;							// if not player dead...
-		r &= valid_tile(x, y);						// and is inside map...
-		r &= !state.m_tilemap.is_tile_active(x, y);				// and is not wall...
-
-		for (const bomb& bomb : state.m_bombs) {		// and no other bombs are there...
-			r &= !(bomb.m_x == x
-				&& bomb.m_y == y
-				&& bomb.m_explosion_tick > tick);
-		}
-		r &= (state.get_bomb(index).m_explosion_tick
-			+ bomb::COOLDOWN_TICKS) < tick;			// and the bomb isn't already placed or in cooldown...
-
-		return r;
-	}
+	
 
 	void update(game game_instance, const input::input_state input_state) {
 		
@@ -57,14 +37,20 @@ namespace meteor::game_update_system {
 
 		// TODO Singleplayer mode?
 
-		
-		if (game_instance.m_state_queue.size() == 0) { // Extrapolate
-			
+
+		// ======== IN_GAME ========
+
+		if (game_instance.m_state_queue.size() == 0) {			// Extrapolate
+			// or... not?
+			return;
 		}
 		else if (game_instance.m_state_queue[0].is_default()) { // Interpolate between current and next valid state
 
+			// TODO INTERPOLATE POSITIONS AND TICK
+
 		}
 		else { // set state normally
+			game_instance.m_prev_state = game_instance.m_state;
 			game_instance.m_state = game_instance.m_state_queue[0];
 			game_instance.m_state_queue.erase(game_instance.m_state_queue.begin());
 		}
@@ -72,9 +58,9 @@ namespace meteor::game_update_system {
 		game_instance.m_tick += 1;
 		
 		// Type safe const to reduce word lengths and to emphasise when it's mutable or not (to avoid setting accidently)
-		const int				   user_index  = game_instance.m_user_index;
-		const uint32			   tick		   = game_instance.m_tick;
-		const game_state&	   state	   = game_instance.m_state;
+		const uint8			 user_index  = (uint8)game_instance.m_user_index;
+		const uint32&		 tick		 = game_instance.m_tick;
+		const game_state&	 state	     = game_instance.m_state;
 		const player_entity& user_player = state.get_player(user_index);
 
 		
@@ -92,7 +78,7 @@ namespace meteor::game_update_system {
 		const bool vertical_active = input_state.m_up != input_state.m_down;
 		const bool horizontal_active = input_state.m_left != input_state.m_right;
 
-		if (input_state.m_place_bomb && can_place_bomb(user_index, state, tick))
+		if (input_state.m_place_bomb &&	state.can_place_bomb(user_index, tick))
 														   current_action = player_entity::action::PLACE_BOMB;
 		else if (input_state.m_up    && vertical_active)   current_action = player_entity::action::MOVE_UP;
 		else if (input_state.m_down  && vertical_active)   current_action = player_entity::action::MOVE_DOWN;
