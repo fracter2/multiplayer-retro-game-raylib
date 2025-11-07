@@ -72,6 +72,7 @@ namespace meteor::client_recieve_system {
 				{
 					conn = connection(sender_endpoint);
 					conn.m_status = connection::status::CONNECTING;
+					conn.m_last_recieve_time = time;
 					debug::info("%g - recieved broadcast from server with %d player, attempting join", GetTime(), packet.m_player_id);
 					debug::info("server endpoint: %d.%d.%d.%d:%d",
 						sender_endpoint.m_address.a(),
