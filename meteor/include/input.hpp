@@ -43,6 +43,12 @@ namespace meteor::input {
 		bool m_lmb_just_pressed;
 		bool m_esc;
 		bool m_esc_just_pressed;
+		bool m_1;						
+		bool m_1_just_pressed;			// Toggle server online / offline. Client quit-game
+		bool m_2;						
+		bool m_2_just_pressed;			// Toggle server broadcast / client join broadcast
+		bool m_3;						
+		bool m_3_just_pressed;			// Server start game
 	};
 
 

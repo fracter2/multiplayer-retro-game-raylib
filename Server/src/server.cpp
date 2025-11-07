@@ -93,6 +93,7 @@ int main()
 
 			
 			//game_update_system::update(game, input);
+			server_game_system::update(ticks, dt, game_instance, input);
 
 			server_send_system::update(ticks, time, socket, server, local_endpoint, game_instance);
 

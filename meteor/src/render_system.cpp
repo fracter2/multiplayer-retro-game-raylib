@@ -8,6 +8,11 @@
 
 namespace meteor::render{
 	
+	constexpr float BOMB_RADIUS = 12;
+	constexpr Color BOMB_COLOR = GRAY;
+	constexpr float PLAYER_RADIUS = 8;
+	constexpr Color PLAYER_COLOR = BLUE;
+	constexpr Color PLAYER_COLOR_DEAD = DARKBLUE;
 
 	void client_system(const uint32& tick, const double time, const game& game_instance, const connection& conn, const Texture& texture, ui::main_menu menu) {
 
@@ -34,8 +39,18 @@ namespace meteor::render{
 			}
 
 			// TODO RENDER BOMBS
+			for (int i = 0; i < MAX_PLAYERS; i++) {
+				const bomb& da_bomb = game_instance.m_state.m_bombs[i];
+				if (da_bomb.m_explosion_tick >= tick) { DrawCircle(da_bomb.m_x, da_bomb.m_y, BOMB_RADIUS, BOMB_COLOR); }
+				//if (da_bomb.m_explosion_tick >= tick) { DrawRectanglePro(da_bomb.m_x, da_bomb.m_y, BOMB_RADIUS, BOMB_COLOR); }
+			}
 
 			// TODO RENDER CHARACTERS
+			for (int i = 0; i < MAX_PLAYERS; i++) {
+				const player_entity& player = game_instance.m_state.m_players[i];
+				if (player.m_dead) { DrawCircle(player.m_position.x, player.m_position.x, PLAYER_RADIUS, PLAYER_COLOR_DEAD); }
+				if (player.m_dead) { DrawCircle(player.m_position.x, player.m_position.x, PLAYER_RADIUS, PLAYER_COLOR); }
+			}
 
 			// TODO RENDER NAMES (if there are names)
 

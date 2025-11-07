@@ -32,5 +32,11 @@ namespace meteor::input {
 		state.m_esc_just_pressed = (!state.m_esc) and IsKeyDown(KEY_ESCAPE);
 		state.m_esc = IsKeyDown(KEY_ESCAPE);
 
+		state.m_1_just_pressed = !(state.m_1) and IsKeyDown(KEY_ONE);			// Toggle server online / offline. Client quit-game
+		state.m_1 = IsKeyDown(KEY_ONE);
+		state.m_2_just_pressed = !(state.m_2) and IsKeyDown(KEY_TWO);			// Toggle server send broadcast / client join broadcast
+		state.m_2 = IsKeyDown(KEY_TWO);
+		state.m_3_just_pressed = !(state.m_3) and IsKeyDown(KEY_THREE);			// Server start game
+		state.m_3 = IsKeyDown(KEY_THREE);
 	}
 }
