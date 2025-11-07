@@ -14,7 +14,7 @@
 namespace meteor::server_recieve_system {
 
 
-	void update(const double time, server_state& server, udp_socket& socket, game& game_instance) {
+	void update(const double time, server_state& server, udp_socket& socket, game& game_instance, ip_endpoint& local_endpoint) {
 
 		{// timeout
 			uint8 i = 0;
@@ -45,6 +45,8 @@ namespace meteor::server_recieve_system {
 				print_error_code();
 				return;	// skip entire method in case it gets resolved next loop
 			}
+
+			if (sender_endpoint == local_endpoint) { continue; }
 
 			// ======== OFFLINE ========
 			if (server.m_status == server_state::status::OFFLINE) {

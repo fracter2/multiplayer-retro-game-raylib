@@ -13,7 +13,8 @@ namespace meteor::server_recieve_system {
 		const double time, 
 		server_state& server,
 		udp_socket& socket,
-		game& game
+		game& game,
+		ip_endpoint& local_endpoint
 	);
 
 	void join_lobby(
