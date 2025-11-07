@@ -9,13 +9,13 @@
 #include <iostream>
 
 //#include "raylib.h"
-#include "common.hpp"
+//#include "common.hpp"
 //#include "messages.hpp"
-#include "input.hpp"
-#include "game.hpp"
-#include "protocol.hpp"
-#include "connection.hpp"
-#include "network.hpp"
+//#include "input.hpp"
+//#include "game.hpp"
+//#include "protocol.hpp"
+//#include "connection.hpp"
+//#include "network.hpp"
 
 #include "server_state.hpp"
 #include "server_recieve_system.hpp"
@@ -46,9 +46,9 @@ int main()
 	//connection clients[MAX_PLAYERS] = {};
 	server_state server = {};
 
-	game		   game_instance = {};
+	game			   game_instance = {};
 	input::input_state input = {};
-
+	ui::main_menu	   menu = {};
 
 	double next_tick_time = GetTime();
 	uint32 ticks = 0;
@@ -93,13 +93,13 @@ int main()
 
 			
 			//game_update_system::update(game, input);
-			server_game_system::update(ticks, dt, game_instance, input);
+			server_game_system::update(ticks, dt, game_instance, input, server);
 
 			server_send_system::update(ticks, time, socket, server, local_endpoint, game_instance);
 
 			BeginDrawing();
 			//render_system::render(ticks, time, game, server_connection, texture);
-			render::server_system(ticks, time, game_instance, server, texture);
+			render::server_system(ticks, time, game_instance, server, texture, menu);
 			EndDrawing();
 
 		} //!tick loop

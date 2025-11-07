@@ -17,6 +17,12 @@ namespace meteor::input {
 		, m_lmb_just_pressed(lmb)
 		, m_esc(esc)
 		, m_esc_just_pressed(esc)
+		, m_1(false)
+		, m_1_just_pressed(false)
+		, m_2(false)
+		, m_2_just_pressed(false)
+		, m_3(false)
+		, m_3_just_pressed(false)
 	{
 	}
 

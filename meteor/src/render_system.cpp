@@ -41,15 +41,15 @@ namespace meteor::render{
 			// TODO RENDER BOMBS
 			for (int i = 0; i < MAX_PLAYERS; i++) {
 				const bomb& da_bomb = game_instance.m_state.m_bombs[i];
-				if (da_bomb.m_explosion_tick >= tick) { DrawCircle(da_bomb.m_x, da_bomb.m_y, BOMB_RADIUS, BOMB_COLOR); }
+				if (da_bomb.m_explosion_tick >= tick) { DrawCircle((int)da_bomb.m_x, (int)da_bomb.m_y, BOMB_RADIUS, BOMB_COLOR); }
 				//if (da_bomb.m_explosion_tick >= tick) { DrawRectanglePro(da_bomb.m_x, da_bomb.m_y, BOMB_RADIUS, BOMB_COLOR); }
 			}
 
 			// TODO RENDER CHARACTERS
 			for (int i = 0; i < MAX_PLAYERS; i++) {
 				const player_entity& player = game_instance.m_state.m_players[i];
-				if (player.m_dead) { DrawCircle(player.m_position.x, player.m_position.x, PLAYER_RADIUS, PLAYER_COLOR_DEAD); }
-				if (player.m_dead) { DrawCircle(player.m_position.x, player.m_position.x, PLAYER_RADIUS, PLAYER_COLOR); }
+				if (player.m_dead) { DrawCircle((int)player.m_position.x, (int)player.m_position.x, PLAYER_RADIUS, PLAYER_COLOR_DEAD); }
+				if (player.m_dead) { DrawCircle((int)player.m_position.x, (int)player.m_position.x, PLAYER_RADIUS, PLAYER_COLOR); }
 			}
 
 			// TODO RENDER NAMES (if there are names)

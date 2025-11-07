@@ -4,7 +4,6 @@
 #pragma once
 
 #include "server_game_system.hpp"
-#include "server_state.hpp"
 
 namespace meteor::server_game_system {
 

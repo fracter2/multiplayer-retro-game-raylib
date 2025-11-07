@@ -34,21 +34,21 @@ namespace meteor::input {
 		}
 		*/
 
-		bool m_up;
-		bool m_down;
-		bool m_left;
-		bool m_right;
-		bool m_place_bomb;
-		bool m_lmb;
-		bool m_lmb_just_pressed;
-		bool m_esc;
-		bool m_esc_just_pressed;
-		bool m_1;						
-		bool m_1_just_pressed;			// Toggle server online / offline. Client quit-game
-		bool m_2;						
-		bool m_2_just_pressed;			// Toggle server broadcast / client join broadcast
-		bool m_3;						
-		bool m_3_just_pressed;			// Server start game
+		bool m_up = false;
+		bool m_down = false;
+		bool m_left = false;
+		bool m_right = false;
+		bool m_place_bomb = false;
+		bool m_lmb = false;
+		bool m_lmb_just_pressed = false;
+		bool m_esc = false;
+		bool m_esc_just_pressed = false;
+		bool m_1 = false;						
+		bool m_1_just_pressed = false;			// Toggle server online / offline. Client quit-game
+		bool m_2 = false;
+		bool m_2_just_pressed = false;			// Toggle server broadcast / client join broadcast
+		bool m_3 = false;
+		bool m_3_just_pressed = false;			// Server start game
 	};
 
 

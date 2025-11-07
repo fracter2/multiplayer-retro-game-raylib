@@ -9,6 +9,6 @@
 
 namespace meteor::server_game_system {
 
-	void update(const uint32& tick, const double& dt, game& game_instance, const input::input_state& input_state, const server_state& server);
+	void update(const uint32& tick, const double& dt, game& game_instance, const input::input_state& input_state, server_state& server);
 
 }

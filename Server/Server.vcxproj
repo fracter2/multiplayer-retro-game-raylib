@@ -34,6 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\meteor\include\game.hpp" />
+    <ClInclude Include="..\meteor\include\input.hpp" />
     <ClInclude Include="include\server_game_system.hpp" />
     <ClInclude Include="include\server_recieve_system.hpp" />
     <ClInclude Include="include\server_render_system.hpp" />

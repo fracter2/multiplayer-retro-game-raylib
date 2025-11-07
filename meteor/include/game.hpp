@@ -126,7 +126,7 @@ namespace meteor {
 		
 		player_action_queue() = default;
 		
-		bool is_empty() { return m_size == 0; }
+		bool is_empty() const { return m_size == 0; }
 		
 		// Reads oldest value and consumes it
 		std::pair<player_entity::action, uint32> read_next() {
