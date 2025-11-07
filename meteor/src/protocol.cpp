@@ -12,11 +12,12 @@ namespace meteor
 	{
 	}
 
-	connect_packet::connect_packet(uint8 id)
+	connect_packet::connect_packet(uint8 id, bool broadcast)
 		: m_type((uint8)protocol_packet_type::CONNECT)
 		, m_magic(PROTOCOL_MAGIC)
 		, m_version(PROTOCOL_VERSION)
 		, m_player_id(id)
+		, m_broadcast(broadcast)
 	{
 	}
 
@@ -28,6 +29,7 @@ namespace meteor
 		success &= stream.serialize(message.m_magic);
 		success &= stream.serialize(message.m_version);
 		success &= stream.serialize(message.m_player_id);
+		success &= stream.serialize(message.m_broadcast);
 		return success;
 	}
 

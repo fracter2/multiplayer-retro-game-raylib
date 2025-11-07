@@ -84,6 +84,7 @@ namespace meteor::client_recieve_system {
 				}
 				case connection::status::CONNECTING:
 				{
+					if (packet.m_broadcast) { break; }
 					conn.m_status = connection::status::CONNECTED;
 					debug::info("%g - gracefully connected to server as player %d", GetTime(), packet.m_player_id);
 
