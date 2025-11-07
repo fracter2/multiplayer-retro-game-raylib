@@ -30,7 +30,7 @@ namespace meteor::client_recieve_system {
 			}
 
 			// Only accept non-server packages if in DISCONNECTED state
-			if ((conn.m_status == connection::status::DISCONNECTED || sender_endpoint != conn.m_endpoint)) {
+			if ((conn.m_status != connection::status::DISCONNECTED && sender_endpoint != conn.m_endpoint)) {
 				debug::info("%g - !! ignoring - pck from NON-SERVER endpoint: %d.%d.%d.%d:%d, data size: %d",
 					GetTime(),
 					sender_endpoint.address().a(),
