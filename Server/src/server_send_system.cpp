@@ -97,7 +97,7 @@ namespace meteor::server_send_system {
 
 
 				// Type safe const to reduce word lengths and to emphasise when it's mutable or not (to avoid setting accidently)
-				const uint32		 tick = game_instance.m_tick;
+				const uint32&		 tick = game_instance.m_tick;
 				const game_state&    state = game_instance.m_state;
 				const player_entity& player = state.get_player(client_index);
 
@@ -106,38 +106,53 @@ namespace meteor::server_send_system {
 
 
 				// -------- LOBBY STATE MESSAGE --------
-				// TODO Send game lobby updates (If changed) including win/lose state
 
-				game_lobby_message lobby_message = game_lobby_message();
+				if (game_instance.game_lobby_changed) {
+					game_lobby_message lobby_message = game_lobby_message(game_instance.queue_game_start, game_instance, game_instance.m_status);
+					if (writer.m_stream.can_fit(sizeof(lobby_message))) {	// LIMIT TO MAX PACKAGE SIZE
+						lobby_message.write(writer);
+					}
+					else { 
+						debug::warn("%g - message cannot fit!, size: %d", GetTime(), stream_send.size());
+						break; 
+					}
+				}
 				
-
 
 
 				// -------- GAME STATE MESSAGE --------
 				// Send unsent game states (not reliable-transmittion, client only cares about latest)
 				// Consider using reverse iterator to simplify(?)
 				const uint8 history_size = (uint8)game_instance.m_state_history.size();
-				uint8 state_i = history_size - (game_instance.m_states_not_sent - 1);	// -1 so the for(state_i) to account for state history not having latest game.m_state
+				uint8 states_not_sent = game_instance.m_states_not_sent;						// Make local for this conn-loop. Reset at end of update()
+				if (game_instance.m_status == game::status::POST_GAME) { states_not_sent = 1; }	// Always only send latest state in post_game
+				uint8 state_i = history_size - (states_not_sent - 1);							// -1 so the for(state_i) to account for state history not having latest game.m_state
 
 				for (uint8 i = state_i; i < history_size; i++) {
-					const uint32 state_tick = game_instance.m_tick - game_instance.m_states_not_sent;	
-					game_state_message message = game_state_message(game_instance.m_state_history[i], state_tick);
+					const uint32 state_tick = game_instance.m_tick - states_not_sent;
+					game_state_message state_message = game_state_message(game_instance.m_state_history[i], state_tick);
 
-					if (writer.m_stream.can_fit(sizeof(message))) {	// LIMIT TO MAX PACKAGE SIZE
-						message.write(writer);
-						game_instance.m_states_not_sent -= 1;
+					if (writer.m_stream.can_fit(sizeof(state_message))) {	// LIMIT TO MAX PACKAGE SIZE
+						state_message.write(writer);
+						states_not_sent -= 1;
 					}
-					else { break; }
+					else {
+						debug::warn("%g - message cannot fit!, size: %d", GetTime(), stream_send.size());
+						break;
+					}
 
 				}
 
-				if (game_instance.m_states_not_sent == 1) {
-					game_state_message message = game_state_message(game_instance.m_state, game_instance.m_tick);
-					if (writer.m_stream.can_fit(sizeof(message))) {	// LIMIT TO MAX PACKAGE SIZE
-						message.write(writer);
-						game_instance.m_states_not_sent -= 1;
+				if (states_not_sent == 1) {
+					game_state_message state_message = game_state_message(game_instance.m_state, game_instance.m_tick);
+					if (writer.m_stream.can_fit(sizeof(state_message))) {	// LIMIT TO MAX PACKAGE SIZE
+						state_message.write(writer);
+						states_not_sent -= 1;
 					}
-					else { break; }
+					else {
+						debug::warn("%g - message cannot fit!, size: %d", GetTime(), stream_send.size());
+						break;
+					}
 				}
 
 				debug::info("%g - sending payload package to client %d, size: %d", GetTime(), client_index, stream_send.size());
@@ -184,7 +199,9 @@ namespace meteor::server_send_system {
 		} // !for (conn clients)
 
 		
-
+		// Reset dirty checks 
+		game_instance.m_states_not_sent = 0;
+		game_instance.game_lobby_changed = false;
 		
 
 

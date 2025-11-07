@@ -221,6 +221,9 @@ namespace meteor::client_recieve_system {
 						if (!message.read(reader)) { print_error_code(); break; }
 
 						// TODO Apply all game lobby info recieved
+						for (int i = 0; i < MAX_PLAYERS; i++) {
+							game_instance.m_player_info[i] = message.m_player_info[i];
+						}
 
 						if (message.m_start_now && game_instance.m_status == game::status::PRE_GAME) {
 							game_instance.m_status = game::status::IN_GAME;

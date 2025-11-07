@@ -13,14 +13,6 @@
 
 namespace meteor::server_recieve_system {
 
-	void disconnect_conn(connection& conn, server_state& server) {
-		//conn.m_endpoint = {};				// We could let this stay until it is overriden by new player. This way we know who "recently deleted" 
-											// and can reply with more disconnect packets, in case of packet loss.
-		conn.m_status = connection::status::DISCONNECTED;
-		conn.m_send_sequence = 0;
-		conn.m_recieve_sequence = 0;
-		conn.m_recieve_acknowledge = 0;
-	}
 
 	void update(const double time, server_state& server, udp_socket& socket, game& game_instance) {
 
@@ -30,8 +22,14 @@ namespace meteor::server_recieve_system {
 				if (conn.m_status != connection::status::DISCONNECTED
 				&& time > conn.m_last_recieve_time + TIMEOUT)
 				{
-					debug::info("Timeout player: %f", i);
-					disconnect_conn(conn, server);
+					debug::info("Timeout player: %d", i);
+					conn.m_status = connection::status::DISCONNECTED;
+					conn.m_send_sequence = 0;
+					conn.m_recieve_sequence = 0;
+					conn.m_recieve_acknowledge = 0;
+
+					game_instance.m_player_info[i].m_player_status = player_info::status::TIMED_OUT;
+					game_instance.game_lobby_changed = true;			// Queue for the send system to send lobby state message
 				}
 				i++;
 			}
@@ -139,14 +137,21 @@ namespace meteor::server_recieve_system {
 				}
 				else {
 					client_index = (uint8)r_index;
-					assert((uint32)client_index == r_index);	// Check incase we have more than uint8 limit clients... *just in case*
+					assert((uint32)client_index == r_index);	// Check incase we have more than uint8 limit clients... *just in case someone increases it above this* (i know)
 				}
 
 
-				debug::info("%g - Gracefully Disconnecting client %f", GetTime(), client_index);
+				debug::info("%g - Gracefully Disconnecting client %d", GetTime(), client_index);
 				connection& conn = server.m_clients[client_index];
 				conn.m_status = connection::status::DISCONNECTING;	// Queue for the send system to send disconnect package
 				conn.m_last_recieve_time = time;
+
+				player_info::status leave_reason = player_info::status::USER_LEFT;
+				if (game_instance.m_player_info[client_index].m_player_status == player_info::status::LOSER) 
+					leave_reason = player_info::status::RAGEQUIT;
+
+				game_instance.m_player_info[client_index].m_player_status = leave_reason;
+				game_instance.game_lobby_changed = true;			// Queue for the send system to send lobby state message
 
 				break;
 			}//!Disconnect
@@ -185,6 +190,8 @@ namespace meteor::server_recieve_system {
 				// Conn status check
 				if (conn.m_status == connection::status::CONNECTING) {
 					conn.m_status = connection::status::CONNECTED;
+					game_instance.m_player_info[client_index].m_player_status = player_info::status::ACTIVE;
+					game_instance.game_lobby_changed = true;			// Queue for the send system to send lobby state message
 					debug::info("%g - client %d joined gracefully", GetTime(), client_index);
 				}
 				if (conn.m_status != connection::status::CONNECTED) {
@@ -276,8 +283,13 @@ namespace meteor::server_recieve_system {
 		uint8 i = 0;
 		for (connection& conn : server.m_clients) {
 			if (conn.m_status == connection::status::DISCONNECTED) {
+				conn.m_status = connection::status::CONNECTING;
 				conn.m_endpoint = sender_endpoint;
 				conn.m_last_recieve_time = time;
+				
+				game_instance.m_player_info[i].m_player_status = player_info::status::JOINING;
+				game_instance.game_lobby_changed = true;			// Queue for the send system to send lobby state message
+				
 				break;
 			}
 			i++;
@@ -290,14 +302,5 @@ namespace meteor::server_recieve_system {
 			sender_endpoint.m_address.d(),
 			sender_endpoint.port());
 	}
-
-
-	void recieve_packet( const double time, server_state& server, uint8 connection_index, udp_socket& socket, game& game) {
-		connection& conn = server.m_clients[connection_index];
-
-
-	}
-
-
 
 }

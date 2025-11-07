@@ -122,21 +122,40 @@ namespace meteor
 	// ---- game_lobby_message ----
 
 	template <typename T>
+	bool serialize(player_info& info, T& stream) {
+		bool success = true;
+		success &= serialize<player_info::status, uint8>(info.m_player_status, stream);
+		for (char& c : info.m_name) {
+			success &= stream.serialize(c);
+		}
+		
+		return success;
+	}
+
+	template <typename T>
 	bool serialize(game_lobby_message& message, T& stream) {
 		bool success = true;
 		success &= serialize<message_type, uint8>(message.m_type, stream);
 		success &= stream.serialize(message.m_start_now);
+		for (player_info& info : message.m_player_info) { serialize(info, stream); }
+		success &= serialize<game::status, uint8>(message.m_game_status, stream);
+
 		return success;
 	}
 
 	bool game_lobby_message::write(byte_stream_writer& writer) { return serialize(*this, writer); }
 	bool game_lobby_message::read(byte_stream_reader& reader) { return serialize(*this, reader); }
 
-
-	game_lobby_message::game_lobby_message(bool start_now) 
+	// TODO Learn how to properly use iterators... or just use pointer...
+	game_lobby_message::game_lobby_message(bool start_now, const game& game_instance, const game::status& status)
 		: m_type(message_type::GAME_LOBBY)
 		, m_start_now(start_now)
+		, m_game_status(status)
 	{
+		for (int i = 0; i < MAX_PLAYERS; i++){
+			m_player_info[i] = game_instance.m_player_info[i];
+		}
+		
 	}
    
    

@@ -16,13 +16,6 @@ namespace meteor::server_recieve_system {
 		game& game
 	);
 
-	void recieve_packet(
-		const double time,
-		server_state& server,
-		uint8 connection_index,
-		udp_socket& socket,
-		game& game);
-
 	void join_lobby(
 		const double& time,
 		server_state& server, 

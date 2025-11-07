@@ -19,6 +19,11 @@ namespace meteor
 	  MAX		// Used to check if its out-of-range. Keep as highest value
    };
 
+   enum class disconnect_reason : uint8 {
+	   SOMETHING,
+	   TIMEOUT
+   };
+
    struct connect_packet {
 	   connect_packet();
 	   connect_packet(uint8 id);
