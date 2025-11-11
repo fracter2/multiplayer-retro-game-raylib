@@ -6,7 +6,6 @@
 #include "game.hpp"
 #include "connection.hpp"
 
-#include "raylib.h"
 #include "ui.hpp"
 
 
@@ -14,9 +13,6 @@
 
 namespace meteor::render {
 
-	constexpr Vector2 ZERO = Vector2(0, 0);
-
-	// TODO MOVE TO COMMON "render.hpp" OR SIMILAR with texture atlass + more
 	namespace atlass {	// Texture atlass sources coordinates, manually aligned
 		static constexpr Rectangle WALL = { 0, 0, 16, 16 };
 		static constexpr Rectangle PLAYER = { 0, 0, 16, 16 };
@@ -24,7 +20,37 @@ namespace meteor::render {
 		static constexpr Rectangle BOMB = { 0, 0, 16, 16 };
 	};
 
+	static constexpr float BOMB_RADIUS = 12;
+	static constexpr Color BOMB_COLOR = GRAY;
+	static constexpr float PLAYER_RADIUS = 8;
+	static constexpr Color PLAYER_COLOR = BLUE;
+	static constexpr Color PLAYER_COLOR_DEAD = DARKBLUE;
+
 	
 
 	
+	static void render_map(const Texture& texture, const tilemap& map) {
+		for (int i = 0; i < tilemap::COUNT; i++) {
+			if (!map.is_tile_active(i)) { continue; }
+
+			Vector2i c = index_to_coord(i);
+			const Vector2 pos = Vector2((float)c.x, (float)c.y) * (float)tilemap::TILE_PIXEL_LENGTH;
+			const Rectangle destination{ pos.x, pos.y, (float)tilemap::TILE_PIXEL_LENGTH, (float)tilemap::TILE_PIXEL_LENGTH };
+			DrawTexturePro(texture, atlass::WALL, destination, Vector2(0, 0), 0.0f, WHITE);
+		}
+	}
+
+	static void render_bombs(const Texture& texture, const game& game_instance, const uint32& tick) {
+		for (const bomb& da_bomb : game_instance.m_state.m_bombs) {
+			if (da_bomb.m_explosion_tick >= tick) { DrawCircle((int)da_bomb.m_x, (int)da_bomb.m_y, BOMB_RADIUS, BOMB_COLOR); }
+		}
+	}
+
+	static void render_characters(const Texture& texture, const game& game_instance) {
+		for (const player_entity& player : game_instance.m_state.m_players) {
+			if (player.m_dead) { DrawCircle((int)player.m_position.x, (int)player.m_position.x, PLAYER_RADIUS, PLAYER_COLOR_DEAD); }
+			if (player.m_dead) { DrawCircle((int)player.m_position.x, (int)player.m_position.x, PLAYER_RADIUS, PLAYER_COLOR); }
+		}
+	}
+
 }

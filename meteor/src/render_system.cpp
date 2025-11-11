@@ -4,15 +4,10 @@
 
 //#include "render_system.hpp"
 #include "render.hpp"
-#include "raymath.h"
 
 namespace meteor::render{
 	
-	constexpr float BOMB_RADIUS = 12;
-	constexpr Color BOMB_COLOR = GRAY;
-	constexpr float PLAYER_RADIUS = 8;
-	constexpr Color PLAYER_COLOR = BLUE;
-	constexpr Color PLAYER_COLOR_DEAD = DARKBLUE;
+	
 
 	void client_system(const uint32& tick, const double time, const game& game_instance, const connection& conn, const Texture& texture, ui::main_menu menu) {
 
@@ -27,30 +22,13 @@ namespace meteor::render{
 			// TODO RENDER BACKGROUND
 
 			// RENDER MAP
-			for (int i = 0; i < tilemap::COUNT; i++) {
-				if (!map.is_tile_active(i)) { continue; }
-
-				uint8 x, y = 0;
-				index_to_coord(i, x, y);
-
-				const Vector2 position = tilemap::SIZE_V * Vector2(x, y);
-				const Rectangle destination{ position.x, position.y, (float)tilemap::TILE_SIZE, (float)tilemap::TILE_SIZE };
-				DrawTexturePro(texture, atlass::WALL, destination, ZERO, 0.0f, WHITE);
-			}
+			render_map(texture, map);
 
 			// TODO RENDER BOMBS
-			for (int i = 0; i < MAX_PLAYERS; i++) {
-				const bomb& da_bomb = game_instance.m_state.m_bombs[i];
-				if (da_bomb.m_explosion_tick >= tick) { DrawCircle((int)da_bomb.m_x, (int)da_bomb.m_y, BOMB_RADIUS, BOMB_COLOR); }
-				//if (da_bomb.m_explosion_tick >= tick) { DrawRectanglePro(da_bomb.m_x, da_bomb.m_y, BOMB_RADIUS, BOMB_COLOR); }
-			}
+			render_bombs(texture, game_instance, tick);
 
 			// TODO RENDER CHARACTERS
-			for (int i = 0; i < MAX_PLAYERS; i++) {
-				const player_entity& player = game_instance.m_state.m_players[i];
-				if (player.m_dead) { DrawCircle((int)player.m_position.x, (int)player.m_position.x, PLAYER_RADIUS, PLAYER_COLOR_DEAD); }
-				if (player.m_dead) { DrawCircle((int)player.m_position.x, (int)player.m_position.x, PLAYER_RADIUS, PLAYER_COLOR); }
-			}
+			render_characters(texture, game_instance);
 
 			// TODO RENDER NAMES (if there are names)
 
