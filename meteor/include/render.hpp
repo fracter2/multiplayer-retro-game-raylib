@@ -53,4 +53,29 @@ namespace meteor::render {
 		}
 	}
 
+
+	static void render_player_info(const Vector2i& coord, const game& game_instance) {
+		
+		constexpr int font_size = 18;
+		constexpr Color color = MAROON;
+		constexpr Color color_backdrop = BLACK;
+
+		std::string str = "";
+
+		int i = 0;
+		for (player_info player : game_instance.m_player_info) {
+			
+			str += TextFormat("Player %d: %s ("
+				, i
+				, player.m_name);
+			str += player_info::status_to_str(player.m_player_status);
+			str += ")\n";
+			
+		}
+		DrawText(str.c_str(), coord.x + 1, coord.y + 1, font_size, color_backdrop);
+		DrawText(str.c_str(), coord.x, coord.y, font_size, color);
+
+
+	}
+
 }

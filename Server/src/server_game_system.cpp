@@ -11,36 +11,37 @@ namespace meteor::server_game_system {
 	void update(const uint32& tick, const double& dt, game& game_instance, const input::input_state& input_state, server_state& server) {
 
 
-		if (input_state.m_1_just_pressed 
-			&& server.m_status == server_state::status::OFFLINE) {		// Start server
-			server.m_status = server_state::status::ONLINE_JOINABLE;
-			game_instance.m_status = game::status::PRE_GAME;
-		}
-		if (input_state.m_2_just_pressed) {								// Toggle broadcasts
+		if (input_state.m_2_just_pressed) {
 			server.m_broadcast = !server.m_broadcast;
 		}
-		if (input_state.m_3_just_pressed 
-			&& game_instance.m_status == game::status::PRE_GAME 
-			&& server.get_client_count() >= 2) {						// Start game
-			game_instance.queue_game_start = true;
-		}
 
 
+		// ======== PRE_GAME ========
 		if (game_instance.m_status == game::status::PRE_GAME) {
-			// TODO Lobby?
+			if (input_state.m_3_just_pressed && server.get_client_count() >= 2) {
+				game_instance.queue_game_start = true;
+			}
 
 			return;
 		}
+
+		// ======== POST_GAME ========
 		else if (game_instance.m_status == game::status::POST_GAME) {
-
 			return;
 		}
+
+		// ======== INVALID ========
 		else if (game_instance.m_status == game::status::INVALID) {
+			if (input_state.m_1_just_pressed && server.m_status == server_state::status::OFFLINE) {
+				game_instance.m_status = game::status::PRE_GAME;
+				server.m_status = server_state::status::ONLINE_JOINABLE;
 
+				// NOTE it does not reset the game or server
+			}
 			return;
 		}
 
-
+		// else...
 		// ======== IN_GAME ========
 		game_instance.m_tick += 1;
 		game_instance.m_state_history.push_back(game_instance.m_state);

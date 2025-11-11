@@ -6,6 +6,7 @@
 #include <cassert>
 #include <vector>
 #include <string_view>
+#include <string>
 #include <type_traits>
 
 namespace meteor {

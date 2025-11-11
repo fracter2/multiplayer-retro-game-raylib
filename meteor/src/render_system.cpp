@@ -72,6 +72,8 @@ namespace meteor::render{
 		{
 			// RENDER FPS
 			DrawFPS(2, GetScreenHeight() - 20);
+			const Vector2i coord = Vector2i(8, 40);
+			render_player_info(coord, game_instance);
 
 			// TODO RENDER RTT in ms (averaged across a second? sepparate peak?)
 

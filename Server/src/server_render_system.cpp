@@ -37,8 +37,23 @@ namespace meteor::render {
 
 		// ==== PRE GAME ====
 		else if (game_instance.m_status == game::status::PRE_GAME) {
-			// TODO RENDER GAME LOBBY (if in lobby
+			
 
+
+			{ // Toggle broadcast and start game (key 2/3) Instructions
+				constexpr int font_size = 20;
+				constexpr Color color = MAROON;
+				const char* text = TextFormat("Press '2' to toggle broadcasts (%s) and '3' to START GAME (%s)"
+					, server.m_broadcast? "BROADCASTING" : "OFF         "
+					, server.get_client_count() >= 2? "CAN START      " : "TOO FEW PLAYERS"
+				);
+				const int text_width = MeasureText(text, font_size);
+				const int text_x = (GetScreenWidth() - text_width) / 2;
+				const int text_y = 8;
+				DrawText(text, text_x + 1, text_y + 1, font_size, BLACK);
+				DrawText(text, text_x, text_y, font_size, color);
+				//DrawTextPro
+			}
 		}
 
 
@@ -51,15 +66,21 @@ namespace meteor::render {
 
 
 
-		// ==== INVALID / MENU ====
+		// ==== INVALID (MENU) ====
 		else {
-			// TODO RENDER MENU
-
 			// TODO RENDER BUTTONS / INPUT AREAS
 
-			// TODO RENDER AVAILABLE SERVERS IN NETWORK
+			{ // Start game (Key 1) Instructions
+				constexpr int font_size = 40;
+				constexpr Color color = MAROON;
+				const char* text = TextFormat("Press '1' to init server");
+				const int text_width = MeasureText(text, font_size);
+				const int text_x = (GetScreenWidth() - text_width) / 2;
+				const int text_y = 8;
+				DrawText(text, text_x + 1, text_y + 1, font_size, BLACK);
+				DrawText(text, text_x, text_y, font_size, color);
+			}
 
-			// TODO RENDER POPUPS / NOTIFICATIONS (timeout or disconnect)
 		}
 
 
@@ -68,6 +89,9 @@ namespace meteor::render {
 		{
 			// RENDER FPS
 			DrawFPS(2, GetScreenHeight() - 20);
+
+			const Vector2i coord = Vector2i(8, 40);
+			render_player_info(coord, game_instance);
 
 			// TODO RENDER RTT in ms (averaged across a second? sepparate peak?)
 

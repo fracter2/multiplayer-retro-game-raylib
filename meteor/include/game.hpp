@@ -184,7 +184,40 @@ namespace meteor {
 			RAGEQUIT,
 			USER_LEFT,
 			KICKED,
-			TIMED_OUT
+			TIMED_OUT,
+			MAX
+		};
+
+		/*
+		static constexpr char status_str[][10] = {
+			"EMPTY",
+			"JOINING",
+			"ACTIVE",
+			"AFK",
+			"LOSER",
+			"WINNER",
+			"RAGEQUIT",
+			"USER_LEFT",
+			"KICKED",
+			"TIMED_OUT"
+		};*/
+
+
+		static std::string status_to_str(const status& s) {
+			assert((int)s >= 0 && s < status::MAX);
+			switch (s) {
+			case status::EMPTY: return std::string("EMPTY");
+			case status::JOINING: return std::string("JOINING");
+			case status::ACTIVE: return std::string("ACTIVE");
+			case status::AFK: return std::string("AFK");
+			case status::LOSER: return std::string("LOSER");
+			case status::WINNER: return std::string("WINNER");
+			case status::RAGEQUIT: return std::string("RAGEQUIT");
+			case status::USER_LEFT: return std::string("USER_LEFT");
+			case status::KICKED: return std::string("KICKED");
+			case status::TIMED_OUT: return std::string("TIMED_OUT");
+			default: return std::string("OUT_OF_RANGE STATUS");
+			}
 		};
 
 		player_info() = default;
