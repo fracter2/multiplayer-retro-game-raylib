@@ -8,7 +8,6 @@
 #include <string_view>
 #include <type_traits>
 
-
 namespace meteor {
 	using uint64 = unsigned long long;
 	using  int64 = signed long long;
@@ -22,11 +21,7 @@ namespace meteor {
 	using yourmom = double long;
 	using yourdad = long double;
 	
-	constexpr uint8  TICK_RATE = 60;
-	constexpr double TICK_TIME = 1.0 / TICK_RATE;
-
+	
 	
 
-
-	
 }

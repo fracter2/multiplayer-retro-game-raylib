@@ -15,6 +15,9 @@ namespace meteor {
 	// TODO Consider making a "game_config" class that is sent before game starts. Would need maps to be created/deleted each game (convinience thing)
 	static constexpr int MAX_PLAYERS = 4;
 	
+	constexpr int TICK_RATE = 60;
+	constexpr double TICK_TIME = 1.0 / TICK_RATE;
+
 
 	struct tilemap {
 		static constexpr uint32 TILE_SIZE = 32;
