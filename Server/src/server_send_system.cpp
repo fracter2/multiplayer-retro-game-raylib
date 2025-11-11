@@ -7,7 +7,7 @@
 
 namespace meteor::server_send_system {
 
-	void disconnect_conn(connection& conn, server_state& server) {
+	static void disconnect_conn(connection& conn, server_state& server) {
 		//conn.m_endpoint = {};				// We could let this stay until it is overriden by new player. This way we know who "recently deleted" 
 											// and can reply with more disconnect packets, in case of packet loss.
 		conn.m_status = connection::status::DISCONNECTED;
@@ -16,7 +16,7 @@ namespace meteor::server_send_system {
 		conn.m_recieve_acknowledge = 0;
 	}
 
-	void send_broadcast(udp_socket& socket,
+	static void send_broadcast(udp_socket& socket,
 		server_state& server,
 		const ip_endpoint& local_endpoint,
 		const game& game_instance) {
@@ -25,7 +25,7 @@ namespace meteor::server_send_system {
 		byte_stream_writer writer(stream_send);
 		ip_endpoint broadcast_endpoint = ip_endpoint(network::get_broadcast_address(), local_endpoint.m_port);
 
-		connect_packet packet = connect_packet((uint8)server.get_client_count());
+		connect_packet packet = connect_packet((uint8)server.get_client_count(), true);
 		packet.write(writer);
 
 		debug::info("%g - sending broadcast", GetTime());
@@ -63,8 +63,9 @@ namespace meteor::server_send_system {
 			assert(game_instance.m_status == game::status::PRE_GAME);		// Only allow joinable in PRE_GAME (lobby) state
 			assert(server.get_client_count() < MAX_PLAYERS);				// Ensure we've handled player counts correctly
 
-			if (server.m_broadcast) {
+			if (server.m_broadcast && server.m_next_broadcast_tick <= ticks) {
 				send_broadcast(socket, server, local_endpoint, game_instance);
+				server.m_next_broadcast_tick = ticks + server_state::BROADCAST_IDLE_TICKS;
 			}
 		}
 

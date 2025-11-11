@@ -12,6 +12,8 @@
 namespace meteor {
 
 	struct server_state {
+		static constexpr uint32 BROADCAST_IDLE_TICKS = 120;
+
 		enum class status : uint8 {
 			OFFLINE,
 			ONLINE_JOINABLE,
@@ -79,6 +81,7 @@ namespace meteor {
 		}
 
 		bool m_broadcast = true;
+		uint32 m_next_broadcast_tick = 0;
 		status m_status = status::OFFLINE;
 		connection m_clients[MAX_PLAYERS] = {};
 	};
