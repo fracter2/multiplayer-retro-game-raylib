@@ -2,9 +2,11 @@
 
 #pragma once
 
-#include "raylib.h"
-#include "raymath.h"
+#include <raylib.h>
+#include <raymath.h>
 #include "common.hpp"
+
+
 //#include "network.hpp"
 //#include "messages.hpp"
 
@@ -12,47 +14,143 @@
 
 namespace meteor {
 
-	// TODO Consider making a "game_config" class that is sent before game starts. Would need maps to be created/deleted each game (convinience thing)
 	static constexpr int MAX_PLAYERS = 4;
-	
 	constexpr int TICK_RATE = 60;
 	constexpr double TICK_TIME = 1.0 / TICK_RATE;
 
 
+	/*
+	struct tile {
+		tile() = default;
+		tile(const uint8& x, const uint8& y);
+
+		uint8 x, y = 0;
+		tile operator+(const tile& a) { tile t = tile(x + a.x, y + a.y); assert(t.x > x && t.y > y); return tile(x + a.x, y + a.y); }
+		tile operator-(const tile& a) { return tile(x - a.x, y - a.y); }
+		tile operator*(const tile& a) { return tile(x * a.x, y * a.y); }
+		tile operator/(const tile& a) { return tile(x / a.x, y / a.y); }
+
+
+		template<std::integral<> T> Vector2i operator*(T a) { return Vector2i(x * a, y * a); }
+		//template<std::integral<> T> Vector2i operator/(Vector2i a) { return Vector2i(x / a.x, y / a.y); }	// Is this even needed? 
+	};*/
+
+	struct Vector2i {
+		Vector2i() = default;
+		Vector2i(const int& x, const int& y) : x(x), y(y) {};
+		Vector2i(const Vector2& a) : x((int)a.x), y((int)a.y) {};
+
+		int x, y = 0;
+		Vector2i operator+(const Vector2i& a) { return Vector2i(x + a.x, y + a.y); }
+		Vector2i operator-(const Vector2i& a) { return Vector2i(x - a.x, y - a.y); }
+		Vector2i operator*(const Vector2i& a) { return Vector2i(x * a.x, y * a.y); }
+		Vector2i operator/(const Vector2i& a) { return Vector2i(x / a.x, y / a.y); }
+
+		bool operator==(const Vector2i a) { return x == a.x && y == a.y; }
+
+		template<std::integral<> T> Vector2i operator*(T a) { return Vector2i((int)(x * a), (int)(y * a)); }
+		//template<std::integral<> T> Vector2i operator/(Vector2i a) { return Vector2i(x / a.x, y / a.y); }	// Is this even needed? 
+	};
+
+
 	struct tilemap {
-		static constexpr uint32 TILE_SIZE = 32;
+		static constexpr uint32 TILE_PIXEL_LENGTH = 32;		// Pixels, for rendering // TODO RENAME OR MOVE
 		static constexpr uint8  WIDTH = 16;
 		static constexpr uint8  HEIGHT = 16;
-		static constexpr Vector2 SIZE_V = Vector2(WIDTH, HEIGHT);
+		//static constexpr Vector2 SIZE_V = Vector2(WIDTH, HEIGHT);
 
 		// Right now map sizes are hard coded to simplify implementation (especially for network messages)
 		static constexpr int COUNT = WIDTH * HEIGHT;
-		static constexpr int TILEMAP_BYTES =
+		static constexpr int BYTES_NEEDED =
 			WIDTH * HEIGHT / 8
 			+ (((WIDTH * HEIGHT) % 8) == 0 ? 0 : 1);		// Add 1 if there's remainder, since "/" rounds down
 
+		struct coord;
+		struct index;
 
 		tilemap() = default;
 
-		uint8 m_tiles[TILEMAP_BYTES] = {};
+		uint8 m_tiles[BYTES_NEEDED] = {};
 
 		// Returns if tile is active (aka not destroyed)
-		bool is_tile_active(const uint8 x, const uint8 y) const;
-		bool is_tile_active(const uint32 index) const;
+		bool is_tile_active(const Vector2i& coord) const;
+		bool is_tile_active(const int& index) const;
 
-		void set_tile(const uint8 x, const uint8 y, bool value);
+		void set_tile(const Vector2i& coord, bool value);
+		void set_tile(const int& index, bool value);
+
+		//		TODO Consider finishing these as safe structs for thir values. coord would have to validate after each x/y (or force const)
+		/*
+		struct index {
+			index() = default;
+			template<std::integral<> T> index(const T& a);
+			index(const coord& a);
+
+			const uint32 v = 0;
+		};
+
+		struct coord {
+			coord() = default;
+			template<std::integral<> T> coord(const T& ax, const T& ay);
+			coord(const uint8& ax, const uint8& ay);
+			coord(const Vector2i& a);
+			coord(const index& a);
+
+			coord operator+(const coord& a) { return coord(x + a.x, y + a.y); }
+			coord operator-(const Vector2i& a) { return coord(x - a.x, y - a.y); }
+			coord operator*(const Vector2i& a) { return coord(x * a.x, y * a.y); }
+			coord operator/(const Vector2i& a) { return coord(x / a.x, y / a.y); }
+
+			const uint8 x, y = 0;
+		};
+		*/
 	};
 
 	// if it's inside the map boundries
-	static bool valid_tile(const uint8 x, const uint8 y) {
+	static bool is_valid_tile(const Vector2i& a)  {
+		if (a.x >= tilemap::WIDTH || a.x < 0
+			|| a.y >= tilemap::HEIGHT || a.y < 0
+			|| (a.x + a.y * tilemap::WIDTH) >= tilemap::COUNT) return false;
+		else return true;
+	}
+
+	static bool is_valid_index(const int& index) {
+		return index < tilemap::COUNT && index >= 0;
+	}
+	
+	static int coord_to_index(const Vector2i& a) {
+		//if (!is_valid_tile(a)) return UINT32_MAX;
+		assert(is_valid_tile(a));
+		return (uint32)(a.x + a.y * tilemap::WIDTH);
+	}
+
+	static Vector2i index_to_coord(const int& index) {
+		//if (index >= tilemap::COUNT || index < 0) return Vector2i(-1, -1);
+		assert(is_valid_index(index));	
+		int y = index / tilemap::WIDTH;
+		int x = index % tilemap::WIDTH;
+		return Vector2i(x, y);
+	}
+
+	// Vec2 to tile coordniate system. Not clamped by tilemap size
+	/*static void vec2_to_coord(const Vector2& pos, uint8& x, uint8& y) {
+		uint8 new_x = (uint8)pos.x;
+		uint8 new_y = (uint8)pos.y;
+
+		x = new_x;
+		y = new_y;
+	}*/
+
+	/*
+	static bool is_valid_tile(const uint8 x, const uint8 y) {
 		if (x >= tilemap::WIDTH
-			|| y >= tilemap::HEIGHT
-			|| (x + y * tilemap::WIDTH) >= tilemap::COUNT) return false;
+		||  y >= tilemap::HEIGHT
+		|| (x + y * tilemap::WIDTH) >= tilemap::COUNT) return false;
 		else return true;
 	}
 
 	static uint32 coord_to_index(const uint8 x, const uint8 y) {
-		if (!valid_tile(x, y)) return UINT32_MAX;
+		if (!is_valid_tile(x, y)) return UINT32_MAX;
 		return (x + y * tilemap::WIDTH);
 	}
 
@@ -69,7 +167,7 @@ namespace meteor {
 
 		x = new_x;
 		y = new_y;
-	}
+	}*/
 
 
 	// Player-user state, to keep track of game player slots.
@@ -158,7 +256,7 @@ namespace meteor {
 			return;
 		}
 
-	private:	// These properties are not properly invalidated / reset when not in-queue, so we don't let it be checked
+	private:	// These properties and elements are not invalidated / reset when not in-queue, so we don't let it be checked
 		uint8 m_size = 0;
 		player_entity::action m_actions[SIZE] = {};
 		uint32 m_ticks[SIZE] = {};
@@ -193,13 +291,13 @@ namespace meteor {
 		const tilemap& get_tilemap() const;
 		const bool is_default() const;
 
-		bool is_walkable(const Vector2& pos) const;
-		bool is_walkable(const uint8& x, const uint8& y) const;
-		Vector2 move_and_collide(const Vector2& pos, const Vector2& vel) const;
-		void apply_player_action(const uint8& player_index, const double& dt, const uint32& tick);
+		//bool is_walkable(const Vector2& pos) const;
+		bool is_walkable(const Vector2i& coord) const;									// TODO replace sepparate x/y with struct, everywhere
+		//Vector2 move_and_collide(const Vector2& pos, const Vector2& vel) const;					// TODO redundant? consider replacing with is_walkable()
+		void update_player(const uint8& player_index, const uint32& tick);
 		bool can_place_bomb(const uint8& index, const uint32& tick) const;
-		void apply_bomb_explosion(const uint8& index);
-		bool apply_bomb_explosion_to_tile(const bomb& da_bomb, const uint8& x, const uint8& y);
+		void apply_bomb_explosion(const bomb& da_bomb);											// TODO could be clarified w/side effects and purpose
+		bool explode_at(const Vector2i& coord);		// TODO RENAME / REDO, not clear how its used
 	};
 
 

@@ -7,6 +7,41 @@
 
 namespace meteor {
 
+
+	
+
+	/*
+	Vector2i::Vector2i(const uint8& x, const uint8& y)
+		: x(x), y(y)
+	{
+	}; */
+
+	/*
+	template<std::integral<> T> tilemap::index::index(const T& a) {
+
+	}
+	tilemap::index::index(const coord& a) {
+		//if (!valid_tile(a.x, a.y)) return UINT32_MAX;
+		return index(a.x + a.y * tilemap::WIDTH);
+	}
+
+	template<std::integral<> T> tilemap::coord::coord(const T& x, const T& y) {
+		assert();
+	}
+
+	tilemap::coord::coord(const uint8& ax, const uint8& ay) 
+		: x(ax), y(ay)
+	{
+	}
+
+	tilemap::coord::coord(const Vector2i& a) {
+
+	}
+	tilemap::coord::coord(const index& a) {
+
+	}
+	*/
+
 	player_entity::player_entity(Vector2 position)
 		: m_position(position)
 	{
@@ -14,16 +49,16 @@ namespace meteor {
 
 	bool game_state::can_place_bomb(const uint8& index, const uint32& tick) const {
 		const player_entity& user_player = m_players[index];
-		uint8 x, y = 0;
-		vec2_to_coord(user_player.m_position, x, y);
+
+		Vector2i coord = Vector2i(user_player.m_position);
 
 		bool r = true;
 		r &= !user_player.m_dead;							// if not player dead...
-		r &= is_walkable(x, y);								// and is inside map... and is not wall...
+		r &= is_walkable(coord);							// and is inside map...
 
 		for (const bomb& bomb : m_bombs) {					// and no other bombs are there...
-			r &= !(bomb.m_x == x
-				&& bomb.m_y == y
+			r &= !(bomb.m_x == coord.x
+				&& bomb.m_y == coord.y
 				&& bomb.m_explosion_tick > tick);
 		}
 		r &= (get_bomb(index).m_explosion_tick
@@ -32,29 +67,26 @@ namespace meteor {
 		return r;
 	}
 
-	bool game_state::is_walkable(const uint8& x, const uint8& y) const {
-		if (valid_tile(x, y) && !m_tilemap.is_tile_active(x, y)) 
-			return false;
-		else return true;
+	bool game_state::is_walkable(const Vector2i& coord) const {
+		if (is_valid_tile(coord)) 
+			if (!m_tilemap.is_tile_active(coord)) 
+				return true;
+		return false;
 	}
 
-	bool game_state::is_walkable(const Vector2& pos) const {
-		uint8 x, y = 0;
-		vec2_to_coord(pos, x, y);
-		return is_walkable(x, y);
-	}
-
-	Vector2 game_state::move_and_collide(const Vector2& pos, const Vector2& vel) const {
+	/*Vector2 game_state::move_and_collide(const Vector2& pos, const Vector2& vel) const {
 		if (is_walkable(Vector2(pos + vel))) return Vector2(pos + vel);
 		else return pos;
-	}
+	}*/
 
-	void game_state::apply_player_action(const uint8& player_index, const double& dt, const uint32& tick) {
-		const double speed = player_entity::MOVE_SPEED * dt;	// CONSIDER USING STANDARDIZED 1/TICKRATE 
+	void game_state::update_player(const uint8& player_index, const uint32& tick) {
+		const double speed = player_entity::MOVE_SPEED * TICK_TIME;
 		player_entity& player = m_players[player_index];
-		
+
+		Vector2 dir = { 0, 0 };
+
 		switch (player.m_prev_action) {
-		case player_entity::action::INVALID: {
+		case player_entity::action::INVALID: {		// Is this state really usefull?
 			// lol
 			break;
 		}
@@ -63,69 +95,67 @@ namespace meteor {
 			break;
 		}
 		case player_entity::action::MOVE_UP: {
-			player.m_position = move_and_collide(player.m_position, Vector2(0, -1) * (float)speed);
-			
+			dir = Vector2(0, -1);
 			break;
 		}
 		case player_entity::action::MOVE_DOWN: {
-			player.m_position = move_and_collide(player.m_position, Vector2(0, 1) * (float)speed);
+			dir = Vector2(0, 1);
 			break;
 		}
 		case player_entity::action::MOVE_LEFT: {
-			player.m_position = move_and_collide(player.m_position, Vector2(-1, 0) * (float)speed);
+			dir = Vector2(-1, 0);
 			break;
 		}
 		case player_entity::action::MOVE_RIGHT: {
-			player.m_position = move_and_collide(player.m_position, Vector2(1, 0) * (float)speed);
+			dir = Vector2(1, 0);
 			break;
 		}
 		case player_entity::action::PLACE_BOMB: {		// TODO CONSIDER SETTING EXPLOSION TIME BASED ON INPUT-TICK player.m_prev_action_tick
 			bomb& da_bomb = m_bombs[player_index];
-			uint8 x, y = 0;
-			vec2_to_coord(player.m_position, x, y);
+			Vector2i coord = Vector2i(player.m_position);
+			
 			if (can_place_bomb(player_index, tick)) {
 				da_bomb.m_explosion_tick = tick + bomb::FUSE_TICKS;
-				da_bomb.m_x = x;
-				da_bomb.m_y = y;
+				da_bomb.m_x = (uint8)coord.x;
+				da_bomb.m_y = (uint8)coord.y;
 			}
 			break;
 		}
-			
 		}
-	}
 
-	// Returns true if it hit a tile, destroying it, and killingany players on the way
-	bool game_state::apply_bomb_explosion_to_tile(const bomb& da_bomb, const uint8& x, const uint8& y) {
-		for (player_entity& player : m_players) {
-			if (!player.m_dead) {
-				uint8 m_x, m_y = 0;
-				vec2_to_coord(player.m_position, m_x, m_y);
-				if (m_x == x && m_y == da_bomb.m_y) { player.m_dead = true; }
+		if (dir != Vector2(0, 0)) {
+			Vector2 new_pos = player.m_position + dir * (float)speed;
+			if (is_walkable(new_pos)) {
+				player.m_position = new_pos;
 			}
 		}
-		if (m_tilemap.is_tile_active(x, y)) { 
-			m_tilemap.set_tile(x, y, false); 
+
+		
+
+	}
+
+	// Returns true if it hit a tile, destroying it, and killing any players on the way
+	bool game_state::explode_at(const Vector2i& coord) {	// TODO Simplify by removing sepparate x/y, and merge or make private
+		for (player_entity& player : m_players) {
+			if (!player.m_dead && coord == Vector2i(player.m_position)) {
+				player.m_dead = true;
+			}
+		}
+		if (m_tilemap.is_tile_active(coord)) { 
+			m_tilemap.set_tile(coord, false); 
 			return true; 
 		}
 		return false;
 	}
 
-	void game_state::apply_bomb_explosion(const uint8& index) {
-		bomb& da_bomb = m_bombs[index];
+	void game_state::apply_bomb_explosion(const bomb& da_bomb) {
 
-		// Traverse left, right, up and down. Kill any players in the way, and destroy the first hit tile (in each direction)
-		for (uint8 x = da_bomb.m_x; x < tilemap::WIDTH; x++) {
-			if (apply_bomb_explosion_to_tile(da_bomb, x, da_bomb.m_y)) break;
-		}
-		for (uint8 x = da_bomb.m_x; x > 0; x--) {
-			if (apply_bomb_explosion_to_tile(da_bomb, x - 1, da_bomb.m_y)) break;
-		}
-		for (uint8 y = da_bomb.m_y; y < tilemap::HEIGHT; y++) {
-			if (apply_bomb_explosion_to_tile(da_bomb, da_bomb.m_x, y)) break;
-		}
-		for (uint8 y = da_bomb.m_y; y > 0; y--) {
-			if (apply_bomb_explosion_to_tile(da_bomb, da_bomb.m_x, y - 1)) break;
-		}
+		// Goal: Traverse left, right, up and down. Kill any players in the way, and destroy the first hit tile (in each direction)
+		for (int x = da_bomb.m_x; x < tilemap::WIDTH; x++)  { if (explode_at(Vector2i(x, da_bomb.m_y))) break; }
+		for (int x = da_bomb.m_x; x >= 0; x--)				{ if (explode_at(Vector2i(x, da_bomb.m_y))) break; }
+		for (int y = da_bomb.m_y; y < tilemap::HEIGHT; y++) { if (explode_at(Vector2i(da_bomb.m_x, y))) break; }
+		for (int y = da_bomb.m_y; y >= 0; y--)				{ if (explode_at(Vector2i(da_bomb.m_x, y))) break; }
+
 	}
 
 	bomb::bomb(uint8 x, uint8 y, int32 explosion_tick)
@@ -135,30 +165,30 @@ namespace meteor {
 	{
 	}
 
-	bool tilemap::is_tile_active(const uint8 x, const uint8 y) const {
-		assert(valid_tile(x, y));
-
-		uint8 byte = *(m_tiles + ((x + y * WIDTH) / 8));
-		uint8 bitmask = (uint8)1 << ((x + y * WIDTH) % 8);
-
-		return (byte & bitmask) != 0;	// & is the bitwise "and" operator, so if the result is higher than 0, that bit is active.
+	bool inline tilemap::is_tile_active(const Vector2i& coord) const {
+		return is_tile_active(coord_to_index(coord));
 	}
 
-	bool tilemap::is_tile_active(const uint32 index) const {
-		assert(index < tilemap::COUNT);
-
+	bool tilemap::is_tile_active(const int& index) const {
+		assert(is_valid_index(index));
 		uint8 byte = *(m_tiles + (index / 8));
 		uint8 bitmask = (uint8)1 << (index % 8);
 
 		return (byte & bitmask) != 0;	// & is the bitwise "and" operator, so if the result is higher than 0, that bit is active.
 	}
 
-	void tilemap::set_tile(const uint8 x, const uint8 y, bool value) {
-		assert(valid_tile(x, y));
-		uint8& byte = *(m_tiles + ((x + y * WIDTH) / 8));
-		uint8 bitmask = (uint8)1 << ((x + y * WIDTH) % 8);
+	void tilemap::set_tile(const Vector2i& coord, bool val) {
+		assert(is_valid_tile(coord));
+		set_tile(coord_to_index(coord), val);
+		
+	}
 
-		if (value) { byte = byte | bitmask; }			// | is bitwise "or", resulting in all 1s being kept from both
+	void tilemap::set_tile(const int& index, bool val) {
+		assert(is_valid_index(index));
+		uint8& byte = *(m_tiles + (index / 8));
+		uint8 bitmask = (uint8)1 << (index % 8);
+
+		if (val) { byte = byte | bitmask; }			// | is bitwise "or", resulting in all 1s being kept from both
 		else { byte = byte & (~bitmask); }		// ~ is bitwise complement operator, flipping all bits 1->0 and 0->1
 	}
 

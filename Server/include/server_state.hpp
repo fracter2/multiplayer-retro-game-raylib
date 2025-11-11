@@ -45,22 +45,6 @@ namespace meteor {
 			return false;
 		}
 
-		/*
-		uint8 get_client_index(const ip_endpoint& endpoint) const {
-			uint8 i = 0;
-			for (const connection& conn : m_clients) {
-				if (conn.m_endpoint == endpoint
-					&& conn.m_status != connection::status::DISCONNECTED) {
-					return i;
-				}
-				i++;
-			}
-
-			assert(false);	// To have type safety, we expect "has_client()" to check before this method
-			return -1;
-		}
-		*/
-
 		// Used to know if the sender of a pack was a resently-left member. To be *extra* graceful, in case of packet loss.
 		bool has_client_recently_left(const ip_endpoint& endpoint) {
 			for (connection& conn : m_clients) {
@@ -72,9 +56,9 @@ namespace meteor {
 			return false;
 		}
 
-		uint32 get_client_count() {
+		uint32 get_client_count() const {
 			uint32 i = 0;
-			for (connection& conn : m_clients) {
+			for (const connection& conn : m_clients) {
 				if (conn.m_status != connection::status::DISCONNECTED) { i++; }
 			}
 			return i;

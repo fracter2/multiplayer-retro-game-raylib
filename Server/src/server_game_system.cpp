@@ -58,11 +58,11 @@ namespace meteor::server_game_system {
 			// Get next action, if there are any queued up
 			if (!game_instance.m_player_action_queue[player_index].is_empty()) {
 				std::pair<player_entity::action, uint32> r = game_instance.m_player_action_queue[player_index].read_next();
-				player.m_prev_action = r.first;				// This is set only here, not by m_state. Ideally we would communicate that better through wording/whatever
+				player.m_prev_action = r.first;	
 				player.m_prev_action_tick = r.second;
 			}
 
-			game_instance.m_state.apply_player_action(player_index, dt, tick);
+			game_instance.m_state.update_player(player_index, tick);
 
 			player_index++;
 		}
@@ -71,7 +71,7 @@ namespace meteor::server_game_system {
 		uint8 bomb_index = 0;
 		for (const bomb& da_bomb : game_instance.m_state.m_bombs) {
 			if (da_bomb.m_explosion_tick == game_instance.m_tick) {
-				game_instance.m_state.apply_bomb_explosion(bomb_index);
+				game_instance.m_state.apply_bomb_explosion(da_bomb);
 			}
 			bomb_index++;
 		}

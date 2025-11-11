@@ -5,11 +5,11 @@
 #include <cstdio>
 #include <stdio.h>
 
-#include "common.hpp"
-#include "timer.hpp"
-#include "messages.hpp"
-#include "protocol.hpp"
-#include "connection.hpp"
+//#include "common.hpp"
+//#include "timer.hpp"
+//#include "messages.hpp"
+//#include "protocol.hpp"
+//#include "connection.hpp"
 //#include "game.hpp"
 
 //#include "input.hpp"
@@ -17,7 +17,7 @@
 #include "client_recieve_system.hpp"
 #include "game_update_system.hpp"
 #include "render_system.hpp"
-#include "ui.hpp"
+//#include "ui.hpp"
 
 //#define _CLIENT // This is also added in project settings, making it "global"
 
