@@ -157,7 +157,7 @@ namespace meteor::server_send_system {
 					}
 				}
 
-				debug::info("%g - sending payload package to client %d, size: %d", GetTime(), client_index, stream_send.size());
+				//debug::info("%g - sending payload package to client %d, size: %d", GetTime(), client_index, stream_send.size());
 				if (!socket.send_to(conn.m_endpoint, stream_send)) { print_error_code(); }
 				else {
 					// TODO LOG DATA SENT
