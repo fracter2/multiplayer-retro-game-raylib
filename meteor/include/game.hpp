@@ -321,6 +321,7 @@ namespace meteor {
 		};
 		
 		game() = default;
+		void init();
 
 		player_info m_player_info[MAX_PLAYERS] = {};
 
