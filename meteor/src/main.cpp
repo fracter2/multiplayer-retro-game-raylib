@@ -85,6 +85,7 @@ int main(int argc, char **argv)
 		// tick loop
 		if (time >= next_tick_time) {
 			next_tick_time += TICK_TIME;
+			ticks += 1;
 
 			input::update(input);
 

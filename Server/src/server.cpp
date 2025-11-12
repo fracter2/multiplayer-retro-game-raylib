@@ -78,6 +78,7 @@ int main()
 		dt = GetFrameTime();
 		running &= !WindowShouldClose();
 		time = GetTime();
+		
 
 		//client_recieve_system::update(time, socket, server_connection, game);
 		server_recieve_system::update(time, server, socket, game_instance, local_endpoint);
@@ -86,6 +87,7 @@ int main()
 		// tick loop
 		if (time >= next_tick_time) {
 			next_tick_time += TICK_TIME;
+			ticks += 1;
 
 			// Use struct for all inputs, like "input_map"
 			// Then convert to input Action, like move_requests
