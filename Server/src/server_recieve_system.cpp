@@ -88,6 +88,7 @@ namespace meteor::server_recieve_system {
 				if (packet.m_version != PROTOCOL_VERSION) { debug::info("%g - recieved bad connect protocol version", GetTime()); break; }
 				if (packet.m_magic != PROTOCOL_MAGIC) { debug::info("%g - recieved bad connect magic version", GetTime()); break; }
 
+				debug::info("%g - connect package", GetTime());
 
 				if (!server.has_client(sender_endpoint)) {
 					if (server.m_status == server_state::status::ONLINE_JOINABLE) {

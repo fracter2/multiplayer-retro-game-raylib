@@ -62,10 +62,11 @@ namespace meteor::server_send_system {
 		if (server.m_status == server_state::status::ONLINE_JOINABLE) {
 			assert(game_instance.m_status == game::status::PRE_GAME);		// Only allow joinable in PRE_GAME (lobby) state
 			assert(server.get_client_count() < MAX_PLAYERS);				// Ensure we've handled player counts correctly
-
+			
 			if (server.m_broadcast && server.m_next_broadcast_tick <= ticks) {
 				send_broadcast(socket, server, local_endpoint, game_instance);
 				server.m_next_broadcast_tick = ticks + server_state::BROADCAST_IDLE_TICKS;
+				
 			}
 		}
 
