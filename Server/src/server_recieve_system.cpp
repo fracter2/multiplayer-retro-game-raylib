@@ -66,9 +66,7 @@ namespace meteor::server_recieve_system {
 			
 			// Read stream
 			byte_stream_reader reader(stream_recieve);
-			debug::info("%g - recieving, data size: %d",
-				GetTime(),
-				stream_recieve.size());
+			//debug::info("%g - recieving, data size: %d", GetTime(), stream_recieve.size());
 			
 			if (reader.peek() >= (uint8)protocol_packet_type::MAX) {	// check if it's above max protocol uint8
 				debug::info("%g ignoring - recieved unknown protocol: %f", GetTime(), reader.peek());
@@ -87,8 +85,6 @@ namespace meteor::server_recieve_system {
 				if (!packet.read(reader)) { debug::info("%g - error reading connect package", GetTime()); print_error_code(); break; }
 				if (packet.m_version != PROTOCOL_VERSION) { debug::info("%g - recieved bad connect protocol version", GetTime()); break; }
 				if (packet.m_magic != PROTOCOL_MAGIC) { debug::info("%g - recieved bad connect magic version", GetTime()); break; }
-
-				debug::info("%g - connect package", GetTime());
 
 				if (!server.has_client(sender_endpoint)) {
 					if (server.m_status == server_state::status::ONLINE_JOINABLE) {
@@ -187,7 +183,7 @@ namespace meteor::server_recieve_system {
 				}
 				
 
-				debug::info("%g - recieving payload from client %d", GetTime(), client_index);
+				//debug::info("%g - recieving payload from client %d", GetTime(), client_index);
 				connection& conn = server.m_clients[client_index];
 				
 				// Conn status check
@@ -245,7 +241,7 @@ namespace meteor::server_recieve_system {
 					// ---- INPUT_ACTION ----
 					case message_type::INPUT_ACTION:
 					{
-						debug::info("%g - recieved input message from client %d", GetTime(), client_index);
+						//debug::info("%g - recieved input message from client %d", GetTime(), client_index);
 						input_action_message message;
 						if (!message.read(reader)) { print_error_code(); break; }
 
