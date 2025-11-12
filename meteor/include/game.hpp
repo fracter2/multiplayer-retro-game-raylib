@@ -60,6 +60,7 @@ namespace meteor {
 
 	struct tilemap {
 		static constexpr uint32 TILE_PIXEL_LENGTH = 32;		// Pixels, for rendering // TODO RENAME OR MOVE
+		static constexpr Vector2 TILE_PIXEL_CENTER_OFFSET = Vector2(TILE_PIXEL_LENGTH/2, TILE_PIXEL_LENGTH/2);		// Pixels, for rendering // TODO RENAME OR MOVE
 		static constexpr uint8  WIDTH = 16;
 		static constexpr uint8  HEIGHT = 16;
 		//static constexpr Vector2 SIZE_V = Vector2(WIDTH, HEIGHT);
@@ -301,6 +302,16 @@ namespace meteor {
 		static constexpr int ACTIONS_BUFFER_LENGTH = 12;
 		static constexpr int STATE_HISTORY_LENGTH = 30;
 		
+		static const Vector2i GET_PLAYER_START_TILE(const int& i) {
+			
+			static const Vector2i PLAYER_START_COORDS[MAX_PLAYERS] = {
+				Vector2i(0, 0),
+				Vector2i((int)tilemap::WIDTH - 1, (int)tilemap::HEIGHT - 1),
+				Vector2i((int)tilemap::WIDTH - 1, 0),
+				Vector2i(0, (int)tilemap::HEIGHT - 1)
+			};
+			return PLAYER_START_COORDS[i];
+		};
 
 		enum class status : uint8 {
 			INVALID,
