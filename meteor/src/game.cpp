@@ -177,19 +177,26 @@ namespace meteor {
 		return (byte & bitmask) != 0;	// & is the bitwise "and" operator, so if the result is higher than 0, that bit is active.
 	}
 
-	void tilemap::set_tile(const Vector2i& coord, bool val) {
+	void tilemap::set_tile(const Vector2i& coord, const bool& val) {
 		assert(is_valid_tile(coord));
 		set_tile(coord_to_index(coord), val);
 		
 	}
 
-	void tilemap::set_tile(const int& index, bool val) {
+	void tilemap::set_tile(const int& index, const bool& val) {
 		assert(is_valid_index(index));
 		uint8& byte = *(m_tiles + (index / 8));
 		uint8 bitmask = (uint8)1 << (index % 8);
 
 		if (val) { byte = byte | bitmask; }			// | is bitwise "or", resulting in all 1s being kept from both
 		else { byte = byte & (~bitmask); }		// ~ is bitwise complement operator, flipping all bits 1->0 and 0->1
+	}
+
+	void tilemap::set_all(const bool& value) {
+		for (uint8& byte : m_tiles) {
+			if (value) byte = UINT8_MAX;
+			else byte = 0;
+		}
 	}
 
 	const player_entity& game_state::get_player(const int index) const {

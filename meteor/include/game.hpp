@@ -81,8 +81,9 @@ namespace meteor {
 		bool is_tile_active(const Vector2i& coord) const;
 		bool is_tile_active(const int& index) const;
 
-		void set_tile(const Vector2i& coord, bool value);
-		void set_tile(const int& index, bool value);
+		void set_tile(const Vector2i& coord, const bool& value);
+		void set_tile(const int& index, const bool& value);
+		void set_all(const bool& value);
 
 		//		TODO Consider finishing these as safe structs for thir values. coord would have to validate after each x/y (or force const)
 		/*
