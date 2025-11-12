@@ -41,14 +41,14 @@ namespace meteor {
 		Vector2i(const Vector2& a) : x((int)a.x), y((int)a.y) {};
 
 		int x, y = 0;
-		Vector2i operator+(const Vector2i& a) { return Vector2i(x + a.x, y + a.y); }
-		Vector2i operator-(const Vector2i& a) { return Vector2i(x - a.x, y - a.y); }
-		Vector2i operator*(const Vector2i& a) { return Vector2i(x * a.x, y * a.y); }
-		Vector2i operator/(const Vector2i& a) { return Vector2i(x / a.x, y / a.y); }
+		Vector2i operator+(const Vector2i& a) const { return Vector2i(x + a.x, y + a.y); }
+		Vector2i operator-(const Vector2i& a) const { return Vector2i(x - a.x, y - a.y); }
+		Vector2i operator*(const Vector2i& a) const { return Vector2i(x * a.x, y * a.y); }
+		Vector2i operator/(const Vector2i& a) const { return Vector2i(x / a.x, y / a.y); }
 
-		bool operator==(const Vector2i a) { return x == a.x && y == a.y; }
+		bool operator==(const Vector2i a) const { return x == a.x && y == a.y; }
 
-		template<std::integral<> T> Vector2i operator*(T a) { return Vector2i((int)(x * a), (int)(y * a)); }
+		template<std::integral<> T> Vector2i operator*(const T& a) const { return Vector2i((int)(x * a), (int)(y * a)); }
 		//template<std::integral<> T> Vector2i operator/(Vector2i a) { return Vector2i(x / a.x, y / a.y); }	// Is this even needed? 
 	};
 
