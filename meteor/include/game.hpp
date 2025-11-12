@@ -70,8 +70,8 @@ namespace meteor {
 			WIDTH * HEIGHT / 8
 			+ (((WIDTH * HEIGHT) % 8) == 0 ? 0 : 1);		// Add 1 if there's remainder, since "/" rounds down
 
-		struct coord;
-		struct index;
+		//struct coord;
+		//struct index;
 
 		tilemap() = default;
 
@@ -138,42 +138,13 @@ namespace meteor {
 		return Vector2i(x, y);
 	}
 
-	// Vec2 to tile coordniate system. Not clamped by tilemap size
-	/*static void vec2_to_coord(const Vector2& pos, uint8& x, uint8& y) {
-		uint8 new_x = (uint8)pos.x;
-		uint8 new_y = (uint8)pos.y;
+	static Vector2 coord_to_pos_center(const Vector2i& coord) {
+		const float x = ((float)coord.x * (float)tilemap::TILE_PIXEL_LENGTH) + tilemap::TILE_PIXEL_CENTER_OFFSET.x;
+		const float y = ((float)coord.y * (float)tilemap::TILE_PIXEL_LENGTH) + tilemap::TILE_PIXEL_CENTER_OFFSET.y;
 
-		x = new_x;
-		y = new_y;
-	}*/
-
-	/*
-	static bool is_valid_tile(const uint8 x, const uint8 y) {
-		if (x >= tilemap::WIDTH
-		||  y >= tilemap::HEIGHT
-		|| (x + y * tilemap::WIDTH) >= tilemap::COUNT) return false;
-		else return true;
+		return Vector2(x, y);
 	}
 
-	static uint32 coord_to_index(const uint8 x, const uint8 y) {
-		if (!is_valid_tile(x, y)) return UINT32_MAX;
-		return (x + y * tilemap::WIDTH);
-	}
-
-	static void index_to_coord(const uint32 index, uint8& x, uint8& y) {
-		if (index >= tilemap::COUNT) return;
-		y = (uint8)index / tilemap::WIDTH;
-		x = (uint8)index % tilemap::WIDTH;
-	}
-
-	// Vec2 to tile coordniate system. Not clamped by tilemap size
-	static void vec2_to_coord(const Vector2& pos, uint8& x, uint8& y) {
-		uint8 new_x = (uint8)pos.x;
-		uint8 new_y = (uint8)pos.y;
-
-		x = new_x;
-		y = new_y;
-	}*/
 
 
 	// Player-user state, to keep track of game player slots.
@@ -193,20 +164,6 @@ namespace meteor {
 			TIMED_OUT,
 			MAX
 		};
-
-		/*
-		static constexpr char status_str[][10] = {
-			"EMPTY",
-			"JOINING",
-			"ACTIVE",
-			"AFK",
-			"LOSER",
-			"WINNER",
-			"RAGEQUIT",
-			"USER_LEFT",
-			"KICKED",
-			"TIMED_OUT"
-		};*/
 
 
 		static std::string status_to_str(const status& s) {

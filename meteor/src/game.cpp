@@ -7,40 +7,7 @@
 
 namespace meteor {
 
-
-	
-
-	/*
-	Vector2i::Vector2i(const uint8& x, const uint8& y)
-		: x(x), y(y)
-	{
-	}; */
-
-	/*
-	template<std::integral<> T> tilemap::index::index(const T& a) {
-
 	}
-	tilemap::index::index(const coord& a) {
-		//if (!valid_tile(a.x, a.y)) return UINT32_MAX;
-		return index(a.x + a.y * tilemap::WIDTH);
-	}
-
-	template<std::integral<> T> tilemap::coord::coord(const T& x, const T& y) {
-		assert();
-	}
-
-	tilemap::coord::coord(const uint8& ax, const uint8& ay) 
-		: x(ax), y(ay)
-	{
-	}
-
-	tilemap::coord::coord(const Vector2i& a) {
-
-	}
-	tilemap::coord::coord(const index& a) {
-
-	}
-	*/
 
 	player_entity::player_entity(Vector2 position)
 		: m_position(position)
