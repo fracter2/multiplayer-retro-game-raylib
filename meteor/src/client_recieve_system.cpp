@@ -194,9 +194,9 @@ namespace meteor::client_recieve_system {
 							break;
 						}
 
-						if (ticks_ahead == 0)						  debug::info("%g - recieved gamestate that is on current tick: %d", GetTime(), message.m_tick);
-						else if (ticks_ahead < game_instance.m_state_queue.size())  debug::info("%g - recieved state for upcoming tick inbetween newest and current", GetTime());
-						else if (ticks_ahead == game_instance.m_state_queue.size()) debug::info("%g - recieved state for already queued, newest tick", GetTime());
+						if (ticks_ahead == 0) { debug::info("%g - recieved gamestate that is on current tick: %d", GetTime(), message.m_tick); break; }
+						else if (ticks_ahead < game_instance.m_state_queue.size()) { debug::info("%g - recieved state for upcoming tick inbetween newest and current", GetTime()); }
+						else if (ticks_ahead == game_instance.m_state_queue.size()) { debug::info("%g - recieved state for already queued, newest tick", GetTime()); }
 						//else // ticks_ahead > game.m_queued_states
 
 						if (game_instance.m_state_queue[ticks_ahead - 1].is_default())	// .is_default() means that tick is empty
