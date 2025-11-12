@@ -41,7 +41,6 @@ namespace meteor::client_send_system {
 		udp_socket& socket,
 		connection& connection,
 		const ip_endpoint& client_endpoint,
-		const ip_endpoint& server_endpoint,
 		const game& game_instance
 	);
 	

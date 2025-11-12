@@ -8,7 +8,7 @@
 namespace meteor::client_send_system {
 
 
-	void update(const uint32& ticks, const double time, udp_socket& socket, connection& conn, const ip_endpoint& client_endpoint, const ip_endpoint& server_endpoint, const game& game_instance) {
+	void update(const uint32& ticks, const double time, udp_socket& socket, connection& conn, const ip_endpoint& client_endpoint, const game& game_instance) {
 
 		// Only perform send update once every third tick
 		if (ticks % TICKS_PER_UPDATE != 0) {
@@ -25,7 +25,7 @@ namespace meteor::client_send_system {
 			connect_packet packet;
 			packet.write(writer);
 
-			if (!socket.send_to(server_endpoint, stream_send)) { print_error_code(); }
+			if (!socket.send_to(conn.m_endpoint, stream_send)) { print_error_code(); }
 			else {
 				// TODO LOG DATA SENT
 			}
@@ -41,7 +41,7 @@ namespace meteor::client_send_system {
 
 
 			if (game_instance.m_status != game::status::IN_GAME) {
-				if (!socket.send_to(server_endpoint, stream_send)) { print_error_code(); }
+				if (!socket.send_to(conn.m_endpoint, stream_send)) { print_error_code(); }
 				else {
 					// TODO LOG DATA SENT
 				}
@@ -75,7 +75,7 @@ namespace meteor::client_send_system {
 			}
 			
 			debug::info("sending payload package");
-			if (!socket.send_to(server_endpoint, stream_send)) { print_error_code(); }
+			if (!socket.send_to(conn.m_endpoint, stream_send)) { print_error_code(); }
 			else {
 				// TODO LOG DATA SENT
 			}
@@ -98,7 +98,7 @@ namespace meteor::client_send_system {
 			disconnect_packet packet;
 			packet.write(writer);
 
-			if (!socket.send_to(server_endpoint, stream_send)) { print_error_code(); }
+			if (!socket.send_to(conn.m_endpoint, stream_send)) { print_error_code(); }
 			else {
 				// TODO LOG DATA SENT
 			}

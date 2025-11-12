@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 	constexpr uint16 PORT = 54321;
 	const ip_endpoint SERVER_ENDPOINT(ip_address(192, 168, 1, 72), PORT);	// for testing only. BROADCASTS will connect for you
 	ip_endpoint local_endpoint = {};
-	ip_endpoint server_endpoint = SERVER_ENDPOINT;
+	//ip_endpoint server_endpoint = SERVER_ENDPOINT;
 	udp_socket socket = {};
 	connection server_connection = {};
 
@@ -91,7 +91,7 @@ int main(int argc, char **argv)
 
 			game_update_system::update(game_instance, input);
 
-			client_send_system::update(ticks, time, socket, server_connection, local_endpoint, server_endpoint, game_instance);
+			client_send_system::update(ticks, time, socket, server_connection, local_endpoint, game_instance);
 
 			BeginDrawing();
 			render::client_system(ticks, time, game_instance, server_connection, texture, menu);
