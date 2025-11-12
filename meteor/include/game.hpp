@@ -52,6 +52,11 @@ namespace meteor {
 		//template<std::integral<> T> Vector2i operator/(Vector2i a) { return Vector2i(x / a.x, y / a.y); }	// Is this even needed? 
 	};
 
+#define Vector2i_ZERO Vector2i(0, 0)
+#define Vector2i_UP Vector2i(0, -1)
+#define Vector2i_DOWN Vector2i(0, 1)
+#define Vector2i_LEFT Vector2i(-1, 0)
+#define Vector2i_RIGHT Vector2i(1, 0)
 
 	struct tilemap {
 		static constexpr uint32 TILE_PIXEL_LENGTH = 32;		// Pixels, for rendering // TODO RENAME OR MOVE
