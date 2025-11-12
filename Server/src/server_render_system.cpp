@@ -44,7 +44,7 @@ namespace meteor::render {
 				constexpr int font_size = 20;
 				constexpr Color color = MAROON;
 				const char* text = TextFormat("Press '2' to toggle broadcasts (%s) and '3' to START GAME (%s)"
-					, server.m_broadcast? "BROADCASTING" : "OFF         "
+					, server.m_broadcast? "ON" : "OFF"
 					, server.get_client_count() >= 2? "CAN START      " : "TOO FEW PLAYERS"
 				);
 				const int text_width = MeasureText(text, font_size);
