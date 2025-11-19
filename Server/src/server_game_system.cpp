@@ -21,6 +21,7 @@ namespace meteor::server_game_system {
 			if (input_state.m_3_just_pressed && server.get_client_count() >= 2) {
 				game_instance.queue_game_start = true;
 				game_instance.init();
+				server.m_status = server_state::status::ONLINE;
 			}
 
 			return;

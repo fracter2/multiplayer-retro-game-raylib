@@ -29,8 +29,7 @@ namespace meteor {
 		}
 		
 		
-		
-		// TODO set gameplay mode
+		m_status = status::IN_GAME;
 	}
 
 	player_entity::player_entity(Vector2 position)
