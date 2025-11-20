@@ -187,7 +187,7 @@ namespace meteor::client_recieve_system {
 						game_state_message message;		// WHY ERROR
 						if (!message.read(reader)) { print_error_code(); break; }
 
-						int ticks_ahead = message.m_tick - game_instance.m_tick;
+						int ticks_ahead = (int)message.m_tick - (int)game_instance.m_tick; 
 
 						if (ticks_ahead < 0) { debug::info("%g - recieved gamestate that is behind at tick: %d, local tick: %d, ignoring", GetTime(), message.m_tick, game_instance.m_tick); 
 							break; 
