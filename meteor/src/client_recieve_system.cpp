@@ -168,6 +168,7 @@ namespace meteor::client_recieve_system {
 				conn.m_recieve_acknowledge = packet.m_acknowledge;
 
 				uint32 msg_sequence = packet.m_sequence; // TODO FOR RELIABLE MESSAGES, set by message_type::SEQUENCE_WRAP, ignore message if conn.sequence is higher.
+				
 
 				// ---- MESSAGES ----
 				while (reader.has_data())
@@ -193,17 +194,23 @@ namespace meteor::client_recieve_system {
 							break; 
 						}
 						if (ticks_ahead == 0) { debug::info("%g - recieved gamestate that is on current tick: %d", GetTime(), message.m_tick); 
+							// TODO Consider replacing current with recieved new
 							break; 
 						}
-						else if (ticks_ahead < game_instance.m_state_queue.size()) { debug::info("%g - recieved state for upcoming tick inbetween newest and current", GetTime()); }
-						else if (ticks_ahead == game_instance.m_state_queue.size()) { debug::info("%g - recieved state for already queued, newest tick", GetTime()); }
-						//else // ticks_ahead > game.m_queued_states
 
-						if (game_instance.m_state_queue[ticks_ahead - 1].is_default())	// .is_default() means that tick is empty
-							debug::info("overriding already queued tick");
+						if (ticks_ahead < game_instance.m_state_queue.size()) { debug::info("%g - recieved state for upcoming tick inbetween newest and current", GetTime()); }
+						if (ticks_ahead == game_instance.m_state_queue.size()) { debug::info("%g - recieved state for already queued, newest tick", GetTime()); }
+						
+						while (ticks_ahead > game_instance.m_state_queue.size()) {
+							game_instance.m_state_queue.push_back(game_state());
+						}
+						
+						if (!game_instance.m_state_queue[ticks_ahead - 1].is_default()) {	// -1 because index '0' is 1 tick ahead (it's the *next* ticks)
+							debug::info("overriding already queued non-default");
+						}
 
 						game_instance.m_state_queue[ticks_ahead - 1] = message.m_game_state;
-
+						
 						break;
 					}
 					// ---- INPUT_ACTION ----
