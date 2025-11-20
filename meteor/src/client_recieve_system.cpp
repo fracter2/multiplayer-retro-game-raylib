@@ -44,9 +44,7 @@ namespace meteor::client_recieve_system {
 
 			// Read stream
 			byte_stream_reader reader(stream_recieve);
-			debug::info("%g - recieving, data size: %d",
-				GetTime(),
-				stream_recieve.size());
+			//debug::info("%g - recieving, data size: %d", GetTime(), stream_recieve.size());
 
 			uint8 p = reader.peek();
 			if (p > (uint8)protocol_packet_type::PAYLOAD) {	// check if it's above max protocol uint8
@@ -210,7 +208,8 @@ namespace meteor::client_recieve_system {
 						}
 
 						game_instance.m_state_queue[ticks_ahead - 1] = message.m_game_state;
-						
+						debug::info("%g - recieved gamestate tick: %d, local tick: %d", GetTime(), message.m_tick, game_instance.m_tick);
+
 						break;
 					}
 					// ---- INPUT_ACTION ----
