@@ -36,13 +36,15 @@ namespace meteor::render{
 
 			// TODO REMDER CLIENT PREDICTION / SERVER_AUTH BOX for local player / bomb
 
+
+			render_player_info(Vector2i(8, 40), game_instance);
 		}
 		
 
 		// ==== PRE GAME ====
 		else if (game_instance.m_status == game::status::PRE_GAME) {
 			// TODO RENDER GAME LOBBY (if in lobby
-
+			render_player_info(Vector2i(8, 40), game_instance);
 		}
 		
 
@@ -51,6 +53,7 @@ namespace meteor::render{
 		else if (game_instance.m_status == game::status::POST_GAME) {
 			// TODO RENDER WIN / LOSE
 
+			render_player_info(Vector2i(8, 40), game_instance);
 		}
 		
 
@@ -58,6 +61,16 @@ namespace meteor::render{
 		// ==== INVALID / MENU ====
 		else {
 			// TODO RENDER MENU
+			{ // "In Menu"
+				constexpr int font_size = 40;
+				constexpr Color color = MAROON;
+				const char* text = TextFormat("Not connected");
+				const int text_width = MeasureText(text, font_size);
+				const int text_x = (GetScreenWidth() - text_width) / 2;
+				const int text_y = 8;
+				DrawText(text, text_x + 1, text_y + 1, font_size, BLACK);
+				DrawText(text, text_x, text_y, font_size, color);
+			}
 
 			// TODO RENDER BUTTONS / INPUT AREAS
 
@@ -72,8 +85,7 @@ namespace meteor::render{
 		{
 			// RENDER FPS
 			DrawFPS(2, GetScreenHeight() - 20);
-			const Vector2i coord = Vector2i(8, 40);
-			render_player_info(coord, game_instance);
+			
 
 			// TODO RENDER RTT in ms (averaged across a second? sepparate peak?)
 
