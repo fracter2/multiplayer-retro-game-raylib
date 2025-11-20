@@ -41,13 +41,18 @@ namespace meteor::game_update_system {
 		// ======== IN_GAME ========
 
 		if (game_instance.m_state_queue.size() == 0) {			// Extrapolate
-			// or... not?
+			// or... not? just freeze?
+			// Extrapolate only to a degree?
 			return;
 		}
 		else if (game_instance.m_state_queue[0].is_default()) { // Interpolate between current and next valid state
+			
+			int count = 0;
+			while (game_instance.m_state_queue[count].is_default()) { count++; }
 
-			// TODO INTERPOLATE POSITIONS AND TICK
-
+			std::vector<game_state> r = {};
+			interp_game_states(game_instance.m_state, game_instance.m_state_queue[count], r, count);
+			
 		}
 		else { // set state normally
 			game_instance.m_prev_state = game_instance.m_state;

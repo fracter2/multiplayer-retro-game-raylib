@@ -354,9 +354,30 @@ namespace meteor {
 		mutable bool queue_game_start = false;			// If the game should start next send tick
 #endif
 		
-
-
 	};
+
+
+	static void interp_game_states(const game_state& from, const game_state& to, std::vector<game_state>& result_arr, const int desired_interp_states) {
+
+		assert(desired_interp_states > 0);
+		if (desired_interp_states <= 0) { return; }
+
+		// "to" state i, skipped since it's just TO state
+		const int to_i = desired_interp_states + 1;
+		
+		// Skip 0 since that is just the FROM state
+		for (int i = 1; i < to_i; i++) {
+			const float fraction = (float)(i) / (float)(to_i);
+			game_state state = game_state(from);
+
+
+			int plr_i = 0;
+			for (player_entity& player : state.m_players) {
+				player.m_position = Vector2Lerp(player.m_position, to.m_players[plr_i].m_position, fraction);
+			}
+			result_arr.push_back(state);
+		}
+	}
 
 	
 }
