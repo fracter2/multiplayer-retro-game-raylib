@@ -18,14 +18,18 @@ namespace meteor::server_game_system {
 
 		// ======== PRE_GAME ========
 		if (game_instance.m_status == game::status::PRE_GAME) {
-			if (input_state.m_3_just_pressed && server.get_client_count() >= 2) {
+			if (input_state.m_3_just_pressed && game_instance.get_player_count() >= 2) {
 				game_instance.queue_game_start = true;
 				game_instance.init();
 				server.m_status = server_state::status::ONLINE;
 			}
+			if (input_state.m_4_just_pressed && game_instance.get_player_count() < MAX_PLAYERS) {
+				game_instance.fill_player_slots_with_bots();
+			}
 
 			return;
 		}
+
 
 		// ======== POST_GAME ========
 		else if (game_instance.m_status == game::status::POST_GAME) {

@@ -44,5 +44,7 @@ namespace meteor::input {
 		state.m_2 = IsKeyDown(KEY_TWO);
 		state.m_3_just_pressed = !(state.m_3) and IsKeyDown(KEY_THREE);			// Server start game
 		state.m_3 = IsKeyDown(KEY_THREE);
+		state.m_4_just_pressed = !(state.m_4) and IsKeyDown(KEY_FOUR);			// Server fill lobby with bots
+		state.m_4 = IsKeyDown(KEY_FOUR);
 	}
 }

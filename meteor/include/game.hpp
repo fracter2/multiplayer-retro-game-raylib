@@ -156,6 +156,7 @@ namespace meteor {
 			EMPTY,
 			JOINING,
 			ACTIVE,
+			ACTIVE_BOT,
 			AFK,
 			LOSER,
 			WINNER,
@@ -170,15 +171,16 @@ namespace meteor {
 		static std::string status_to_str(const status& s) {
 			assert((int)s >= 0 && s < status::MAX);
 			switch (s) {
-			case status::EMPTY: return std::string("EMPTY");
-			case status::JOINING: return std::string("JOINING");
-			case status::ACTIVE: return std::string("ACTIVE");
-			case status::AFK: return std::string("AFK");
-			case status::LOSER: return std::string("LOSER");
-			case status::WINNER: return std::string("WINNER");
-			case status::RAGEQUIT: return std::string("RAGEQUIT");
+			case status::EMPTY:		return std::string("EMPTY");
+			case status::JOINING:	return std::string("JOINING");
+			case status::ACTIVE:	return std::string("ACTIVE");
+			case status::ACTIVE_BOT: return std::string("ACTIVE_BOT");
+			case status::AFK:		return std::string("AFK");
+			case status::LOSER:		return std::string("LOSER");
+			case status::WINNER:	return std::string("WINNER");
+			case status::RAGEQUIT:	return std::string("RAGEQUIT");
 			case status::USER_LEFT: return std::string("USER_LEFT");
-			case status::KICKED: return std::string("KICKED");
+			case status::KICKED:	return std::string("KICKED");
 			case status::TIMED_OUT: return std::string("TIMED_OUT");
 			default: return std::string("OUT_OF_RANGE STATUS");
 			}
@@ -189,7 +191,7 @@ namespace meteor {
 		//bool m_is_host	// noone is host since the server is running on a sepparate exe. 
 							// The server exe could have admin tools, if needed.
 		status m_player_status = status::EMPTY;
-		char   m_name[NAME_LENGTH_MAX] = "";
+		char   m_name[NAME_LENGTH_MAX] = "";				// TODO Replace with std::string or similar
 		// maybe lag info or similar could be here too
 	};
 
@@ -288,13 +290,11 @@ namespace meteor {
 		const tilemap& get_tilemap() const;
 		const bool is_default() const;
 
-		//bool is_walkable(const Vector2& pos) const;
-		bool is_walkable(const Vector2i& coord) const;									// TODO replace sepparate x/y with struct, everywhere
-		//Vector2 move_and_collide(const Vector2& pos, const Vector2& vel) const;					// TODO redundant? consider replacing with is_walkable()
+		bool is_walkable(const Vector2i& coord) const;
 		void update_player(const uint8& player_index, const uint32& tick);
 		bool can_place_bomb(const uint8& index, const uint32& tick) const;
-		void apply_bomb_explosion(const bomb& da_bomb);											// TODO could be clarified w/side effects and purpose
-		bool explode_at(const Vector2i& coord);		// TODO RENAME / REDO, not clear how its used
+		void apply_bomb_explosion(const bomb& da_bomb);
+		bool explode_at(const Vector2i& coord);
 	};
 
 
@@ -322,6 +322,9 @@ namespace meteor {
 		
 		game() = default;
 		void init();
+
+		uint32 get_player_count() const;
+		void fill_player_slots_with_bots();
 
 		player_info m_player_info[MAX_PLAYERS] = {};
 

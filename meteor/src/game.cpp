@@ -13,7 +13,8 @@ namespace meteor {
 
 		int i = 0;
 		for (player_entity& player : m_state.m_players) {
-			if (m_player_info[i].m_player_status == player_info::status::ACTIVE) {
+			if (m_player_info[i].m_player_status == player_info::status::ACTIVE
+				|| m_player_info[i].m_player_status == player_info::status::ACTIVE_BOT) {
 				player.m_dead = false;
 				player.m_prev_action = player_entity::action::STAND_STILL;
 				const Vector2i coord = GET_PLAYER_START_TILE(i);
@@ -30,6 +31,32 @@ namespace meteor {
 		
 		
 		m_status = status::IN_GAME;
+	}
+
+	uint32 game::get_player_count() const {
+		uint32 i = 0;
+		for (const player_info& player : m_player_info) {
+			if (player.m_player_status == player_info::status::ACTIVE
+			|| player.m_player_status == player_info::status::ACTIVE_BOT) {
+				i++;
+			}
+		}
+		return i;
+	}
+
+	void game::fill_player_slots_with_bots() {
+		for (player_info& player : m_player_info) {
+			if (player.m_player_status == player_info::status::EMPTY
+			|| player.m_player_status == player_info::status::RAGEQUIT
+			|| player.m_player_status == player_info::status::TIMED_OUT
+			|| player.m_player_status == player_info::status::KICKED
+			|| player.m_player_status == player_info::status::USER_LEFT) {
+				player.m_player_status = player_info::status::ACTIVE_BOT;
+				player.m_name[0] = 'b';	// TODO We really need to make this a std::string
+				player.m_name[1] = 'o';
+				player.m_name[2] = 't';
+			}
+		}
 	}
 
 	player_entity::player_entity(Vector2 position)

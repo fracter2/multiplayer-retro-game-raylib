@@ -189,12 +189,12 @@ namespace meteor::client_recieve_system {
 
 						int ticks_ahead = message.m_tick - game_instance.m_tick;
 
-						if (ticks_ahead < 0) {
-							debug::info("%g - recieved gamestate that is behind at tick: %d, local tick: %d, ignoring", GetTime(), message.m_tick, game_instance.m_tick);
-							break;
+						if (ticks_ahead < 0) { debug::info("%g - recieved gamestate that is behind at tick: %d, local tick: %d, ignoring", GetTime(), message.m_tick, game_instance.m_tick); 
+							break; 
 						}
-
-						if (ticks_ahead == 0) { debug::info("%g - recieved gamestate that is on current tick: %d", GetTime(), message.m_tick); break; }
+						if (ticks_ahead == 0) { debug::info("%g - recieved gamestate that is on current tick: %d", GetTime(), message.m_tick); 
+							break; 
+						}
 						else if (ticks_ahead < game_instance.m_state_queue.size()) { debug::info("%g - recieved state for upcoming tick inbetween newest and current", GetTime()); }
 						else if (ticks_ahead == game_instance.m_state_queue.size()) { debug::info("%g - recieved state for already queued, newest tick", GetTime()); }
 						//else // ticks_ahead > game.m_queued_states

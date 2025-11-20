@@ -46,9 +46,11 @@ namespace meteor::input {
 		bool m_1 = false;						
 		bool m_1_just_pressed = false;			// Toggle server online / offline. Client quit-game
 		bool m_2 = false;
-		bool m_2_just_pressed = false;			// Toggle server broadcast / client join broadcast
+		bool m_2_just_pressed = false;			// Toggle server broadcast. Client join broadcast
 		bool m_3 = false;
 		bool m_3_just_pressed = false;			// Server start game
+		bool m_4 = false;
+		bool m_4_just_pressed = false;			// Server fill lobby with bots
 	};
 
 
