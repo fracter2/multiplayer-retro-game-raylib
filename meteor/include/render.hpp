@@ -70,7 +70,7 @@ namespace meteor::render {
 				, player.m_name);
 			str += player_info::status_to_str(player.m_player_status);
 			str += ")\n";
-			
+			i++;
 		}
 		DrawText(str.c_str(), coord.x + 1, coord.y + 1, font_size, color_backdrop);
 		DrawText(str.c_str(), coord.x, coord.y, font_size, color);
