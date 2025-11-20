@@ -25,6 +25,8 @@ namespace meteor::render {
 	static constexpr float PLAYER_RADIUS = 8;
 	static constexpr Color PLAYER_COLOR = BLUE;
 	static constexpr Color PLAYER_COLOR_DEAD = DARKBLUE;
+	static constexpr Color PLAYER_NUM_COLOR = BLACK;
+	static constexpr int   PLAYER_NUM_SIZE = 6;
 
 	
 
@@ -47,9 +49,12 @@ namespace meteor::render {
 	}
 
 	static void render_characters(const Texture& texture, const game& game_instance) {
+		int i = 0;
 		for (const player_entity& player : game_instance.m_state.m_players) {
-			if (player.m_dead) { DrawCircle((int)player.m_position.x, (int)player.m_position.x, PLAYER_RADIUS, PLAYER_COLOR_DEAD); }
-			if (player.m_dead) { DrawCircle((int)player.m_position.x, (int)player.m_position.x, PLAYER_RADIUS, PLAYER_COLOR); }
+			if (player.m_dead) { DrawCircleV(player.m_position, PLAYER_RADIUS, PLAYER_COLOR_DEAD); }
+			else			   { DrawCircleV(player.m_position, PLAYER_RADIUS, PLAYER_COLOR); }
+			DrawTextPro(GetFontDefault(), TextFormat("%d", i), player.m_position, Vector2Zero(),0, PLAYER_NUM_SIZE, 0, PLAYER_NUM_COLOR);
+			i++;
 		}
 	}
 
