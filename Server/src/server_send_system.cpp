@@ -109,7 +109,7 @@ namespace meteor::server_send_system {
 
 				// -------- LOBBY STATE MESSAGE --------
 
-				if (game_instance.game_lobby_changed) {
+				if (game_instance.game_lobby_changed || game_instance.queue_game_start) {
 					game_lobby_message lobby_message = game_lobby_message(game_instance.queue_game_start, game_instance, game_instance.m_status);
 					if (writer.m_stream.can_fit(sizeof(lobby_message))) {	// LIMIT TO MAX PACKAGE SIZE
 						lobby_message.write(writer);
