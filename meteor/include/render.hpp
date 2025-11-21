@@ -31,6 +31,12 @@ namespace meteor::render {
 	static constexpr Color PLAYER_NUM_COLOR = BLACK;
 	static constexpr int   PLAYER_NUM_SIZE = 6;
 
+	static constexpr Vector2 MAP_SIZE = Vector2((float)tilemap::WIDTH * (float)tilemap::TILE_PIXEL_LENGTH, (float)tilemap::HEIGHT * (float)tilemap::TILE_PIXEL_LENGTH);
+	static constexpr Vector2 MAP_OFFSET = Vector2(
+		((WINDOW_WIDTH - MAP_SIZE.x) / 2)	// Center-aligned
+		, 80
+	);
+
 	
 
 	
