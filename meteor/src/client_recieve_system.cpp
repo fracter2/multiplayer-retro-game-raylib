@@ -235,6 +235,7 @@ namespace meteor::client_recieve_system {
 
 						if (message.m_start_now && game_instance.m_status == game::status::PRE_GAME) {
 							game_instance.m_status = game::status::IN_GAME;
+							debug::info("%g - Set game status 'IN_GAME'", GetTime());
 						}
 						break;
 					}
