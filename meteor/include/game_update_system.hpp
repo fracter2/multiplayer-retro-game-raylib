@@ -94,6 +94,8 @@ namespace meteor::game_update_system {
 
 		if (ticks_to_remove > 0) {
 			game_instance.m_predict_actions.erase(game_instance.m_predict_actions.begin(), game_instance.m_predict_actions.begin() + ticks_to_remove);
+			
+
 		}
 
 		
