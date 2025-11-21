@@ -53,9 +53,9 @@ namespace meteor::client_send_system {
 			// TODO SEND USERS CLIENT using PLAYER_ID IN SERVER
 
 			// Type safe const to reduce word lengths and to emphasise when it's mutable or not (to avoid setting accidently)
-			const int				   user_index  = game_instance.m_user_index;
-			const uint32			   tick		   = game_instance.m_tick;
-			const game_state&	   state	   = game_instance.m_state;
+			const int			 user_index  = game_instance.m_user_index;
+			const uint32		 tick		 = game_instance.m_tick;
+			const game_state&	 state	     = game_instance.m_state;
 			const player_entity& user_player = state.get_player(user_index);
 
 
