@@ -347,8 +347,9 @@ namespace meteor {
 #endif
 
 #ifdef _SERVER
+		void push_state_to_history();
 		std::vector<game_state> m_state_history = std::vector<game_state>();
-		mutable uint8 m_states_not_sent = 0;
+		mutable int m_states_not_sent = 0;
 		player_action_queue m_player_action_queue[MAX_PLAYERS] = {};
 		mutable bool game_lobby_changed = false;
 		mutable bool queue_game_start = false;			// If the game should start next send tick

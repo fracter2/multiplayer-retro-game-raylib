@@ -59,6 +59,10 @@ namespace meteor {
 		}
 	}
 
+
+
+
+
 	player_entity::player_entity(Vector2 position)
 		: m_position(position)
 	{
@@ -234,4 +238,17 @@ namespace meteor {
 	const bool game_state::is_default() const {
 		return m_players[0].m_prev_action == player_entity::action::INVALID;
 	}
+
+
+#ifdef _SERVER
+	void game::push_state_to_history() {
+		m_tick += 1;
+		m_state_history.insert(m_state_history.begin(), m_state);
+		m_states_not_sent += 1;
+		while (m_state_history.size() >= game::STATE_HISTORY_LENGTH) {
+			m_state_history.pop_back();
+		}
+	}
+#endif
+
 }

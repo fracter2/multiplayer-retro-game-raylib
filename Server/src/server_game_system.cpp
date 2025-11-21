@@ -25,6 +25,7 @@ namespace meteor::server_game_system {
 			}
 			if (input_state.m_4_just_pressed && game_instance.get_player_count() < MAX_PLAYERS) {
 				game_instance.fill_player_slots_with_bots();
+				game_instance.game_lobby_changed = true;
 			}
 
 			return;
@@ -49,12 +50,7 @@ namespace meteor::server_game_system {
 
 		// else...
 		// ======== IN_GAME ========
-		game_instance.m_tick += 1;
-		game_instance.m_state_history.push_back(game_instance.m_state);
-		game_instance.m_states_not_sent += 1;
-		while (game_instance.m_state_history.size() >= game::STATE_HISTORY_LENGTH) {
-			game_instance.m_state_history.erase(game_instance.m_state_history.begin());
-		}
+		game_instance.push_state_to_history();
 
 		// Apply player actions
 		uint8 player_index = 0;
