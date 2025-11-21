@@ -56,14 +56,15 @@ namespace meteor
 	template <typename T>
 	bool serialize(game_state& state, T& stream) {
 		bool success = true;
-		for (int i = 0; i <MAX_PLAYERS; i++) {
-			//success &= stream.serialize(state.m_bombs[i]);
-			//success &= stream.serialize(state.m_players[i]);
+		for (int i = 0; i < MAX_PLAYERS; i++) {
 			success &= serialize(state.m_bombs[i], stream);
 			success &= serialize(state.m_players[i], stream);
 		}
 		//success &= stream.serialize(state.m_tilemap);
-		for (uint8 tile : state.m_tilemap.m_tiles) {	// As long as this is constant between sender / reciever, this is fine.
+
+		//for (uint8 tile : state.m_tilemap.m_tiles) 
+		for (int i = 0; i < tilemap::BYTES_NEEDED; i++)
+		{	// As long as this is constant between sender / reciever, this is fine.
 			success &= stream.serialize(tile);
 		}
 
