@@ -41,30 +41,52 @@ namespace meteor::render {
 
 	
 	static void render_map(const Texture& texture, const tilemap& map) {
-		static constexpr Vector2 MAP_OFFSET = Vector2(100, 100);
-
 		for (int i = 0; i < tilemap::COUNT; i++) {
-			if (!map.is_tile_active(i)) { continue; }
-
 			Vector2i c = index_to_coord(i);
 			const Vector2 pos = MAP_OFFSET + Vector2((float)c.x, (float)c.y) * (float)tilemap::TILE_PIXEL_LENGTH;
 			const Rectangle destination{ pos.x, pos.y, (float)tilemap::TILE_PIXEL_LENGTH, (float)tilemap::TILE_PIXEL_LENGTH };
-			DrawTexturePro(texture, atlass::WALL, destination, Vector2(0, 0), 0.0f, WHITE);
+			DrawTexturePro(
+				texture, 
+				(map.is_tile_active(i) ? atlass::WALL : atlass::BACKGROUND),
+				destination, 
+				Vector2(0, 0), 
+				0.0f, 
+				WHITE);
 		}
 	}
 
 	static void render_bombs(const Texture& texture, const game& game_instance, const uint32& tick) {
 		for (const bomb& da_bomb : game_instance.m_state.m_bombs) {
-			if (da_bomb.m_explosion_tick >= tick) { DrawCircle((int)da_bomb.m_x, (int)da_bomb.m_y, BOMB_RADIUS, BOMB_COLOR); }
+			if (da_bomb.m_explosion_tick >= tick) { 
+				//DrawCircle((int)da_bomb.m_x, (int)da_bomb.m_y, BOMB_RADIUS, BOMB_COLOR); 
+				const Vector2 pos = MAP_OFFSET + Vector2((float)da_bomb.m_x, (float)da_bomb.m_y) * (float)tilemap::TILE_PIXEL_LENGTH;
+				const Rectangle destination{ pos.x, pos.y, (float)tilemap::TILE_PIXEL_LENGTH, (float)tilemap::TILE_PIXEL_LENGTH };
+				DrawTexturePro(
+					texture,
+					atlass::BOMB,
+					destination,
+					Vector2(0, 0),
+					0.0f,
+					WHITE);
+			}
 		}
 	}
 
 	static void render_characters(const Texture& texture, const game& game_instance) {
 		int i = 0;
 		for (const player_entity& player : game_instance.m_state.m_players) {
-			if (player.m_dead) { DrawCircleV(player.m_position, PLAYER_RADIUS, PLAYER_COLOR_DEAD); }
-			else			   { DrawCircleV(player.m_position, PLAYER_RADIUS, PLAYER_COLOR); }
-			DrawTextPro(GetFontDefault(), TextFormat("%d", i), player.m_position, Vector2Zero(),0, PLAYER_NUM_SIZE, 0, PLAYER_NUM_COLOR);
+			//if (player.m_dead) { DrawCircleV(player.m_position, PLAYER_RADIUS, PLAYER_COLOR_DEAD); }
+			//else			   { DrawCircleV(player.m_position, PLAYER_RADIUS, PLAYER_COLOR); }
+			const Vector2 pos = MAP_OFFSET + player.m_position * (float)tilemap::TILE_PIXEL_LENGTH;
+			const Rectangle destination{ pos.x, pos.y, (float)tilemap::TILE_PIXEL_LENGTH, (float)tilemap::TILE_PIXEL_LENGTH };
+			DrawTexturePro(
+				texture,
+				player.m_dead? atlass::PLAYER_DEAD : atlass::PLAYER,
+				destination,
+				tilemap::TILE_PIXEL_CENTER_OFFSET,
+				0.0f,
+				WHITE);
+			//DrawTextPro(GetFontDefault(), TextFormat("%d", i), player.m_position, Vector2Zero(),0, PLAYER_NUM_SIZE, 0, PLAYER_NUM_COLOR);
 			i++;
 		}
 	}
