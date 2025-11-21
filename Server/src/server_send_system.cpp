@@ -125,37 +125,34 @@ namespace meteor::server_send_system {
 				// -------- GAME STATE MESSAGE --------
 				// Send unsent game states (not reliable-transmittion, client only cares about latest)
 				// Consider using reverse iterator to simplify(?)
-				const uint8 history_size = (uint8)game_instance.m_state_history.size();
-				uint8 states_not_sent = game_instance.m_states_not_sent;						// Make local for this conn-loop. Reset at end of update()
-				if (game_instance.m_status == game::status::POST_GAME) { states_not_sent = 1; }	// Always only send latest state in post_game
-				uint8 state_i = history_size - (states_not_sent - 1);							// -1 so the for(state_i) to account for state history not having latest game.m_state
-
-				for (uint8 i = state_i; i < history_size; i++) {
-					const uint32 state_tick = game_instance.m_tick - states_not_sent;
-					game_state_message state_message = game_state_message(game_instance.m_state_history[i], state_tick);
-
+				
+				int queued_states_count = game_instance.m_states_not_sent;						// Make local for this conn-loop. Reset at end of update()
+				if (queued_states_count >= 1) {
+					const uint32 state_tick = game_instance.m_tick;
+					game_state_message state_message = game_state_message(game_instance.m_state, state_tick);
 					if (writer.m_stream.can_fit(sizeof(state_message))) {	// LIMIT TO MAX PACKAGE SIZE
 						state_message.write(writer);
-						states_not_sent -= 1;
 					}
 					else {
 						debug::warn("%g - message cannot fit!, size: %d", GetTime(), stream_send.size());
 						break;
 					}
-
+					queued_states_count--;
 				}
-
-				if (states_not_sent == 1) {
-					game_state_message state_message = game_state_message(game_instance.m_state, game_instance.m_tick);
+				
+				while (queued_states_count >= 1) {
+					const uint32 state_tick = game_instance.m_tick - queued_states_count;
+					game_state_message state_message = game_state_message(game_instance.m_state_history[queued_states_count - 1], state_tick);
 					if (writer.m_stream.can_fit(sizeof(state_message))) {	// LIMIT TO MAX PACKAGE SIZE
 						state_message.write(writer);
-						states_not_sent -= 1;
 					}
 					else {
 						debug::warn("%g - message cannot fit!, size: %d", GetTime(), stream_send.size());
 						break;
 					}
+					queued_states_count--;
 				}
+				
 
 				//debug::info("%g - sending payload package to client %d, size: %d", GetTime(), client_index, stream_send.size());
 				if (!socket.send_to(conn.m_endpoint, stream_send)) { print_error_code(); }
