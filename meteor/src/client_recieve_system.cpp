@@ -196,7 +196,7 @@ namespace meteor::client_recieve_system {
 							break; 
 						}
 
-						if (ticks_ahead < game_instance.m_state_queue.size()) { debug::info("%g - recieved state for upcoming tick inbetween newest and current", GetTime()); }
+						//if (ticks_ahead < game_instance.m_state_queue.size()) { debug::info("%g - recieved state for upcoming tick inbetween newest and current", GetTime()); }
 						if (ticks_ahead == game_instance.m_state_queue.size()) { debug::info("%g - recieved state for already queued, newest tick", GetTime()); }
 						
 						while (ticks_ahead > game_instance.m_state_queue.size()) {
