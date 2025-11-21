@@ -55,9 +55,9 @@ namespace meteor::render {
 		}
 	}
 
-	static void render_bombs(const Texture& texture, const game& game_instance, const uint32& tick) {
+	static void render_bombs(const Texture& texture, const game& game_instance) {
 		for (const bomb& da_bomb : game_instance.m_state.m_bombs) {
-			if (da_bomb.m_explosion_tick >= tick) { 
+			if (da_bomb.m_explosion_tick >= game_instance.m_state.m_tick) {
 				//DrawCircle((int)da_bomb.m_x, (int)da_bomb.m_y, BOMB_RADIUS, BOMB_COLOR); 
 				const Vector2 pos = MAP_OFFSET + Vector2((float)da_bomb.m_x, (float)da_bomb.m_y) * (float)tilemap::TILE_PIXEL_LENGTH;
 				const Rectangle destination{ pos.x, pos.y, (float)tilemap::TILE_PIXEL_LENGTH, (float)tilemap::TILE_PIXEL_LENGTH };

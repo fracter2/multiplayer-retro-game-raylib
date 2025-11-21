@@ -23,7 +23,7 @@ namespace meteor::render {
 
 			
 			render_map(texture, map);
-			render_bombs(texture, game_instance, tick);
+			render_bombs(texture, game_instance);
 			render_characters(texture, game_instance);
 
 			// TODO RENDER NAMES (if there are names)

@@ -68,7 +68,7 @@ namespace meteor {
 	{
 	};
 
-	bool game_state::can_place_bomb(const uint8& index, const uint32& tick) const {
+	bool game_state::can_place_bomb(const uint8& index) const {
 		const player_entity& user_player = m_players[index];
 
 		Vector2i coord = Vector2i(user_player.m_position);
@@ -80,10 +80,9 @@ namespace meteor {
 		for (const bomb& bomb : m_bombs) {					// and no other bombs are there...
 			r &= !(bomb.m_x == coord.x
 				&& bomb.m_y == coord.y
-				&& bomb.m_explosion_tick > tick);
+				&& bomb.m_explosion_tick > m_tick);
 		}
-		r &= (get_bomb(index).m_explosion_tick
-			+ bomb::COOLDOWN_TICKS) < tick;					// and the bomb isn't already placed or in cooldown...
+		r &= (get_bomb(index).m_explosion_tick + bomb::COOLDOWN_TICKS) < m_tick;	// and the bomb isn't already placed or in cooldown...
 
 		return r;
 	}
@@ -100,7 +99,7 @@ namespace meteor {
 		else return pos;
 	}*/
 
-	void game_state::update_player(const uint8& player_index, const uint32& tick) {
+	void game_state::update_player(const uint8& player_index) {
 		const double speed = player_entity::MOVE_SPEED * TICK_TIME;
 		player_entity& player = m_players[player_index];
 
@@ -135,8 +134,8 @@ namespace meteor {
 			bomb& da_bomb = m_bombs[player_index];
 			Vector2i coord = Vector2i(player.m_position);
 			
-			if (can_place_bomb(player_index, tick)) {
-				da_bomb.m_explosion_tick = tick + bomb::FUSE_TICKS;
+			if (can_place_bomb(player_index)) {
+				da_bomb.m_explosion_tick = m_tick + bomb::FUSE_TICKS;
 				da_bomb.m_x = (uint8)coord.x;
 				da_bomb.m_y = (uint8)coord.y;
 			}

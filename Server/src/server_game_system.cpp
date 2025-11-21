@@ -65,18 +65,16 @@ namespace meteor::server_game_system {
 				player.m_prev_action_tick = r.second;
 			}
 
-			game_instance.m_state.update_player(player_index, tick);
+			game_instance.m_state.update_player(player_index);
 
 			player_index++;
 		}
 
 		// Detonate any bomboes
-		uint8 bomb_index = 0;
 		for (const bomb& da_bomb : game_instance.m_state.m_bombs) {
 			if (da_bomb.m_explosion_tick == game_instance.m_state.m_tick) {
 				game_instance.m_state.apply_bomb_explosion(da_bomb);
 			}
-			bomb_index++;
 		}
 
 		// Check for winner

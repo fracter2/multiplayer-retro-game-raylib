@@ -116,9 +116,11 @@ namespace meteor {
 	// if it's inside the map boundries
 	static bool is_valid_tile(const Vector2i& a)  {
 		if (a.x >= tilemap::WIDTH || a.x < 0
-			|| a.y >= tilemap::HEIGHT || a.y < 0
-			|| (a.x + a.y * tilemap::WIDTH) >= tilemap::COUNT) return false;
-		else return true;
+		|| a.y >= tilemap::HEIGHT || a.y < 0
+		|| (a.x + a.y * tilemap::WIDTH) >= tilemap::COUNT) 
+			return false;
+		else 
+			return true;
 	}
 
 	static bool is_valid_index(const int& index) {
@@ -281,9 +283,9 @@ namespace meteor {
 #endif // _SERVER
 
 	struct bomb {
-		static constexpr double FUSE_TIME = 3.0;
+		static constexpr double FUSE_TIME = 2.0;
 		static constexpr uint32 FUSE_TICKS = (uint32)(FUSE_TIME * (double)TICK_RATE);
-		static constexpr uint32 COOLDOWN_TICKS = (uint32)(1.0 * (double)TICK_RATE);
+		static constexpr uint32 COOLDOWN_TICKS = (uint32)(0.5 * (double)TICK_RATE);
 
 		bomb() = default;
 		bomb(uint8 x, uint8 y, int32 explosion_tick);
@@ -309,8 +311,8 @@ namespace meteor {
 		const bool is_default() const;
 
 		bool is_walkable(const Vector2i& coord) const;
-		void update_player(const uint8& player_index, const uint32& tick);
-		bool can_place_bomb(const uint8& index, const uint32& tick) const;
+		void update_player(const uint8& player_index);
+		bool can_place_bomb(const uint8& index) const;
 		void apply_bomb_explosion(const bomb& da_bomb);
 		bool explode_at(const Vector2i& coord);
 	};
