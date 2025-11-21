@@ -139,11 +139,15 @@ namespace meteor {
 		return Vector2i(x, y);
 	}
 
-	static Vector2 coord_to_pos_center(const Vector2i& coord) {
+	/*static Vector2 coord_to_pos_center(const Vector2i& coord) {
 		const float x = ((float)coord.x * (float)tilemap::TILE_PIXEL_LENGTH) + tilemap::TILE_PIXEL_CENTER_OFFSET.x;
 		const float y = ((float)coord.y * (float)tilemap::TILE_PIXEL_LENGTH) + tilemap::TILE_PIXEL_CENTER_OFFSET.y;
 
 		return Vector2(x, y);
+	}*/
+
+	static Vector2 coord_to_pos_center(const Vector2i& coord) {
+		return Vector2((float)coord.x, (float)coord.y) + Vector2(0.5, 0.5);
 	}
 
 
