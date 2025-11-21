@@ -17,7 +17,7 @@ namespace meteor::game_update_system {
 	
 	
 
-	void update(game game_instance, const input::input_state input_state) {
+	void update(game& game_instance, const input::input_state& input_state) {
 		
 
 		if (game_instance.m_status == game::status::PRE_GAME) {
@@ -61,21 +61,13 @@ namespace meteor::game_update_system {
 		}
 
 		game_instance.m_tick += 1;
+
 		
 		// Type safe const to reduce word lengths and to emphasise when it's mutable or not (to avoid setting accidently)
 		const uint8			 user_index  = (uint8)game_instance.m_user_index;
 		const uint32&		 tick		 = game_instance.m_tick;
 		const game_state&	 state	     = game_instance.m_state;
 		const player_entity& user_player = state.get_player(user_index);
-
-		
-		// Remove predicted actions that have been used by the server
-		uint32 ticks_ahead  = game_instance.m_tick - user_player.m_prev_action_tick;
-		int ticks_to_remove = (int)game_instance.m_predict_actions.size() - (int)ticks_ahead;
-
-		game_instance.m_predict_actions.erase(game_instance.m_predict_actions.begin(), game_instance.m_predict_actions.begin() + ticks_to_remove); 
-		//game_instance.m_last_sent_action_index -= ticks_to_remove;
-		
 
 
 		// INPUT PARSING
@@ -93,6 +85,16 @@ namespace meteor::game_update_system {
 
 		game_instance.m_predict_actions.push_back(current_action);
 		game_instance.m_actions_not_sent += 1;
+
+
+
+		// Remove predicted actions that have been used by the server
+		int ticks_ahead = game_instance.m_tick - user_player.m_prev_action_tick;
+		int ticks_to_remove = (int)game_instance.m_predict_actions.size() - ticks_ahead;
+
+		if (ticks_to_remove > 0) {
+			game_instance.m_predict_actions.erase(game_instance.m_predict_actions.begin(), game_instance.m_predict_actions.begin() + ticks_to_remove);
+		}
 
 		
 		// CLIENT SIDE PREDICTION
