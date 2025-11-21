@@ -27,10 +27,9 @@
 
 int main()
 {
-	const int window_width = 1280, window_height = 720;
-	const std::string_view window_title = "Bomberman SERVER";
+	static constexpr std::string_view window_title = "Bomberman SERVER";
 
-	InitWindow(window_width, window_height, window_title.data());
+	InitWindow(meteor::render::WINDOW_WIDTH, meteor::render::WINDOW_HEIGHT, window_title.data());
 	SetExitKey(0);			// Esc
 
 	using namespace meteor;
@@ -56,7 +55,7 @@ int main()
 	double time = GetTime();
 	bool running = true;
 
-	Texture texture = LoadTexture("data/tiles.png");
+	Texture texture = LoadTexture("../meteor/data/tiles.png");
 	// TODO assert texture is actually loaded
 	
 	// ==== INIT ====
