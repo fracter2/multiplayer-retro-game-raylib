@@ -78,7 +78,7 @@ namespace meteor::game_update_system {
 		const bool vertical_active = input_state.m_up != input_state.m_down;
 		const bool horizontal_active = input_state.m_left != input_state.m_right;
 
-		if (input_state.m_place_bomb &&	state.can_place_bomb(user_index, tick))
+		if (input_state.m_place_bomb &&	state.can_place_bomb(user_index))
 														   current_action = player_entity::action::PLACE_BOMB;
 		else if (input_state.m_up    && vertical_active)   current_action = player_entity::action::MOVE_UP;
 		else if (input_state.m_down  && vertical_active)   current_action = player_entity::action::MOVE_DOWN;
