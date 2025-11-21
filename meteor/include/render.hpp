@@ -21,6 +21,8 @@ namespace meteor::render {
 		static constexpr Rectangle BOMB = { 64, 0, 16, 16 };
 	};
 
+	static constexpr int WINDOW_WIDTH = 1280, WINDOW_HEIGHT = 720;
+
 	static constexpr float BOMB_RADIUS = 12;
 	static constexpr Color BOMB_COLOR = GRAY;
 	static constexpr float PLAYER_RADIUS = 8;
