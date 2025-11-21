@@ -69,6 +69,8 @@ namespace meteor
 			success &= stream.serialize(state.m_tilemap.m_tiles[i]);
 		}
 
+		success &= stream.serialize(state.m_tick);
+
 		return success;
 	}
 
@@ -78,8 +80,7 @@ namespace meteor
 		bool success = true;
 		//success &= stream.serialize(message.m_type);
 		success &= serialize<message_type, uint8>(message.m_type, stream);
-		success &= stream.serialize(message.m_tick);
-		//success &= stream.serialize(message.m_game_state);
+		//success &= stream.serialize(message.m_tick);
 		success &= serialize(message.m_game_state, stream);
 		return success;
 	}
@@ -89,10 +90,9 @@ namespace meteor
 	bool game_state_message::read(byte_stream_reader& reader) { return serialize(*this, reader); }
 
 
-	game_state_message::game_state_message(game_state state, uint32 tick)
+	game_state_message::game_state_message(game_state state)
 		: m_type(message_type::GAME_STATE)
 		, m_game_state(state)
-		, m_tick(tick)
 	{
 	}
 

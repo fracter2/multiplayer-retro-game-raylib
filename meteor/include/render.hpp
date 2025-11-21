@@ -103,10 +103,12 @@ namespace meteor::render {
 		int i = 0;
 		for (player_info player : game_instance.m_player_info) {
 			
-			str += TextFormat("Player %d: %s, input from tick: %d ("
+			const double input_delay = ((double)(game_instance.m_state.m_tick) - (double)(game_instance.m_state.m_players[i].m_prev_action_tick)) * TICK_TIME;
+
+			str += TextFormat("Player %d: %s, input_delay: %f ("
 				, i
 				, player.m_name
-				, game_instance.m_state.m_players[i].m_prev_action_tick
+				, input_delay
 			);
 			str += player_info::status_to_str(player.m_player_status);
 			str += ")\n";

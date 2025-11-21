@@ -99,7 +99,7 @@ namespace meteor::server_send_system {
 
 
 				// Type safe const to reduce word lengths and to emphasise when it's mutable or not (to avoid setting accidently)
-				const uint32&		 tick = game_instance.m_tick;
+				const uint32&		 tick = game_instance.m_state.m_tick;
 				const game_state&    state = game_instance.m_state;
 				const player_entity& player = state.get_player(client_index);
 
@@ -128,8 +128,8 @@ namespace meteor::server_send_system {
 				
 				int queued_states_count = game_instance.m_states_not_sent;						// Make local for this conn-loop. Reset at end of update()
 				if (queued_states_count >= 1) {
-					const uint32 state_tick = game_instance.m_tick;
-					game_state_message state_message = game_state_message(game_instance.m_state, state_tick);
+					const uint32 state_tick = game_instance.m_state.m_tick;
+					game_state_message state_message = game_state_message(game_instance.m_state);
 					if (writer.m_stream.can_fit(sizeof(state_message))) {	// LIMIT TO MAX PACKAGE SIZE
 						state_message.write(writer);
 					}
@@ -141,8 +141,8 @@ namespace meteor::server_send_system {
 				}
 				
 				while (queued_states_count >= 1) {
-					const uint32 state_tick = game_instance.m_tick - queued_states_count;
-					game_state_message state_message = game_state_message(game_instance.m_state_history[queued_states_count - 1], state_tick);
+					const uint32 state_tick = game_instance.m_state.m_tick - queued_states_count;
+					game_state_message state_message = game_state_message(game_instance.m_state_history[queued_states_count - 1]);
 					if (writer.m_stream.can_fit(sizeof(state_message))) {	// LIMIT TO MAX PACKAGE SIZE
 						state_message.write(writer);
 					}

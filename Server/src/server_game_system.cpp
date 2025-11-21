@@ -54,7 +54,7 @@ namespace meteor::server_game_system {
 
 		// Apply player actions
 		uint8 player_index = 0;
-		for (player_entity player : game_instance.m_state.m_players) {
+		for (player_entity& player : game_instance.m_state.m_players) {
 			if (player.m_dead) continue;
 
 
@@ -73,7 +73,7 @@ namespace meteor::server_game_system {
 		// Detonate any bomboes
 		uint8 bomb_index = 0;
 		for (const bomb& da_bomb : game_instance.m_state.m_bombs) {
-			if (da_bomb.m_explosion_tick == game_instance.m_tick) {
+			if (da_bomb.m_explosion_tick == game_instance.m_state.m_tick) {
 				game_instance.m_state.apply_bomb_explosion(da_bomb);
 			}
 			bomb_index++;

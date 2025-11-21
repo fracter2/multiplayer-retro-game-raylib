@@ -186,12 +186,13 @@ namespace meteor::client_recieve_system {
 						game_state_message message;		// WHY ERROR
 						if (!message.read(reader)) { print_error_code(); break; }
 
-						int ticks_ahead = (int)message.m_tick - (int)game_instance.m_tick; 
+						const uint32 msg_tick = message.m_game_state.m_tick;
+						int ticks_ahead = (int)msg_tick - (int)game_instance.m_state.m_tick;
 
-						if (ticks_ahead < 0) { debug::info("%g - recieved gamestate that is behind at tick: %d, local tick: %d, ignoring", GetTime(), message.m_tick, game_instance.m_tick); 
+						if (ticks_ahead < 0) { debug::info("%g - recieved gamestate that is behind at tick: %d, local tick: %d, ignoring", GetTime(), msg_tick, game_instance.m_state.m_tick);
 							break; 
 						}
-						if (ticks_ahead == 0) { debug::info("%g - recieved gamestate that is on current tick: %d", GetTime(), message.m_tick); 
+						if (ticks_ahead == 0) { debug::info("%g - recieved gamestate that is on current tick: %d", GetTime(), msg_tick);
 							// TODO Consider replacing current with recieved new
 							break; 
 						}

@@ -242,12 +242,12 @@ namespace meteor {
 
 #ifdef _SERVER
 	void game::push_state_to_history() {
-		m_tick += 1;
 		m_state_history.insert(m_state_history.begin(), m_state);
 		m_states_not_sent += 1;
 		while (m_state_history.size() >= game::STATE_HISTORY_LENGTH) {
 			m_state_history.pop_back();
 		}
+		m_state.m_tick += 1;
 	}
 #endif
 

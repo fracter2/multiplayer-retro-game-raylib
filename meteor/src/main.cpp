@@ -90,7 +90,7 @@ int main(int argc, char **argv)
 
 			game_update_system::update(game_instance, input);
 
-			client_send_system::update(ticks, time, socket, server_connection, local_endpoint, game_instance);
+			client_send_system::update(ticks, socket, server_connection, local_endpoint, game_instance);
 
 			BeginDrawing();
 			render::client_system(ticks, time, game_instance, server_connection, texture, menu);

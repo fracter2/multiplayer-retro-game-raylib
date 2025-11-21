@@ -45,6 +45,17 @@ namespace meteor::render{
 		else if (game_instance.m_status == game::status::PRE_GAME) {
 			// TODO RENDER GAME LOBBY (if in lobby
 			render_player_info(Vector2i(8, 40), game_instance);
+
+			{ // "Waiting for server to start"
+				constexpr int font_size = 40;
+				constexpr Color color = MAROON;
+				const char* text = TextFormat("Waiting for server to start");
+				const int text_width = MeasureText(text, font_size);
+				const int text_x = (GetScreenWidth() - text_width) / 2;
+				const int text_y = 8;
+				DrawText(text, text_x + 1, text_y + 1, font_size, BLACK);
+				DrawText(text, text_x, text_y, font_size, color);
+			}
 		}
 		
 

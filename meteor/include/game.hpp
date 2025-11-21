@@ -200,7 +200,7 @@ namespace meteor {
 	};
 
 	struct player_entity {
-		static constexpr double MOVE_SPEED = 20;
+		static constexpr double MOVE_SPEED = 2;
 
 		// All player character actions, can only be performed one at a time per tick.
 		// Should have a predictable way of being applied, used for latency state
@@ -301,6 +301,7 @@ namespace meteor {
 		player_entity m_players[MAX_PLAYERS] = {};
 		bomb		  m_bombs[MAX_PLAYERS] = {};
 		tilemap		  m_tilemap = {};
+		uint32		  m_tick = 0;
 
 		const player_entity& get_player(const int index) const;
 		const bomb& get_bomb(const int index) const;
@@ -316,8 +317,9 @@ namespace meteor {
 
 
 	struct game {
-		static constexpr int ACTIONS_BUFFER_LENGTH = 12;
+		//static constexpr int ACTIONS_BUFFER_LENGTH = 12;
 		static constexpr int STATE_HISTORY_LENGTH = 30;
+		static constexpr int STATE_QUEUE_LENGTH = 6;
 		
 		static const Vector2i GET_PLAYER_START_TILE(const int& i) {
 			
@@ -346,12 +348,11 @@ namespace meteor {
 		player_info m_player_info[MAX_PLAYERS] = {};
 
 		game_state  m_state = {};
-		uint32		m_tick = 0;
+		//uint32	m_tick = 0;
 		status		m_status = status::INVALID;
 
 #ifdef _CLIENT
 		int					  m_user_index = -1;								// index of local user client
-		//player_entity::action m_predict_actions[ACTIONS_BUFFER_LENGTH] = {};	// un-acked actions by player, used to client-side-predict
 
 		std::vector<player_entity::action> m_predict_actions = std::vector<player_entity::action>();
 		mutable uint8							   m_actions_not_sent = 0;				// Used by the send system to know what is queued. Mutable so send system can modify despite const refrence, for type safety
@@ -375,23 +376,19 @@ namespace meteor {
 	};
 
 
-	static void interp_game_states(const game_state& from, const game_state& to, std::vector<game_state>& result_arr, const int desired_interp_states) {
+	static void interp_game_states(const game_state& from, const game_state& to, std::vector<game_state>& result_arr) {
+		if (to.m_tick - from.m_tick <= 0) { return; }
 
-		assert(desired_interp_states > 0);
-		if (desired_interp_states <= 0) { return; }
-
-		// "to" state i, skipped since it's just TO state
-		const int to_i = desired_interp_states + 1;
-		
-		// Skip 0 since that is just the FROM state
-		for (int i = 1; i < to_i; i++) {
-			const float fraction = (float)(i) / (float)(to_i);
+		// Skip 0 since that is just the 'from' state
+		for (int i = 1; i < (int)to.m_tick; i++) {
+			const float fraction = (float)(i) / (float)(to.m_tick);
 			game_state state = game_state(from);
-
+			state.m_tick += i;
 
 			int plr_i = 0;
 			for (player_entity& player : state.m_players) {
 				player.m_position = Vector2Lerp(player.m_position, to.m_players[plr_i].m_position, fraction);
+				plr_i++;
 			}
 			result_arr.push_back(state);
 		}

@@ -37,7 +37,6 @@ namespace meteor::client_send_system {
 	// Keep all dependencies as arguments to make them clearly visible
 	void update(
 		const uint32& ticks,
-		const double time,
 		udp_socket& socket,
 		connection& connection,
 		const ip_endpoint& client_endpoint,

@@ -39,18 +39,18 @@ namespace meteor::game_update_system {
 
 		// ======== IN_GAME ========
 
-		if (game_instance.m_state_queue.size() == 0) {			// Extrapolate
+		if (game_instance.m_state_queue.size() == 0) {							// Extrapolate
 			// or... not? just freeze?
 			// Extrapolate only to a degree?
 			return;
 		}
-		else if (game_instance.m_state_queue[0].is_default()) { // Interpolate between current and next valid state
-			
+
+		else if (game_instance.m_state_queue[0].is_default()) {					// Interpolate between current and next valid state
 			int count = 0;
 			while (game_instance.m_state_queue[count].is_default()) { count++; }
 
 			std::vector<game_state> r = {};
-			interp_game_states(game_instance.m_state, game_instance.m_state_queue[count], r, count);
+			interp_game_states(game_instance.m_state, game_instance.m_state_queue[count], r);
 			
 			assert(count == r.size());
 
@@ -60,18 +60,15 @@ namespace meteor::game_update_system {
 				count++; 
 			}
 		}
-		// set state normally
+
 		game_instance.m_prev_state = game_instance.m_state;
 		game_instance.m_state = game_instance.m_state_queue[0];
 		game_instance.m_state_queue.erase(game_instance.m_state_queue.begin());
-		
-
-		game_instance.m_tick += 1;
 
 		
 		// Type safe const to reduce word lengths and to emphasise when it's mutable or not (to avoid setting accidently)
 		const uint8			 user_index  = (uint8)game_instance.m_user_index;
-		const uint32&		 tick		 = game_instance.m_tick;
+		const uint32&		 tick		 = game_instance.m_state.m_tick;
 		const game_state&	 state	     = game_instance.m_state;
 		const player_entity& user_player = state.get_player(user_index);
 
@@ -95,7 +92,7 @@ namespace meteor::game_update_system {
 
 
 		// Remove predicted actions that have been used by the server
-		int ticks_ahead = game_instance.m_tick - user_player.m_prev_action_tick;
+		int ticks_ahead = game_instance.m_state.m_tick - user_player.m_prev_action_tick;
 		int ticks_to_remove = (int)game_instance.m_predict_actions.size() - ticks_ahead;
 
 		if (ticks_to_remove > 0) {
