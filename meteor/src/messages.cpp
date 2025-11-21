@@ -62,10 +62,11 @@ namespace meteor
 		}
 		//success &= stream.serialize(state.m_tilemap);
 
-		//for (uint8 tile : state.m_tilemap.m_tiles) 
-		for (int i = 0; i < tilemap::BYTES_NEEDED; i++)
-		{	// As long as this is constant between sender / reciever, this is fine.
-			success &= stream.serialize(tile);
+		//for (uint8 tile : state.m_tilemap.m_tiles) {
+		//success &= stream.serialize(tile);
+		//}
+		for (int i = 0; i < tilemap::BYTES_NEEDED; i++) {
+			success &= stream.serialize(state.m_tilemap.m_tiles[i]);
 		}
 
 		return success;
