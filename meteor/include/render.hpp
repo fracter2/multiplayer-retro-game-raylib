@@ -75,9 +75,11 @@ namespace meteor::render {
 		int i = 0;
 		for (player_info player : game_instance.m_player_info) {
 			
-			str += TextFormat("Player %d: %s ("
+			str += TextFormat("Player %d: %s, input from tick: %d ("
 				, i
-				, player.m_name);
+				, player.m_name
+				, game_instance.m_state.m_players[i].m_prev_action_tick
+			);
 			str += player_info::status_to_str(player.m_player_status);
 			str += ")\n";
 			i++;
