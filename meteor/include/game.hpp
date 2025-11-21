@@ -202,7 +202,7 @@ namespace meteor {
 	};
 
 	struct player_entity {
-		static constexpr double MOVE_SPEED = 2;
+		static constexpr double MOVE_SPEED = 5;
 
 		// All player character actions, can only be performed one at a time per tick.
 		// Should have a predictable way of being applied, used for latency state
@@ -283,9 +283,9 @@ namespace meteor {
 #endif // _SERVER
 
 	struct bomb {
-		static constexpr double FUSE_TIME = 2.0;
+		static constexpr double FUSE_TIME = 1.5;
 		static constexpr uint32 FUSE_TICKS = (uint32)(FUSE_TIME * (double)TICK_RATE);
-		static constexpr uint32 COOLDOWN_TICKS = (uint32)(0.5 * (double)TICK_RATE);
+		static constexpr uint32 COOLDOWN_TICKS = (uint32)(0.3 * (double)TICK_RATE);
 
 		bomb() = default;
 		bomb(uint8 x, uint8 y, int32 explosion_tick);
