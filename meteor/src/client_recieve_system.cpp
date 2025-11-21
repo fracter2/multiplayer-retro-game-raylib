@@ -208,7 +208,7 @@ namespace meteor::client_recieve_system {
 						}
 
 						game_instance.m_state_queue[ticks_ahead - 1] = message.m_game_state;
-						debug::info("%g - recieved gamestate tick: %d, local tick: %d", GetTime(), message.m_tick, game_instance.m_tick);
+						//debug::info("%g - recieved gamestate tick: %d, local tick: %d", GetTime(), message.m_tick, game_instance.m_tick);
 
 						break;
 					}

@@ -225,42 +225,55 @@ namespace meteor {
 
 #ifdef _SERVER
 	struct player_action_queue {
-		static constexpr uint8 SIZE = 3;		// NOTE: The point of this queue is to allow multiple input to be stretched over a longer period sent at 
-												// the same time, but this inherently means adding delay.
+		
+		
+	public:
+		static constexpr int SIZE = 3;		// NOTE: The point of this queue is to allow multiple input to be stretched over a longer period sent at 
+												// the same time, but this inherently means adding delay. 
+												// If we could afford increasing Network send-rate to match game tickrate, it would be avoided
 		
 		player_action_queue() = default;
 		
 		bool is_empty() const { return m_size == 0; }
 		
+
+		void consume_next() {
+			assert(m_size > 0);
+			const int newest = (int)m_size - 1;
+			for (int i = 0; i < newest; i++) {
+				m_actions[i] = m_actions[i + 1];
+				m_ticks[i] = m_ticks[i + 1];
+			}
+			// Since everything was moved down a step, the last becomes empty
+			m_actions[newest] = {};
+			m_ticks[newest] = {};
+			m_size--;
+		}
+
 		// Reads oldest value and consumes it
 		std::pair<player_entity::action, uint32> read_next() {
 			assert(!is_empty());
 
 			std::pair<player_entity::action, uint32> r = std::pair<player_entity::action, uint32>(m_actions[0], m_ticks[0]);
+			consume_next();
 
 			return r;
 		}
 
 		// Adds new to the last index, removing the oldest element to make space (if full)
 		void append_new(player_entity::action action, uint32 tick) {
-			if (m_size == SIZE) {
-				m_size--;
-				for (int i = 0; i < m_size; i++) {
-					m_actions[i] = m_actions[i + 1];
-					m_ticks[i] = m_ticks[i + 1];
-				}
-				m_actions[m_size] = {};
-				m_ticks[m_size] = {};
-			}
+			while (m_size >= SIZE) consume_next();
 			
-			m_actions[m_size] = action;
-			m_ticks[m_size] = tick;
-			m_size++;
+			if (m_size < SIZE) {
+				m_actions[m_size] = action;
+				m_ticks[m_size] = tick;
+				m_size++;
+			}
 			return;
 		}
 
 	private:	// These properties and elements are not invalidated / reset when not in-queue, so we don't let it be checked
-		uint8 m_size = 0;
+		uint32 m_size = 0;
 		player_entity::action m_actions[SIZE] = {};
 		uint32 m_ticks[SIZE] = {};
 

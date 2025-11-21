@@ -74,7 +74,7 @@ namespace meteor::client_send_system {
 				
 			}
 			
-			debug::info("sending payload package");
+			//debug::info("sending payload package");
 			if (!socket.send_to(conn.m_endpoint, stream_send)) { print_error_code(); }
 			else {
 				// TODO LOG DATA SENT
