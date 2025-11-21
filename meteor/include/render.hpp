@@ -14,10 +14,11 @@
 namespace meteor::render {
 
 	namespace atlass {	// Texture atlass sources coordinates, manually aligned
-		static constexpr Rectangle WALL = { 0, 0, 16, 16 };
-		static constexpr Rectangle PLAYER = { 0, 0, 16, 16 };
-		static constexpr Rectangle PLAYER_DEAD = { 0, 0, 16, 16 };
-		static constexpr Rectangle BOMB = { 0, 0, 16, 16 };
+		static constexpr Rectangle BACKGROUND = { 0, 0, 16, 16 };
+		static constexpr Rectangle WALL = { 16, 0, 16, 16 };
+		static constexpr Rectangle PLAYER = { 32, 0, 16, 16 };
+		static constexpr Rectangle PLAYER_DEAD = { 48, 0, 16, 16 };
+		static constexpr Rectangle BOMB = { 64, 0, 16, 16 };
 	};
 
 	static constexpr float BOMB_RADIUS = 12;
@@ -32,11 +33,13 @@ namespace meteor::render {
 
 	
 	static void render_map(const Texture& texture, const tilemap& map) {
+		static constexpr Vector2 MAP_OFFSET = Vector2(100, 100);
+
 		for (int i = 0; i < tilemap::COUNT; i++) {
 			if (!map.is_tile_active(i)) { continue; }
 
 			Vector2i c = index_to_coord(i);
-			const Vector2 pos = Vector2((float)c.x, (float)c.y) * (float)tilemap::TILE_PIXEL_LENGTH;
+			const Vector2 pos = MAP_OFFSET + Vector2((float)c.x, (float)c.y) * (float)tilemap::TILE_PIXEL_LENGTH;
 			const Rectangle destination{ pos.x, pos.y, (float)tilemap::TILE_PIXEL_LENGTH, (float)tilemap::TILE_PIXEL_LENGTH };
 			DrawTexturePro(texture, atlass::WALL, destination, Vector2(0, 0), 0.0f, WHITE);
 		}
