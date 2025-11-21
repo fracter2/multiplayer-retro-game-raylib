@@ -35,7 +35,6 @@ namespace meteor::game_update_system {
 			return;
 		}
 
-		// TODO Singleplayer mode?
 
 
 		// ======== IN_GAME ========
@@ -53,12 +52,19 @@ namespace meteor::game_update_system {
 			std::vector<game_state> r = {};
 			interp_game_states(game_instance.m_state, game_instance.m_state_queue[count], r, count);
 			
+			assert(count == r.size());
+
+			count = 0;
+			while (game_instance.m_state_queue[count].is_default()) { 
+				game_instance.m_state_queue[count] = r[count];
+				count++; 
+			}
 		}
-		else { // set state normally
-			game_instance.m_prev_state = game_instance.m_state;
-			game_instance.m_state = game_instance.m_state_queue[0];
-			game_instance.m_state_queue.erase(game_instance.m_state_queue.begin());
-		}
+		// set state normally
+		game_instance.m_prev_state = game_instance.m_state;
+		game_instance.m_state = game_instance.m_state_queue[0];
+		game_instance.m_state_queue.erase(game_instance.m_state_queue.begin());
+		
 
 		game_instance.m_tick += 1;
 
@@ -71,7 +77,7 @@ namespace meteor::game_update_system {
 
 
 		// INPUT PARSING
-		player_entity::action current_action = {};
+		player_entity::action current_action = player_entity::action::INVALID;
 		const bool vertical_active = input_state.m_up != input_state.m_down;
 		const bool horizontal_active = input_state.m_left != input_state.m_right;
 
@@ -85,7 +91,7 @@ namespace meteor::game_update_system {
 
 		game_instance.m_predict_actions.push_back(current_action);
 		game_instance.m_actions_not_sent += 1;
-
+		assert(game_instance.m_predict_actions.size() != 0);
 
 
 		// Remove predicted actions that have been used by the server
@@ -94,6 +100,7 @@ namespace meteor::game_update_system {
 
 		if (ticks_to_remove > 0) {
 			game_instance.m_predict_actions.erase(game_instance.m_predict_actions.begin(), game_instance.m_predict_actions.begin() + ticks_to_remove);
+			
 		}
 
 		
