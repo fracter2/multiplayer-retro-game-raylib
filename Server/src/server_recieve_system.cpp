@@ -16,17 +16,14 @@ namespace meteor::server_recieve_system {
 
 	void update(const double time, server_state& server, udp_socket& socket, game& game_instance, ip_endpoint& local_endpoint) {
 
-		{// timeout
-			uint8 i = 0;
+		{// timeout check
+			uint32 i = 0;
 			for (connection& conn : server.m_clients) {
 				if (conn.m_status != connection::status::DISCONNECTED
 				&& time > conn.m_last_recieve_time + TIMEOUT)
 				{
 					debug::info("Timeout player: %d", i);
-					conn.m_status = connection::status::DISCONNECTED;
-					conn.m_send_sequence = 0;
-					conn.m_recieve_sequence = 0;
-					conn.m_recieve_acknowledge = 0;
+					conn.set_disconnected();
 
 					game_instance.m_player_info[i].m_player_status = player_info::status::TIMED_OUT;
 					game_instance.game_lobby_changed = true;			// Queue for the send system to send lobby state message
@@ -159,6 +156,7 @@ namespace meteor::server_recieve_system {
 			// ======== PAYLOAD ========
 			case protocol_packet_type::PAYLOAD:
 			{
+				const int packet_size = stream_recieve.size();
 				payload_packet packet;
 				if (!packet.read(reader)) { debug::info("%g - error reading payload package", GetTime()); print_error_code(); break; }
 
@@ -193,27 +191,11 @@ namespace meteor::server_recieve_system {
 					game_instance.game_lobby_changed = true;			// Queue for the send system to send lobby state message
 					debug::info("%g - client %d joined gracefully", GetTime(), client_index);
 				}
-				if (conn.m_status != connection::status::CONNECTED) {
-					
-					debug::info("%g - recieved payload package when irrelevant", GetTime());
-					continue;
-				}
-
-				// Sequence
-				if (packet.m_sequence <= conn.m_recieve_sequence) {
-					debug::info("out-of-order or duplicate packet dropped. my recieve_sequenece: %d, packet sequence: %d, time: %f "
-						, (conn.m_recieve_sequence)
-						, (packet.m_sequence)
-						, (GetTime())
-					);
-					continue;
-				}
-
-				// move to after validation of good message type
-				conn.m_last_recieve_time = time;
-				conn.m_recieve_sequence = packet.m_sequence;
-				conn.m_recieve_acknowledge = packet.m_acknowledge;
 				
+				
+				if (!conn.can_recieve(packet)) continue;
+				else conn.log_payload(packet, packet_size);
+
 
 				// ---- MESSAGES ----
 				while (reader.has_data())

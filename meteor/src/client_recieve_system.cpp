@@ -15,7 +15,7 @@ namespace meteor::client_recieve_system {
 			&& time > conn.m_last_recieve_time + TIMEOUT) 
 		{
 			debug::info("Timeout");
-			disconnect(conn);
+			conn.set_disconnected();
 		}
 
 
@@ -135,7 +135,7 @@ namespace meteor::client_recieve_system {
 				}//!Status switch
 
 				conn.m_last_recieve_time = time;
-				disconnect(conn);
+				conn.set_disconnected();
 				
 				break;
 			}//!Disconnect
@@ -144,26 +144,12 @@ namespace meteor::client_recieve_system {
 			// ======== PAYLOAD ========
 			case protocol_packet_type::PAYLOAD:
 			{
+				const int packet_size = stream_recieve.size();
 				payload_packet packet;
 				if (!packet.read(reader)) { debug::info("%g - error reading payload package", GetTime()); print_error_code(); break; }
 				
-
-				if (conn.m_status != connection::status::CONNECTED) {
-					debug::info("%g - recieved payload package when irrelevant", GetTime());
-					continue;
-				}
-
-				if (packet.m_sequence <= conn.m_recieve_sequence) {
-					debug::info("%g - out-of-order packet dropped. my recieve_sequenece: %d, packet sequence: %d"
-						, (GetTime())
-						, (conn.m_recieve_sequence)
-						, (packet.m_sequence)
-					);
-					continue;
-				}
-				conn.m_last_recieve_time = time;
-				conn.m_recieve_sequence = packet.m_sequence;
-				conn.m_recieve_acknowledge = packet.m_acknowledge;
+				if (!conn.can_recieve(packet)) continue;
+				else conn.log_payload(packet, packet_size);
 
 				uint32 msg_sequence = packet.m_sequence; // TODO FOR RELIABLE MESSAGES, set by message_type::SEQUENCE_WRAP, ignore message if conn.sequence is higher.
 				
@@ -172,7 +158,7 @@ namespace meteor::client_recieve_system {
 				while (reader.has_data())
 				{
 					uint8 t = reader.peek();
-					if (t >= (uint8)message_type::MAX) {	// check if it's above max message_type value
+					if (t >= (uint8)message_type::MAX) {
 						debug::info("%g - recieved unknown message type.", GetTime());
 						continue;
 					}
@@ -183,7 +169,7 @@ namespace meteor::client_recieve_system {
 					// ---- GAME_STATE ----
 					case message_type::GAME_STATE:
 					{
-						game_state_message message;		// WHY ERROR
+						game_state_message message;	
 						if (!message.read(reader)) { print_error_code(); break; }
 
 						const uint32 msg_tick = message.m_game_state.m_tick;
@@ -251,14 +237,6 @@ namespace meteor::client_recieve_system {
 		} // !while socket.has_data()
 	} // !update()
 
-
-	void disconnect(connection& conn) {
-		conn.m_endpoint = {};
-		conn.m_status = connection::status::DISCONNECTED;
-		conn.m_send_sequence = 0;
-		conn.m_recieve_sequence = 0;
-		conn.m_recieve_acknowledge = 0;
-	}
 
 }//!namespace
 

@@ -16,6 +16,4 @@ namespace meteor::client_recieve_system {
 		connection& conn,
 		game& game
 	);
-
-	void disconnect(connection& conn);
 }

@@ -7,15 +7,6 @@
 
 namespace meteor::server_send_system {
 
-	static void disconnect_conn(connection& conn, server_state& server) {
-		//conn.m_endpoint = {};				// We could let this stay until it is overriden by new player. This way we know who "recently deleted" 
-											// and can reply with more disconnect packets, in case of packet loss.
-		conn.m_status = connection::status::DISCONNECTED;
-		conn.m_send_sequence = 0;
-		conn.m_recieve_sequence = 0;
-		conn.m_recieve_acknowledge = 0;
-	}
-
 	static void send_broadcast(udp_socket& socket,
 		server_state& server,
 		const ip_endpoint& local_endpoint,
@@ -34,6 +25,15 @@ namespace meteor::server_send_system {
 			// TODO LOG DATA SENT
 		}
 	}
+
+#define SAFE_WRITE(message)																	\
+if (writer.m_stream.can_fit(sizeof(message)))	{										\
+	message.write(writer);																\
+}																							\
+else {																						\
+	debug::warn("%g - message cannot fit!, size: %d", GetTime(), stream_send.size());			\
+	break;																						\
+}
 
 	void update(
 		const uint32& ticks,
@@ -84,42 +84,29 @@ namespace meteor::server_send_system {
 				connect_packet packet;
 				packet.write(writer);
 
-				if (!socket.send_to(conn.m_endpoint, stream_send)) { print_error_code(); }
-				else {
-					// TODO LOG DATA SENT
-				}
+				conn.send(socket, stream_send);
 
 				break;
 			}
 
 			case connection::status::CONNECTED: {
-				conn.m_send_sequence += 1;
-				payload_packet packet(conn.m_send_sequence, conn.m_recieve_sequence);
-				packet.write(writer);
 
+				payload_packet packet(conn.get_send_sequence(), conn.get_recieve_sequence());
+				packet.write(writer);
 
 				// Type safe const to reduce word lengths and to emphasise when it's mutable or not (to avoid setting accidently)
 				const uint32&		 tick = game_instance.m_state.m_tick;
 				const game_state&    state = game_instance.m_state;
 				const player_entity& player = state.get_player(client_index);
 
-
 				assert(game_instance.m_status != game::status::INVALID);	
-
 
 				// -------- LOBBY STATE MESSAGE --------
 
 				if (game_instance.game_lobby_changed || game_instance.queue_game_start) {
 					game_lobby_message lobby_message = game_lobby_message(game_instance.queue_game_start, game_instance, game_instance.m_status);
-					if (writer.m_stream.can_fit(sizeof(lobby_message))) {	// LIMIT TO MAX PACKAGE SIZE
-						lobby_message.write(writer);
-					}
-					else { 
-						debug::warn("%g - message cannot fit!, size: %d", GetTime(), stream_send.size());
-						break; 
-					}
+					SAFE_WRITE(lobby_message);
 				}
-				
 
 
 				// -------- GAME STATE MESSAGE --------
@@ -130,39 +117,20 @@ namespace meteor::server_send_system {
 				if (queued_states_count >= 1) {
 					const uint32 state_tick = game_instance.m_state.m_tick;
 					game_state_message state_message = game_state_message(game_instance.m_state);
-					if (writer.m_stream.can_fit(sizeof(state_message))) {	// LIMIT TO MAX PACKAGE SIZE
-						state_message.write(writer);
-					}
-					else {
-						debug::warn("%g - message cannot fit!, size: %d", GetTime(), stream_send.size());
-						break;
-					}
+					SAFE_WRITE(state_message);
+					
 					queued_states_count--;
 				}
 				
 				while (queued_states_count >= 1) {
 					const uint32 state_tick = game_instance.m_state.m_tick - queued_states_count;
 					game_state_message state_message = game_state_message(game_instance.m_state_history[queued_states_count - 1]);
-					if (writer.m_stream.can_fit(sizeof(state_message))) {	// LIMIT TO MAX PACKAGE SIZE
-						state_message.write(writer);
-					}
-					else {
-						debug::warn("%g - message cannot fit!, size: %d", GetTime(), stream_send.size());
-						break;
-					}
+					SAFE_WRITE(state_message);
+
 					queued_states_count--;
 				}
 				
-
-				//debug::info("%g - sending payload package to client %d, size: %d", GetTime(), client_index, stream_send.size());
-				if (!socket.send_to(conn.m_endpoint, stream_send)) { print_error_code(); }
-				else {
-					// TODO LOG DATA SENT
-				}
-
-
-				// -------- RELIABLE MESSAGES --------
-				// TODO Send all un-aked messages for this client as RELIABLE MESSAGES using sequence wrapper (to allow client to avoid doubble-recieving a msg)
+				conn.send(socket, stream_send);
 
 				break;
 			} // !CONNECTED
@@ -181,12 +149,8 @@ namespace meteor::server_send_system {
 				packet.write(writer);
 
 				debug::info("%g - sending disconnect package to disconnecting client: %d", GetTime(), client_index);
-				if (!socket.send_to(conn.m_endpoint, stream_send)) { print_error_code(); }
-				else {
-					// TODO LOG DATA SENT
-
-					disconnect_conn(conn, server);
-				}
+				conn.send(socket, stream_send);
+				conn.set_disconnected();
 
 				break;
 			}
