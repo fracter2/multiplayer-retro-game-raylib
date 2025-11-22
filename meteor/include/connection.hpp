@@ -24,11 +24,8 @@ namespace meteor {
 			TEXAS,				// texas
 		};
 
-		static constexpr uint32 MAX_LOGGED_PACKETS = 20 * 10; // Max logged packets. 20/s sent packets * 10 sec
+		static constexpr uint32 MAX_LOGGED_PACKETS = 20 * 5; // Max logged packets. 20/s * 5 sec
 
-
-
-		connection() = default;
 		connection(ip_endpoint endpoint, status status = status::DISCONNECTED);
 
 		bool can_recieve(const payload_packet& packet) const;
