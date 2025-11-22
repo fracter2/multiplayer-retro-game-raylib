@@ -10,7 +10,7 @@
 namespace meteor::render {
 	
 
-	void server_system(const uint32& tick, const double time, const game& game_instance, const server_state& server, const Texture& texture, ui::main_menu& menu) {
+	void server_system(const uint32& tick, const game& game_instance, const server_state& server, const Texture& texture) {
 		// TODO CLEAR
 		ClearBackground(SKYBLUE);
 

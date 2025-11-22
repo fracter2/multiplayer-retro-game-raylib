@@ -57,7 +57,6 @@ namespace meteor::render {
 	static void render_bombs(const Texture& texture, const game& game_instance) {
 		for (const bomb& da_bomb : game_instance.m_state.m_bombs) {
 			if (da_bomb.m_explosion_tick >= game_instance.m_state.m_tick) {
-				//DrawCircle((int)da_bomb.m_x, (int)da_bomb.m_y, BOMB_RADIUS, BOMB_COLOR); 
 				const Vector2 pos = MAP_OFFSET + Vector2((float)da_bomb.m_x, (float)da_bomb.m_y) * (float)tilemap::TILE_PIXEL_LENGTH;
 				const Rectangle destination{ pos.x, pos.y, (float)tilemap::TILE_PIXEL_LENGTH, (float)tilemap::TILE_PIXEL_LENGTH };
 				DrawTexturePro(
@@ -74,8 +73,6 @@ namespace meteor::render {
 	static void render_characters(const Texture& texture, const game& game_instance) {
 		int i = 0;
 		for (const player_entity& player : game_instance.m_state.m_players) {
-			//if (player.m_dead) { DrawCircleV(player.m_position, PLAYER_RADIUS, PLAYER_COLOR_DEAD); }
-			//else			   { DrawCircleV(player.m_position, PLAYER_RADIUS, PLAYER_COLOR); }
 			const Vector2 pos = MAP_OFFSET + player.m_position * (float)tilemap::TILE_PIXEL_LENGTH;
 			const Rectangle destination{ pos.x, pos.y, (float)tilemap::TILE_PIXEL_LENGTH, (float)tilemap::TILE_PIXEL_LENGTH };
 			DrawTexturePro(

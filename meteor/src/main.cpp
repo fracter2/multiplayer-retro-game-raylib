@@ -35,21 +35,18 @@ int main(int argc, char **argv)
 
 	// ==== APP DATA ====
 	constexpr uint16 PORT = 54321;
-	const ip_endpoint SERVER_ENDPOINT(ip_address(192, 168, 1, 72), PORT);	// for testing only. BROADCASTS will connect for you
 	ip_endpoint local_endpoint = {};
-	//ip_endpoint server_endpoint = SERVER_ENDPOINT;
-	udp_socket socket = {};
-	connection server_connection = {};
+	udp_socket  socket = {};
+	connection  server_connection = {};
 
-	game game_instance = {};
+	game			   game_instance = {};
 	input::input_state input = {};
-	ui::main_menu menu = {};
 	
 	double next_tick_time = GetTime();
 	uint32 ticks = 0;
-	float dt = GetFrameTime();
+	float  dt = GetFrameTime();
 	double time = GetTime();
-	bool running = true;
+	bool   running = true;
 
 	Texture texture = LoadTexture("data/tiles.png");
 
@@ -63,13 +60,6 @@ int main(int argc, char **argv)
 		local_endpoint.m_address.c(),
 		local_endpoint.m_address.d(),
 		local_endpoint.port());
-
-	//server_connection.m_status = connection::status::CONNECTING;		// for testing only
-	//debug::info("attempting to connect by default...");
-
-
-	
-	
 
 	// update loop
 	while (running) {
@@ -93,7 +83,7 @@ int main(int argc, char **argv)
 			client_send_system::update(ticks, socket, server_connection, local_endpoint, game_instance);
 
 			BeginDrawing();
-			render::client_system(ticks, time, game_instance, server_connection, texture, menu);
+			render::client_system(ticks, game_instance, server_connection, texture);
 			EndDrawing();
 
 		} //!tick loop
