@@ -39,7 +39,7 @@ namespace meteor {
 		assert(messages_just_acked >= 0); // dont read older packets!!
 
 		while (messages_just_acked > 0) {
-			m_rtt_history.insert(m_un_acked_send_times.begin(), GetTime() - m_un_acked_send_times.front());
+			m_rtt_history.insert(m_rtt_history.begin(), GetTime() - m_un_acked_send_times.front());
 			m_un_acked_send_times.pop_back();
 		}
 		while (m_rtt_history.size() >= MAX_LOGGED_PACKETS)
