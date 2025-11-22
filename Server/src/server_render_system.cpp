@@ -92,13 +92,13 @@ namespace meteor::render {
 			// RENDER FPS
 			DrawFPS(2, GetScreenHeight() - 20);
 
-			render_player_info(Vector2i(8, 40), game_instance);
+			render_player_info(Vector2i(8, 40), game_instance, server);
 
-			Vector2i offset = HUD_OFFSET + Vector2(80, 20);
+			/*Vector2i offset = HUD_OFFSET + Vector2(80, 20);
 			for (const connection& conn : server.m_clients) {
 				render_connection_stats(offset, game_instance, conn);
 				offset = offset + Vector2i(0, 140);
-			}
+			}*/
 			// TODO RENDER RTT in ms (averaged across a second? sepparate peak?)
 
 			// TODO RENDER BYTES SENT PER SECOND
