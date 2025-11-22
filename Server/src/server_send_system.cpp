@@ -84,7 +84,7 @@ else {																						\
 				connect_packet packet;
 				packet.write(writer);
 
-				conn.send(socket, stream_send);
+				conn.send_stream(socket, stream_send);
 
 				break;
 			}
@@ -130,7 +130,7 @@ else {																						\
 					queued_states_count--;
 				}
 				
-				conn.send(socket, stream_send);
+				conn.send_payload(socket, stream_send);
 
 				break;
 			} // !CONNECTED
@@ -149,7 +149,7 @@ else {																						\
 				packet.write(writer);
 
 				debug::info("%g - sending disconnect package to disconnecting client: %d", GetTime(), client_index);
-				conn.send(socket, stream_send);
+				conn.send_stream(socket, stream_send);
 				conn.set_disconnected();
 
 				break;

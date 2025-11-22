@@ -34,7 +34,7 @@ namespace meteor::client_send_system {
 			connect_packet packet;
 			packet.write(writer);
 
-			conn.send(socket, stream_send);
+			conn.send_stream(socket, stream_send);
 
 			break;
 		}
@@ -45,7 +45,7 @@ namespace meteor::client_send_system {
 			packet.write(writer);
 
 			if (game_instance.m_status != game::status::IN_GAME) {
-				conn.send(socket, stream_send);
+				conn.send_payload(socket, stream_send);
 
 				break;
 			}
@@ -72,7 +72,7 @@ namespace meteor::client_send_system {
 				
 			}
 			
-			conn.send(socket, stream_send);
+			conn.send_payload(socket, stream_send);
 			
 
 			break;
@@ -92,7 +92,7 @@ namespace meteor::client_send_system {
 			disconnect_packet packet;
 			packet.write(writer);
 
-			conn.send(socket, stream_send);
+			conn.send_stream(socket, stream_send);
 
 			break;
 		}

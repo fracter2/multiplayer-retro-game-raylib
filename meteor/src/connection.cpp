@@ -21,7 +21,6 @@ namespace meteor {
 			return false;
 		}
 
-		// Sequence
 		if (packet.m_sequence <= m_recieve_sequence) {
 			debug::info("out-of-order or duplicate packet dropped. my recieve_sequenece: %d, packet sequence: %d, time: %f "
 				, (m_recieve_sequence)
@@ -50,25 +49,29 @@ namespace meteor {
 		while (m_recieve_bytes_history.size() >= MAX_LOGGED_PACKETS)
 			m_recieve_bytes_history.pop_back();
 
-		// Update
+		// Update state
 		m_last_recieve_time = GetTime();
 		m_recieve_sequence = packet.m_sequence;
 		m_recieve_acknowledge = packet.m_acknowledge;
 	}
 
-	bool connection::send(udp_socket& socket, byte_stream& stream) {
+	bool connection::send_payload(udp_socket& socket, byte_stream& stream) {
+		if (send_stream(socket, stream)) {
+			m_send_sequence++;
+			m_un_acked_send_times.push_back(GetTime());
+			return true;
+		}
+		return false;
+	}
+
+	bool connection::send_stream(udp_socket& socket, byte_stream& stream) {
 		// TODO fit reliable messages here, if there is space
 
 		if (!socket.send_to(m_endpoint, stream)) { print_error_code(); return false; }
 
-		// Logg send time and bytes
-		m_un_acked_send_times.push_back(GetTime());
-
 		m_send_bytes_history.insert(m_send_bytes_history.begin(), stream.size());
 		while (m_send_bytes_history.size() >= MAX_LOGGED_PACKETS)
 			m_send_bytes_history.pop_back();
-
-		m_send_sequence++;
 
 		return true;
 	}

@@ -33,7 +33,8 @@ namespace meteor {
 
 		bool can_recieve(const payload_packet& packet) const;
 		void log_payload(const payload_packet& packet, const uint32 size);
-		bool send(udp_socket& socket, byte_stream& stream);
+		bool send_payload(udp_socket& socket, byte_stream& stream);
+		bool send_stream(udp_socket& socket, byte_stream& stream);
 		void set_disconnected();
 
 		uint32 get_send_sequence() const { return m_send_sequence; }
