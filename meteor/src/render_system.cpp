@@ -83,13 +83,27 @@ namespace meteor::render{
 			{ // "In Menu"
 				constexpr int font_size = 40;
 				constexpr Color color = MAROON;
-				const char* text = TextFormat("Not connected");
+				const char* text = TextFormat("Not connected, waiting for server broadcast");
 				const int text_width = MeasureText(text, font_size);
 				const int text_x = (GetScreenWidth() - text_width) / 2;
 				const int text_y = 8;
 				DrawText(text, text_x + 1, text_y + 1, font_size, BLACK);
 				DrawText(text, text_x, text_y, font_size, color);
 			}
+
+#ifdef _CLIENT
+			if (game_instance.m_user_index != -1) { // "Disconnect reason"
+				constexpr int font_size = 40;
+				constexpr Color color = MAROON;
+				std::string text = "Disconnect reason: ";
+				text += player_info::status_to_str(game_instance.m_player_info[game_instance.m_user_index].m_player_status);
+				const int text_width = MeasureText(text.c_str(), font_size);
+				const int text_x = (GetScreenWidth() - text_width) / 2;
+				const int text_y = 300;
+				DrawText(text.c_str(), text_x + 1, text_y + 1, font_size, BLACK);
+				DrawText(text.c_str(), text_x, text_y, font_size, color);
+			}
+#endif 
 
 			// TODO RENDER BUTTONS / INPUT AREAS
 

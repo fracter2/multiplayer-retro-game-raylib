@@ -17,6 +17,7 @@ namespace meteor::client_recieve_system {
 			debug::info("Timeout");
 			conn.set_disconnected();
 			game_instance.m_status = game::status::INVALID;
+			game_instance.m_player_info[game_instance.m_user_index].m_player_status = player_info::status::SERVER_TIMED_OUT;
 		}
 
 

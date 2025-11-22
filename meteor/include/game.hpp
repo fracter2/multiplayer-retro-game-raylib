@@ -170,6 +170,7 @@ namespace meteor {
 			USER_LEFT,
 			KICKED,
 			TIMED_OUT,
+			SERVER_TIMED_OUT,
 			MAX
 		};
 
@@ -188,6 +189,7 @@ namespace meteor {
 			case status::USER_LEFT: return std::string("USER_LEFT");
 			case status::KICKED:	return std::string("KICKED");
 			case status::TIMED_OUT: return std::string("TIMED_OUT");
+			case status::SERVER_TIMED_OUT: return std::string("SERVER_TIMED_OUT");
 			default: return std::string("OUT_OF_RANGE STATUS");
 			}
 		};
@@ -352,16 +354,16 @@ namespace meteor {
 		status		m_status = status::INVALID;
 
 #ifdef _CLIENT
-		int					  m_user_index = -1;								// index of local user client
+		int	m_user_index = -1;								// index of local user client
 
 		std::vector<player_entity::action> m_predict_actions = std::vector<player_entity::action>();
-		mutable uint8							   m_actions_not_sent = 0;				// Used by the send system to know what is queued. Mutable so send system can modify despite const refrence, for type safety
+		mutable uint8 m_actions_not_sent = 0;				// Used by the send system to know what is queued. Mutable so send system can modify despite const refrence, for type safety
 
 		game_state m_predicted_state = {};							// Result state from m_state having predicted actions applied.
 		game_state m_prev_state = {};								// Previously played state, used for split-frame interpolation (if needed)
-		//game_state				m_state_queue[STATE_HISTORY_LENGTH] = {};
+
 		std::vector<game_state> m_state_queue = std::vector<game_state>();
-		//int						m_queued_states = 0;
+
 #endif
 
 #ifdef _SERVER
