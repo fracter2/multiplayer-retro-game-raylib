@@ -188,7 +188,7 @@ namespace meteor::server_recieve_system {
 				if (conn.m_status == connection::status::CONNECTING) {
 					conn.m_status = connection::status::CONNECTED;
 					game_instance.m_player_info[client_index].m_player_status = player_info::status::ACTIVE;
-					game_instance.game_lobby_changed = true;			// Queue for the send system to send lobby state message
+					game_instance.game_lobby_changed = true;
 					debug::info("%g - client %d joined gracefully", GetTime(), client_index);
 				}
 				
