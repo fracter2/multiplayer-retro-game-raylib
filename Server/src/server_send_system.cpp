@@ -91,7 +91,7 @@ else {																						\
 
 			case connection::status::CONNECTED: {
 
-				payload_packet packet(conn.get_send_sequence(), conn.get_recieve_sequence());
+				payload_packet packet(conn.get_send_sequence() + 1, conn.get_recieve_sequence());
 				packet.write(writer);
 
 				// Type safe const to reduce word lengths and to emphasise when it's mutable or not (to avoid setting accidently)

@@ -41,7 +41,7 @@ namespace meteor::client_send_system {
 
 		case connection::status::CONNECTED: {
 
-			payload_packet packet(conn.get_send_sequence(), conn.get_recieve_sequence());
+			payload_packet packet(conn.get_send_sequence() + 1, conn.get_recieve_sequence());
 			packet.write(writer);
 
 			if (game_instance.m_status != game::status::IN_GAME) {
