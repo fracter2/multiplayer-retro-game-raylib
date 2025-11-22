@@ -87,6 +87,16 @@ namespace meteor::render {
 		}
 	}
 
+	// Returns sec as ms with one digit after '.'
+	static std::string sec_to_ms_str_pretty(const double sec) {
+		std::string r = "";
+		r += std::to_string(sec * 1000);
+		if (r.find('.') + 2 < r.size()) {
+			r.erase(r.begin() + r.find('.') + 2, r.end());
+		}
+		r += "ms";
+		return r;
+	}
 
 	static void render_player_info(const Vector2i& coord, const game& game_instance) {
 		
