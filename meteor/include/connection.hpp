@@ -3,6 +3,10 @@
 #pragma once
 
 #include "network.hpp"
+#include "common.hpp"
+#include "protocol.hpp"
+#include "raylib.h"
+#include <algorithm>
 
 namespace meteor {
 	
@@ -20,29 +24,37 @@ namespace meteor {
 			TEXAS,				// texas
 		};
 
-		struct stats {
-			static constexpr uint32 MAX_LOGGED_PACKETS = 20 * 10; // Max logged packets. 20/s sent packets * 10 sec
-			
-		};
+		static constexpr uint32 MAX_LOGGED_PACKETS = 20 * 10; // Max logged packets. 20/s sent packets * 10 sec
+
+
 
 		connection() = default;
-		connection(ip_endpoint endpoint, status status = status::DISCONNECTED)
-			: m_endpoint(endpoint)
-			, m_last_recieve_time(0)
-			, m_status(status)
-			, m_send_sequence(0)
-			, m_recieve_sequence(0)
-			, m_recieve_acknowledge(0)
-		{
-		}
+		connection(ip_endpoint endpoint, status status = status::DISCONNECTED);
 
-		//uint32		m_id				  = 0;
-		ip_endpoint m_endpoint			  = {};
-		double		m_last_recieve_time   = 0;
-		status		m_status			  = status::DISCONNECTED;
-		uint32		m_send_sequence		  = 0;
-		uint32		m_recieve_sequence	  = 0;	// Used as send-ack
-		uint32		m_recieve_acknowledge = 0;
+		bool can_recieve(const payload_packet& packet) const;
+		void log_payload(const payload_packet& packet, const uint32 size);
+		bool send(udp_socket& socket, byte_stream& stream);
+		void set_disconnected();
+
+		uint32 get_send_sequence() const { return m_send_sequence; }
+		uint32 get_recieve_sequence() const { return m_recieve_sequence; }
+		uint32 get_recieve_acknowledge() const { return m_recieve_acknowledge; }
+
+		double get_prev_rtt() const { if (m_rtt_history.empty()) return 0; else return m_rtt_history.front(); }
+
+		ip_endpoint m_endpoint		 = {};
+		status m_status				 = status::DISCONNECTED;
+		double m_last_recieve_time = 0;
+
+	private:
+		uint32 m_send_sequence		 = 0;
+		uint32 m_recieve_sequence	 = 0;	// Used as send-ack
+		uint32 m_recieve_acknowledge = 0;
+
+		std::vector<uint32> m_send_bytes_history = {};
+		std::vector<uint32> m_recieve_bytes_history = {};
+		std::vector<double> m_rtt_history = {};
+		std::vector<double> m_un_acked_send_times = {};
 
 		// Reliable messages history here? allow any message
 		// std::vector<any message> m_reliable_messages_history		// maybe one std::vector for each message type?
