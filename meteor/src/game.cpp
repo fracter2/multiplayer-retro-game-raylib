@@ -14,24 +14,29 @@ namespace meteor {
 		int i = 0;
 		for (player_entity& player : m_state.m_players) {
 			if (m_player_info[i].m_player_status == player_info::status::ACTIVE
-				|| m_player_info[i].m_player_status == player_info::status::ACTIVE_BOT) {
+			|| m_player_info[i].m_player_status == player_info::status::ACTIVE_BOT) {
 				player.m_dead = false;
 				player.m_prev_action = player_entity::action::STAND_STILL;
-				const Vector2i coord = GET_PLAYER_START_TILE(i);
-				player.m_position = coord_to_pos_center(coord);
-
-				m_state.m_tilemap.set_tile(coord, false);
-				if (is_valid_tile(coord + Vector2i_UP))		m_state.m_tilemap.set_tile(coord + Vector2i_UP, false);
-				if (is_valid_tile(coord + Vector2i_DOWN))	m_state.m_tilemap.set_tile(coord + Vector2i_DOWN, false);
-				if (is_valid_tile(coord + Vector2i_LEFT))	m_state.m_tilemap.set_tile(coord + Vector2i_LEFT, false);
-				if (is_valid_tile(coord + Vector2i_RIGHT))	m_state.m_tilemap.set_tile(coord + Vector2i_RIGHT, false);
+				
 			}
+
+			const Vector2i coord = GET_PLAYER_START_TILE(i);
+			player.m_position = coord_to_pos_center(coord);
+
+			m_state.m_tilemap.set_tile(coord, false);
+			if (is_valid_tile(coord + Vector2i_UP))		m_state.m_tilemap.set_tile(coord + Vector2i_UP, false);
+			if (is_valid_tile(coord + Vector2i_DOWN))	m_state.m_tilemap.set_tile(coord + Vector2i_DOWN, false);
+			if (is_valid_tile(coord + Vector2i_LEFT))	m_state.m_tilemap.set_tile(coord + Vector2i_LEFT, false);
+			if (is_valid_tile(coord + Vector2i_RIGHT))	m_state.m_tilemap.set_tile(coord + Vector2i_RIGHT, false);
+
 			i++;
 		}
-		
-		
+	}
+
+	void game::start() {
 		m_status = status::IN_GAME;
 	}
+
 
 	uint32 game::get_player_count() const {
 		uint32 i = 0;
@@ -58,9 +63,6 @@ namespace meteor {
 			}
 		}
 	}
-
-
-
 
 
 	player_entity::player_entity(Vector2 position)
