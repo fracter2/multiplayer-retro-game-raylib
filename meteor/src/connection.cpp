@@ -40,8 +40,10 @@ namespace meteor {
 		assert(messages_just_acked <= m_un_acked_send_times.size());
 
 		while (messages_just_acked > 0) {
+			if (messages_just_acked > m_un_acked_send_times.size()) { debug::info("%g - AJABAJA BROKEN SEQUENCING", GetTime()); }
 			m_rtt_history.insert(m_rtt_history.begin(), GetTime() - m_un_acked_send_times.front());
 			m_un_acked_send_times.pop_back();
+			messages_just_acked--;
 		}
 		while (m_rtt_history.size() >= MAX_LOGGED_PACKETS)
 			m_rtt_history.pop_back();
@@ -63,6 +65,9 @@ namespace meteor {
 			m_un_acked_send_times.push_back(GetTime());
 
 			assert(m_un_acked_send_times.size() == m_send_sequence - m_recieve_acknowledge);
+			if (!(m_un_acked_send_times.size() == m_send_sequence - m_recieve_acknowledge)) {
+				debug::info("%g - AJABAJA BROKEN SEQUENCING", GetTime());
+			}
 			return true;
 		}
 		return false;
