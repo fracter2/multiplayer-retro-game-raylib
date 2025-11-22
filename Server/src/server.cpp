@@ -53,6 +53,7 @@ int main()
 		local_endpoint.m_address.d(),
 		local_endpoint.port());
 
+	game_instance.init();
     
 
 	// update loop
