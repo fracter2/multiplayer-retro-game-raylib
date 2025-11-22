@@ -48,7 +48,7 @@ namespace meteor {
 		double m_last_recieve_time = 0;
 
 	private:
-		uint32 m_send_sequence		 = 0;
+		uint32 m_send_sequence		 = 1;
 		uint32 m_recieve_sequence	 = 0;	// Used as send-ack
 		uint32 m_recieve_acknowledge = 0;
 
