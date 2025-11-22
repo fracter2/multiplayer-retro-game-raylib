@@ -83,6 +83,17 @@ namespace meteor {
 		m_send_sequence = 0;
 		m_recieve_sequence = 0;
 		m_recieve_acknowledge = 0;
+
+		m_send_bytes_history.clear();
+		m_send_bytes_history = { 0 };
+
+		m_recieve_bytes_history.clear();
+		m_recieve_bytes_history = { 0 };
+
+		m_rtt_history.clear();
+		m_rtt_history = { 0 };
+
+		m_un_acked_send_times.clear();
 	}
 }
 
