@@ -54,7 +54,7 @@ int main()
 		local_endpoint.port());
 
 	game_instance.init();
-    
+	
 
 	// update loop
 	while (running) {
@@ -72,18 +72,13 @@ int main()
 			next_tick_time += TICK_TIME;
 			ticks += 1;
 
-			// Use struct for all inputs, like "input_map"
-			// Then convert to input Action, like move_requests
 			input::update(input);
 
-			
-			//game_update_system::update(game, input);
 			server_game_system::update(ticks, dt, game_instance, input, server);
 
 			server_send_system::update(ticks, time, socket, server, local_endpoint, game_instance);
 
 			BeginDrawing();
-			//render_system::render(ticks, time, game, server_connection, texture);
 			render::server_system(ticks, game_instance, server, texture);
 			EndDrawing();
 
@@ -101,10 +96,3 @@ int main()
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
 // Debug program: F5 or Debug > Start Debugging menu
 
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
