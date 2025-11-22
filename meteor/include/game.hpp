@@ -340,6 +340,7 @@ namespace meteor {
 		
 		game() = default;
 		void init();
+		void start();
 
 		uint32 get_player_count() const;
 		void fill_player_slots_with_bots();
