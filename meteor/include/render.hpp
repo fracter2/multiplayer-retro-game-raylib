@@ -111,9 +111,7 @@ namespace meteor::render {
 		// TODO Write connection RTT (+ history graph?)
 
 
-		str += TextFormat("input_delay: %f "
-			, conn.get_prev_rtt()
-		);
+		str += "RTT: " + sec_to_ms_str_pretty(conn.get_prev_rtt());
 
 		const int x = (int)coord.x;
 		const int y = (int)coord.y;
