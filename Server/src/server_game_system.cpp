@@ -55,7 +55,7 @@ namespace meteor::server_game_system {
 		// Apply player actions
 		uint8 player_index = 0;
 		for (player_entity& player : game_instance.m_state.m_players) {
-			if (player.m_dead) continue;
+			if (player.m_dead) { player_index++;  continue; }
 
 
 			// Get next action, if there are any queued up
