@@ -8,15 +8,6 @@
 #include <stdio.h>
 #include <iostream>
 
-//#include "raylib.h"
-//#include "common.hpp"
-//#include "messages.hpp"
-//#include "input.hpp"
-//#include "game.hpp"
-//#include "protocol.hpp"
-//#include "connection.hpp"
-//#include "network.hpp"
-
 #include "server_state.hpp"
 #include "server_recieve_system.hpp"
 #include "server_send_system.hpp"
@@ -36,24 +27,18 @@ int main()
 
 	// ==== APP DATA ====
 	constexpr uint16 PORT = 54321;
-	//const ip_endpoint LOCAL_ENDPOINT(ip_address(10, 12, 234, 103), PORT);	// TODO make use of pre-made local adress getter func
-	ip_endpoint local_endpoint = {};
-	udp_socket socket = {};
-
-
-	//connection server_connection = {};
-	//connection clients[MAX_PLAYERS] = {};
+	ip_endpoint  local_endpoint = {};
+	udp_socket   socket = {};
 	server_state server = {};
 
 	game			   game_instance = {};
 	input::input_state input = {};
-	ui::main_menu	   menu = {};
 
 	double next_tick_time = GetTime();
 	uint32 ticks = 0;
-	float dt = GetFrameTime();
+	float  dt = GetFrameTime();
 	double time = GetTime();
-	bool running = true;
+	bool   running = true;
 
 	Texture texture = LoadTexture("../meteor/data/tiles.png");
 	// TODO assert texture is actually loaded
@@ -61,7 +46,6 @@ int main()
 	// ==== INIT ====
 	network::startup boot;
 	setup_socket_endpoint(socket, local_endpoint, PORT);
-
 	debug::info("local endpoint: %d.%d.%d.%d:%d",
 		local_endpoint.m_address.a(),
 		local_endpoint.m_address.b(),
@@ -69,8 +53,7 @@ int main()
 		local_endpoint.m_address.d(),
 		local_endpoint.port());
 
-
-    //std::cout << "Hello World!\n";
+    
 
 	// update loop
 	while (running) {
@@ -100,7 +83,7 @@ int main()
 
 			BeginDrawing();
 			//render_system::render(ticks, time, game, server_connection, texture);
-			render::server_system(ticks, time, game_instance, server, texture, menu);
+			render::server_system(ticks, game_instance, server, texture);
 			EndDrawing();
 
 		} //!tick loop
