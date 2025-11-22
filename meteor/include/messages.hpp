@@ -55,7 +55,6 @@ namespace meteor
 	   bool			m_start_now = false;
 	   player_info  m_player_info[MAX_PLAYERS] = {};
 	   game::status m_game_status = game::status::INVALID;
-	   // player info here
 	   // messages? with ack confirmation in send system?
    };
 

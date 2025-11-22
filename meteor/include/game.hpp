@@ -198,7 +198,7 @@ namespace meteor {
 							// The server exe could have admin tools, if needed.
 		status m_player_status = status::EMPTY;
 		char   m_name[NAME_LENGTH_MAX] = "";				// TODO Replace with std::string or similar
-		// maybe lag info or similar could be here too
+		//float  m_rtt = 0;
 	};
 
 	struct player_entity {
@@ -227,9 +227,6 @@ namespace meteor {
 
 #ifdef _SERVER
 	struct player_action_queue {
-		
-		
-	public:
 		static constexpr int SIZE = 3;		// NOTE: The point of this queue is to allow multiple input to be stretched over a longer period sent at 
 												// the same time, but this inherently means adding delay. 
 												// If we could afford increasing Network send-rate to match game tickrate, it would be avoided
