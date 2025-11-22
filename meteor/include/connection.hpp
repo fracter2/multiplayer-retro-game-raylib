@@ -51,10 +51,10 @@ namespace meteor {
 		uint32 m_recieve_sequence	 = 0;	// Used as send-ack
 		uint32 m_recieve_acknowledge = 0;
 
-		std::vector<uint32> m_send_bytes_history = {};
-		std::vector<uint32> m_recieve_bytes_history = {};
-		std::vector<double> m_rtt_history = {};
-		std::vector<double> m_un_acked_send_times = {};
+		std::vector<uint32> m_send_bytes_history = { 0 };
+		std::vector<uint32> m_recieve_bytes_history = { 0 };
+		std::vector<double> m_rtt_history = { 0 };
+		std::vector<double> m_un_acked_send_times = { 0 };
 
 		// Reliable messages history here? allow any message
 		// std::vector<any message> m_reliable_messages_history		// maybe one std::vector for each message type?
