@@ -55,7 +55,7 @@ namespace meteor {
 		std::vector<uint32> m_send_bytes_history = { 0 };
 		std::vector<uint32> m_recieve_bytes_history = { 0 };
 		std::vector<double> m_rtt_history = { 0 };
-		std::vector<double> m_un_acked_send_times = { 0 };
+		std::vector<double> m_un_acked_send_times = {};
 
 		// Reliable messages history here? allow any message
 		// std::vector<any message> m_reliable_messages_history		// maybe one std::vector for each message type?
