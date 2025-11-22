@@ -5,6 +5,15 @@
 #include "client_send_system.hpp"
 
 
+#define SAFE_WRITE(message)																	\
+if (writer.m_stream.can_fit(sizeof(message)))	{										\
+	message.write(writer);																\
+}																							\
+else {																						\
+	debug::warn("%g - message cannot fit!, size: %d", GetTime(), stream_send.size());			\
+	break;																						\
+}
+
 namespace meteor::client_send_system {
 
 
@@ -25,26 +34,18 @@ namespace meteor::client_send_system {
 			connect_packet packet;
 			packet.write(writer);
 
-			if (!socket.send_to(conn.m_endpoint, stream_send)) { print_error_code(); }
-			else {
-				// TODO LOG DATA SENT
-			}
+			conn.send(socket, stream_send);
 
 			break;
 		}
 
 		case connection::status::CONNECTED: {
 
-			conn.m_send_sequence += 1;
-			payload_packet packet(conn.m_send_sequence, conn.m_recieve_sequence);
+			payload_packet packet(conn.get_send_sequence(), conn.get_recieve_sequence());
 			packet.write(writer);
 
-
 			if (game_instance.m_status != game::status::IN_GAME) {
-				if (!socket.send_to(conn.m_endpoint, stream_send)) { print_error_code(); }
-				else {
-					// TODO LOG DATA SENT
-				}
+				conn.send(socket, stream_send);
 
 				break;
 			}
@@ -66,19 +67,12 @@ namespace meteor::client_send_system {
 				const uint32 action_tick = tick - (game_instance.m_actions_not_sent + 1);					// +1 so when only one is unsent, it's the current tick (as it is)
 				input_action_message message = input_action_message(game_instance.m_predict_actions[i], action_tick);
 
-				if (writer.m_stream.can_fit(sizeof(message))) {	// LIMIT TO MAX PACKAGE SIZE
-					message.write(writer);
-					game_instance.m_actions_not_sent -= 1;
-				}
-				else { break; }
+				SAFE_WRITE(message);
+				game_instance.m_actions_not_sent -= 1;
 				
 			}
 			
-			//debug::info("sending payload package");
-			if (!socket.send_to(conn.m_endpoint, stream_send)) { print_error_code(); }
-			else {
-				// TODO LOG DATA SENT
-			}
+			conn.send(socket, stream_send);
 			
 
 			break;
@@ -98,10 +92,7 @@ namespace meteor::client_send_system {
 			disconnect_packet packet;
 			packet.write(writer);
 
-			if (!socket.send_to(conn.m_endpoint, stream_send)) { print_error_code(); }
-			else {
-				// TODO LOG DATA SENT
-			}
+			conn.send(socket, stream_send);
 
 			break;
 		}
