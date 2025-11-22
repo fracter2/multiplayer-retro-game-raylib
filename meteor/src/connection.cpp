@@ -37,6 +37,8 @@ namespace meteor {
 		int messages_just_acked = packet.m_acknowledge - m_recieve_acknowledge;
 		assert(messages_just_acked >= 0); // dont read older packets!!
 
+		assert(messages_just_acked <= m_un_acked_send_times.size());
+
 		while (messages_just_acked > 0) {
 			m_rtt_history.insert(m_rtt_history.begin(), GetTime() - m_un_acked_send_times.front());
 			m_un_acked_send_times.pop_back();
@@ -59,6 +61,8 @@ namespace meteor {
 		if (send_stream(socket, stream)) {
 			m_send_sequence++;
 			m_un_acked_send_times.push_back(GetTime());
+
+			assert(m_un_acked_send_times.size() == m_send_sequence - m_recieve_acknowledge);
 			return true;
 		}
 		return false;

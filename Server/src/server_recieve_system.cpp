@@ -133,7 +133,6 @@ namespace meteor::server_recieve_system {
 				}
 				else {
 					client_index = (uint8)r_index;
-					assert((uint32)client_index == r_index);	// Check incase we have more than uint8 limit clients... *just in case someone increases it above this* (i know)
 				}
 
 
@@ -177,12 +176,13 @@ namespace meteor::server_recieve_system {
 				}
 				else {
 					client_index = (uint8)r_index;
-					assert((uint32)client_index == r_index);	// Check incase we have more than uint8 limit clients... *just in case*
 				}
 				
 
 				//debug::info("%g - recieving payload from client %d", GetTime(), client_index);
+				assert(client_index < MAX_PLAYERS);
 				connection& conn = server.m_clients[client_index];
+				assert(conn.m_endpoint == sender_endpoint);
 				
 				// Conn status check
 				if (conn.m_status == connection::status::CONNECTING) {
