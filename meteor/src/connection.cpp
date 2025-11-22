@@ -5,6 +5,15 @@
 #include "connection.hpp"
 
 namespace meteor {
+	connection::connection() {
+
+		// Reserve space so it doesn't look like a memory leak
+		m_recieve_bytes_history.reserve(MAX_LOGGED_PACKETS + 1);
+		m_send_bytes_history.reserve(MAX_LOGGED_PACKETS + 1);
+		m_rtt_history.reserve(MAX_LOGGED_PACKETS + 1);
+
+	}
+
 	connection::connection(ip_endpoint endpoint, status status)
 		: m_endpoint(endpoint)
 		, m_last_recieve_time(0)
@@ -13,6 +22,10 @@ namespace meteor {
 		, m_recieve_sequence(0)
 		, m_recieve_acknowledge(0)
 	{
+		// Reserve space so it doesn't look like a memory leak
+		m_recieve_bytes_history.reserve(MAX_LOGGED_PACKETS + 1);
+		m_send_bytes_history.reserve(MAX_LOGGED_PACKETS + 1);
+		m_rtt_history.reserve(MAX_LOGGED_PACKETS + 1);
 	}
 
 	bool connection::can_recieve(const payload_packet& packet) const {
