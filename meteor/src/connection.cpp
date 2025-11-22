@@ -84,7 +84,7 @@ namespace meteor {
 		//conn.m_endpoint = {};				// We could let this stay until it is overriden by new player. This way we know who "recently deleted" 
 										// and can reply with more disconnect packets, in case of packet loss.
 		m_status = connection::status::DISCONNECTED;
-		m_send_sequence = 1;
+		m_send_sequence = 0;
 		m_recieve_sequence = 0;
 		m_recieve_acknowledge = 0;
 
