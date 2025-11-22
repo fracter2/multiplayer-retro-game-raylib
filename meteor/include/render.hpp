@@ -98,6 +98,26 @@ namespace meteor::render {
 		return r;
 	}
 
+	static void render_connection_stats(const Vector2i& coord, const game& game_instance, const connection& conn) {
+		constexpr int font_size = 12;
+		constexpr Color color = MAROON;
+		constexpr Color color_backdrop = BLACK;
+
+		std::string str = "";
+
+		// TODO Write connection RTT (+ history graph?)
+
+
+		str += TextFormat("input_delay: %f "
+			, conn.get_prev_rtt()
+		);
+
+		const int x = (int)coord.x;
+		const int y = (int)coord.y;
+		DrawText(str.c_str(), x + 1, y + 1, font_size, color_backdrop);
+		DrawText(str.c_str(), x, y, font_size, color);
+	}
+
 	static void render_player_info(const Vector2i& coord, const game& game_instance) {
 		
 		constexpr int font_size = 18;
@@ -111,11 +131,12 @@ namespace meteor::render {
 			
 			const double input_delay = ((double)(game_instance.m_state.m_tick) - (double)(game_instance.m_state.m_players[i].m_prev_action_tick)) * TICK_TIME;
 
-			str += TextFormat("Player %d: %s \n   input_delay: %f \n   status: ("
+			str += TextFormat("Player %d: %s \n   input delay: "
 				, i
 				, player.m_name
-				, input_delay
 			);
+			str += sec_to_ms_str_pretty(input_delay);
+			str += "\n   status: (";
 			str += player_info::status_to_str(player.m_player_status);
 			str += ")\n\n";
 			i++;
@@ -124,13 +145,8 @@ namespace meteor::render {
 		const int y = (int)HUD_OFFSET.y + coord.y;
 		DrawText(str.c_str(), x + 1, y + 1, font_size, color_backdrop);
 		DrawText(str.c_str(), x, y, font_size, color);
-
-
 	}
 
-	static void render_connection_stats(const Vector2i& coord, const game& game_instance, const connection& conn) {
-		constexpr int font_size = 12;
-		constexpr Color color = MAROON;
 		constexpr Color color_backdrop = BLACK;
 
 		std::string str = "";
