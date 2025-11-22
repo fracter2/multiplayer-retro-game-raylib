@@ -14,17 +14,20 @@ namespace meteor::render {
 		// TODO CLEAR
 		ClearBackground(SKYBLUE);
 
+
+		{	// ==== ALWAYS ====
+			render_map(texture, game_instance.m_state.get_tilemap());
+			render_bombs(texture, game_instance);
+			render_characters(texture, game_instance);
+		}
+
+
 		// ==== IN GAME ====
 		if (game_instance.m_status == game::status::IN_GAME) {
-			const tilemap& map = game_instance.m_state.get_tilemap();
 
 
 			// TODO RENDER BACKGROUND
 
-			
-			render_map(texture, map);
-			render_bombs(texture, game_instance);
-			render_characters(texture, game_instance);
 
 			// TODO RENDER NAMES (if there are names)
 
@@ -38,7 +41,6 @@ namespace meteor::render {
 		// ==== PRE GAME ====
 		else if (game_instance.m_status == game::status::PRE_GAME) {
 			
-
 
 			{ // Toggle broadcast and start game (key 2 & 3) Instructions
 				constexpr int font_size = 20;
@@ -61,14 +63,14 @@ namespace meteor::render {
 		// ==== POST GAME ====
 		else if (game_instance.m_status == game::status::POST_GAME) {
 			// TODO RENDER WIN / LOSE
-
 		}
 
 
 
 		// ==== INVALID (MENU) ====
 		else {
-			// TODO RENDER BUTTONS / INPUT AREAS
+
+			
 
 			{ // Start game (Key 1) Instructions
 				constexpr int font_size = 40;
@@ -90,9 +92,13 @@ namespace meteor::render {
 			// RENDER FPS
 			DrawFPS(2, GetScreenHeight() - 20);
 
-			const Vector2i coord = Vector2i(8, 40);
-			render_player_info(coord, game_instance);
+			render_player_info(Vector2i(8, 40), game_instance);
 
+			Vector2i offset = HUD_OFFSET + Vector2(80, 20);
+			for (const connection& conn : server.m_clients) {
+				render_connection_stats(offset, game_instance, conn);
+				offset = offset + Vector2i(0, 140);
+			}
 			// TODO RENDER RTT in ms (averaged across a second? sepparate peak?)
 
 			// TODO RENDER BYTES SENT PER SECOND

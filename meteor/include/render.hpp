@@ -32,10 +32,9 @@ namespace meteor::render {
 	static constexpr int   PLAYER_NUM_SIZE = 6;
 
 	static constexpr Vector2 MAP_SIZE = Vector2((float)tilemap::WIDTH * (float)tilemap::TILE_PIXEL_LENGTH, (float)tilemap::HEIGHT * (float)tilemap::TILE_PIXEL_LENGTH);
-	static constexpr Vector2 MAP_OFFSET = Vector2(
-		((WINDOW_WIDTH - MAP_SIZE.x) / 2)	// Center-aligned
-		, 80
-	);
+	//static constexpr Vector2 MAP_OFFSET = Vector2(((WINDOW_WIDTH - MAP_SIZE.x) / 2), 80);
+	static constexpr Vector2 MAP_OFFSET = Vector2(80, 80);
+	static constexpr Vector2 HUD_OFFSET = Vector2(MAP_OFFSET.x + MAP_SIZE.x, MAP_OFFSET.y);
 
 	
 
@@ -105,19 +104,41 @@ namespace meteor::render {
 			
 			const double input_delay = ((double)(game_instance.m_state.m_tick) - (double)(game_instance.m_state.m_players[i].m_prev_action_tick)) * TICK_TIME;
 
-			str += TextFormat("Player %d: %s, input_delay: %f ("
+			str += TextFormat("Player %d: %s \n   input_delay: %f \n   status: ("
 				, i
 				, player.m_name
 				, input_delay
 			);
 			str += player_info::status_to_str(player.m_player_status);
-			str += ")\n";
+			str += ")\n\n";
 			i++;
 		}
-		DrawText(str.c_str(), coord.x + 1, coord.y + 1, font_size, color_backdrop);
-		DrawText(str.c_str(), coord.x, coord.y, font_size, color);
+		const int x = (int)HUD_OFFSET.x + coord.x;
+		const int y = (int)HUD_OFFSET.y + coord.y;
+		DrawText(str.c_str(), x + 1, y + 1, font_size, color_backdrop);
+		DrawText(str.c_str(), x, y, font_size, color);
 
 
+	}
+
+	static void render_connection_stats(const Vector2i& coord, const game& game_instance, const connection& conn) {
+		constexpr int font_size = 12;
+		constexpr Color color = MAROON;
+		constexpr Color color_backdrop = BLACK;
+
+		std::string str = "";
+
+		// TODO Write connection RTT (+ history graph?)
+		
+
+		str += TextFormat("input_delay: %f "
+			, conn.get_prev_rtt()
+		);
+
+		const int x = (int)coord.x;
+		const int y = (int)coord.y;
+		DrawText(str.c_str(), x + 1, y + 1, font_size, color_backdrop);
+		DrawText(str.c_str(), x, y, font_size, color);
 	}
 
 }
