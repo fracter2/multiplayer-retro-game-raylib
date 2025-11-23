@@ -41,23 +41,37 @@ namespace meteor::render {
 
 	
 
+
+	static void render_tile(const Texture& texture, const tilemap& map, const int i, const Color tint = WHITE) {
+		Vector2i c = index_to_coord(i);
+		const Vector2 pos = MAP_OFFSET + Vector2((float)c.x, (float)c.y) * (float)tilemap::TILE_PIXEL_LENGTH;
+		const Rectangle destination{ pos.x, pos.y, (float)tilemap::TILE_PIXEL_LENGTH, (float)tilemap::TILE_PIXEL_LENGTH };
+		DrawTexturePro(
+			texture,
+			(map.is_tile_active(i) ? atlass::WALL : atlass::BACKGROUND),
+			destination,
+			Vector2(0, 0),
+			0.0f,
+			tint);
+	}
+
 	
-	static void render_map(const Texture& texture, const tilemap& map) {
+	static void render_map(const Texture& texture, const tilemap& map, const Color tint = WHITE) {
 		for (int i = 0; i < tilemap::COUNT; i++) {
-			Vector2i c = index_to_coord(i);
-			const Vector2 pos = MAP_OFFSET + Vector2((float)c.x, (float)c.y) * (float)tilemap::TILE_PIXEL_LENGTH;
-			const Rectangle destination{ pos.x, pos.y, (float)tilemap::TILE_PIXEL_LENGTH, (float)tilemap::TILE_PIXEL_LENGTH };
-			DrawTexturePro(
-				texture, 
-				(map.is_tile_active(i) ? atlass::WALL : atlass::BACKGROUND),
-				destination, 
-				Vector2(0, 0), 
-				0.0f, 
-				WHITE);
+			render_tile(texture, map, i, tint);
 		}
 	}
 
-	static void render_bombs(const Texture& texture, const game_state& state) {
+	// Renders tiles on the first map if it is different from the diff_map
+	static void render_map_diff(const Texture& texture, const tilemap& map, const tilemap& other_map, const Color tint = WHITE) {
+		for (int i = 0; i < tilemap::COUNT; i++) {
+			if (map.is_tile_active(i) != other_map.is_tile_active(i)) {
+				render_tile(texture, map, i, tint);
+			}
+		}
+	}
+
+	static void render_bombs(const Texture& texture, const game_state& state, const Color tint = WHITE) {
 		for (const bomb& da_bomb : state.m_bombs) {
 			if (da_bomb.m_explosion_tick >= state.m_tick) {
 				const Vector2 pos = MAP_OFFSET + Vector2((float)da_bomb.m_x, (float)da_bomb.m_y) * (float)tilemap::TILE_PIXEL_LENGTH;
@@ -68,12 +82,12 @@ namespace meteor::render {
 					destination,
 					Vector2(0, 0),
 					0.0f,
-					WHITE);
+					tint);
 			}
 		}
 	}
 
-	static void render_characters(const Texture& texture, const game_state& state) {
+	static void render_characters(const Texture& texture, const game_state& state, const Color tint = WHITE) {
 		int i = 0;
 		for (const player_entity& player : state.m_players) {
 			const Vector2 pos = MAP_OFFSET + player.m_position * (float)tilemap::TILE_PIXEL_LENGTH;
@@ -84,7 +98,7 @@ namespace meteor::render {
 				destination,
 				tilemap::TILE_PIXEL_CENTER_OFFSET,
 				0.0f,
-				WHITE);
+				tint);
 			//DrawTextPro(GetFontDefault(), TextFormat("%d", i), player.m_position, Vector2Zero(),0, PLAYER_NUM_SIZE, 0, PLAYER_NUM_COLOR);
 			i++;
 		}

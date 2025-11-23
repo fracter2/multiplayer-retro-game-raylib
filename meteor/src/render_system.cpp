@@ -19,7 +19,10 @@ namespace meteor::render{
 
 			// RENDER MAP
 			render_map(texture, game_instance.m_predicted_state.get_tilemap());
+			render_map_diff(texture, game_instance.m_state.get_tilemap(), game_instance.m_predicted_state.get_tilemap(), BLUE);
+			render_bombs(texture, game_instance.m_state, BLUE);
 			render_bombs(texture, game_instance.m_predicted_state);
+			render_characters(texture, game_instance.m_state, BLUE);
 			render_characters(texture, game_instance.m_predicted_state);
 
 			// TODO RENDER NAMES (if there are names)
@@ -35,9 +38,9 @@ namespace meteor::render{
 
 		// ==== PRE GAME ====
 		else if (game_instance.m_status == game::status::PRE_GAME) {
-			render_map(texture, game_instance.m_predicted_state.get_tilemap());
-			render_bombs(texture, game_instance.m_predicted_state);
-			render_characters(texture, game_instance.m_predicted_state);
+			//render_map(texture, game_instance.m_predicted_state.get_tilemap());
+			//render_bombs(texture, game_instance.m_predicted_state);
+			//render_characters(texture, game_instance.m_predicted_state);
 
 			render_player_info(Vector2i(8, 40), game_instance);
 
