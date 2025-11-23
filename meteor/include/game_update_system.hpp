@@ -74,6 +74,7 @@ namespace meteor::game_update_system {
 
 		// INPUT PARSING
 		game_instance.m_predict_actions.push_back(input_to_player_action(input_state, state, user_index));
+		//game_instance.m_predict_actions.insert(game_instance.m_predict_actions.begin(), input_to_player_action(input_state, state, user_index));
 		game_instance.m_actions_not_sent += 1;
 
 
@@ -83,6 +84,7 @@ namespace meteor::game_update_system {
 
 		if (ticks_to_remove > 0) {
 			game_instance.m_predict_actions.erase(game_instance.m_predict_actions.begin(), game_instance.m_predict_actions.begin() + ticks_to_remove);
+			//game_instance.m_predict_actions.erase(game_instance.m_predict_actions.end() - ticks_to_remove, game_instance.m_predict_actions.end());
 			
 		}
 
