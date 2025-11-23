@@ -4,6 +4,7 @@
 #pragma once
 
 #include "server_game_system.hpp"
+#include "input_to_player_action.hpp"
 
 namespace meteor::server_game_system {
 
@@ -53,17 +54,25 @@ namespace meteor::server_game_system {
 		// ======== IN_GAME ========
 		game_instance.push_state_to_history();
 
+
 		// Apply player actions
+		bool bot_controlled = false;
 		uint8 player_index = 0;
 		for (player_entity& player : game_instance.m_state.m_players) {
 			if (player.m_dead) { player_index++;  continue; }
-
 
 			// Get next action, if there are any queued up
 			if (!game_instance.m_player_action_queue[player_index].is_empty()) {
 				std::pair<player_entity::action, uint32> r = game_instance.m_player_action_queue[player_index].read_next();
 				player.m_prev_action = r.first;	
 				player.m_prev_action_tick = r.second;
+			}
+			
+			// PARSE INPUT FOR SERVER to controll bot
+			else if (game_instance.m_player_info[player_index].m_player_status == player_info::status::ACTIVE_BOT && !bot_controlled) {
+				bot_controlled = true;
+				player.m_prev_action = input_to_player_action(input_state, game_instance.m_state, player_index);
+				player.m_prev_action_tick = tick;
 			}
 
 			game_instance.m_state.update_player(player_index);
