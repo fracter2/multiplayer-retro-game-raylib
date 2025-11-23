@@ -115,6 +115,8 @@ namespace meteor {
 		const double speed = player_entity::MOVE_SPEED * TICK_TIME;
 		player_entity& player = m_players[player_index];
 
+		if (player.m_dead) return;
+
 		Vector2 dir = { 0, 0 };
 
 		switch (player.m_prev_action) {
