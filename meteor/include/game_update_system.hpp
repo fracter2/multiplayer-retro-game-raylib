@@ -83,7 +83,7 @@ namespace meteor::game_update_system {
 		int ticks_to_remove = (int)game_instance.m_predict_actions.size() - ticks_ahead;
 
 		if (ticks_to_remove > 0) {
-			game_instance.m_predict_actions.erase(game_instance.m_predict_actions.begin(), game_instance.m_predict_actions.begin() + ticks_to_remove);
+			game_instance.m_predict_actions.erase(game_instance.m_predict_actions.begin(), game_instance.m_predict_actions.begin() + (ticks_to_remove - 1));	// -1 to include begin()
 			//game_instance.m_predict_actions.erase(game_instance.m_predict_actions.end() - ticks_to_remove, game_instance.m_predict_actions.end());
 			
 		}
