@@ -18,9 +18,9 @@ namespace meteor::render{
 		if (game_instance.m_status == game::status::IN_GAME) {
 
 			// RENDER MAP
-			render_map(texture, game_instance.m_state.get_tilemap());
-			render_bombs(texture, game_instance);
-			render_characters(texture, game_instance);
+			render_map(texture, game_instance.m_predicted_state.get_tilemap());
+			render_bombs(texture, game_instance.m_predicted_state);
+			render_characters(texture, game_instance.m_predicted_state);
 
 			// TODO RENDER NAMES (if there are names)
 
@@ -35,7 +35,10 @@ namespace meteor::render{
 
 		// ==== PRE GAME ====
 		else if (game_instance.m_status == game::status::PRE_GAME) {
-			// TODO RENDER GAME LOBBY (if in lobby
+			render_map(texture, game_instance.m_predicted_state.get_tilemap());
+			render_bombs(texture, game_instance.m_predicted_state);
+			render_characters(texture, game_instance.m_predicted_state);
+
 			render_player_info(Vector2i(8, 40), game_instance);
 
 			{ // "Waiting for server to start"
@@ -56,9 +59,9 @@ namespace meteor::render{
 		else if (game_instance.m_status == game::status::POST_GAME) {
 			// TODO RENDER WIN / LOSE
 
-			render_map(texture, game_instance.m_state.get_tilemap());
-			render_bombs(texture, game_instance);
-			render_characters(texture, game_instance);
+			render_map(texture, game_instance.m_predicted_state.get_tilemap());
+			render_bombs(texture, game_instance.m_predicted_state);
+			render_characters(texture, game_instance.m_predicted_state);
 
 			render_player_info(Vector2i(8, 40), game_instance);
 
@@ -160,7 +163,7 @@ namespace meteor::render{
 			// TODO RENDER BYTES SENT PER SECOND
 
 			// TODO RENDER GRAPH WITH BYTES/s AND RTT
-			render_connection_stats(Vector2i(80, 20), game_instance, conn);
+			render_connection_stats(Vector2i(80, 20), conn);
 		}
 
 	}

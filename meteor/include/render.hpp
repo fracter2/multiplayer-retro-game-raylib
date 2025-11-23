@@ -57,9 +57,9 @@ namespace meteor::render {
 		}
 	}
 
-	static void render_bombs(const Texture& texture, const game& game_instance) {
-		for (const bomb& da_bomb : game_instance.m_state.m_bombs) {
-			if (da_bomb.m_explosion_tick >= game_instance.m_state.m_tick) {
+	static void render_bombs(const Texture& texture, const game_state& state) {
+		for (const bomb& da_bomb : state.m_bombs) {
+			if (da_bomb.m_explosion_tick >= state.m_tick) {
 				const Vector2 pos = MAP_OFFSET + Vector2((float)da_bomb.m_x, (float)da_bomb.m_y) * (float)tilemap::TILE_PIXEL_LENGTH;
 				const Rectangle destination{ pos.x, pos.y, (float)tilemap::TILE_PIXEL_LENGTH, (float)tilemap::TILE_PIXEL_LENGTH };
 				DrawTexturePro(
@@ -73,9 +73,9 @@ namespace meteor::render {
 		}
 	}
 
-	static void render_characters(const Texture& texture, const game& game_instance) {
+	static void render_characters(const Texture& texture, const game_state& state) {
 		int i = 0;
-		for (const player_entity& player : game_instance.m_state.m_players) {
+		for (const player_entity& player : state.m_players) {
 			const Vector2 pos = MAP_OFFSET + player.m_position * (float)tilemap::TILE_PIXEL_LENGTH;
 			const Rectangle destination{ pos.x, pos.y, (float)tilemap::TILE_PIXEL_LENGTH, (float)tilemap::TILE_PIXEL_LENGTH };
 			DrawTexturePro(
@@ -101,7 +101,7 @@ namespace meteor::render {
 		return r;
 	}
 
-	static void render_connection_stats(const Vector2i& coord, const game& game_instance, const connection& conn) {
+	static void render_connection_stats(const Vector2i& coord, const connection& conn) {
 		constexpr int font_size = 12;
 		constexpr Color color = MAROON;
 		constexpr Color color_backdrop = BLACK;

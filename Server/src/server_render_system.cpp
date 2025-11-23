@@ -17,8 +17,8 @@ namespace meteor::render {
 
 		{	// ==== ALWAYS ====
 			render_map(texture, game_instance.m_state.get_tilemap());
-			render_bombs(texture, game_instance);
-			render_characters(texture, game_instance);
+			render_bombs(texture, game_instance.m_state);
+			render_characters(texture, game_instance.m_state);
 		}
 
 
