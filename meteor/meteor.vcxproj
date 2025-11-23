@@ -124,6 +124,7 @@
     <ClInclude Include="include\game.hpp" />
     <ClInclude Include="include\game_update_system.hpp" />
     <ClInclude Include="include\input.hpp" />
+    <ClInclude Include="include\input_to_player_action.hpp" />
     <ClInclude Include="include\render.hpp" />
     <ClInclude Include="include\ui.hpp" />
     <ClInclude Include="include\messages.hpp" />

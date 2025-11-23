@@ -11,6 +11,7 @@
 #include "game.hpp"
 
 #include "input.hpp"
+#include "input_to_player_action.hpp"
 
 
 namespace meteor::game_update_system {
@@ -74,21 +75,8 @@ namespace meteor::game_update_system {
 
 
 		// INPUT PARSING
-		player_entity::action current_action = player_entity::action::INVALID;
-		const bool vertical_active = input_state.m_up != input_state.m_down;
-		const bool horizontal_active = input_state.m_left != input_state.m_right;
-
-		if (input_state.m_place_bomb &&	state.can_place_bomb(user_index))
-														   current_action = player_entity::action::PLACE_BOMB;
-		else if (input_state.m_up    && vertical_active)   current_action = player_entity::action::MOVE_UP;
-		else if (input_state.m_down  && vertical_active)   current_action = player_entity::action::MOVE_DOWN;
-		else if (input_state.m_left  && horizontal_active) current_action = player_entity::action::MOVE_LEFT;
-		else if (input_state.m_right && horizontal_active) current_action = player_entity::action::MOVE_RIGHT;
-		else											   current_action = player_entity::action::STAND_STILL;
-
-		game_instance.m_predict_actions.push_back(current_action);
+		game_instance.m_predict_actions.push_back(input_to_player_action(input_state, state, user_index));
 		game_instance.m_actions_not_sent += 1;
-		assert(game_instance.m_predict_actions.size() != 0);
 
 
 		// Remove predicted actions that have been used by the server
