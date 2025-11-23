@@ -69,9 +69,7 @@ namespace meteor::game_update_system {
 		
 		// Type safe const to reduce word lengths and to emphasise when it's mutable or not (to avoid setting accidently)
 		const uint8			 user_index  = (uint8)game_instance.m_user_index;
-		const uint32&		 tick		 = game_instance.m_state.m_tick;
 		const game_state&	 state	     = game_instance.m_state;
-		const player_entity& user_player = state.get_player(user_index);
 
 
 		// INPUT PARSING
@@ -80,7 +78,7 @@ namespace meteor::game_update_system {
 
 
 		// Remove predicted actions that have been used by the server
-		int ticks_ahead = game_instance.m_state.m_tick - user_player.m_prev_action_tick;
+		int ticks_ahead = state.m_tick - state.m_players[user_index].m_prev_action_tick;
 		int ticks_to_remove = (int)game_instance.m_predict_actions.size() - ticks_ahead;
 
 		if (ticks_to_remove > 0) {
@@ -90,7 +88,7 @@ namespace meteor::game_update_system {
 
 		
 		// CLIENT SIDE PREDICTION
-		game_state p_state = game_state(state);	// note: copied, not ref
+		game_state p_state = game_state(state);
 		
 		// TODO Apply predicted actions to client player and client bomb	// TODO MOVE GAME LOGIC OPERATIONS TO UTILITY CLASS TO SYNC BETWEEN CLIENT/SERVER
 		
