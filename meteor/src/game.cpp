@@ -70,21 +70,28 @@ namespace meteor {
 	{
 	};
 
-	bool game_state::can_place_bomb(const uint8& index) const {
-		const player_entity& user_player = m_players[index];
+	bool game_state::can_place_bomb(const uint8& player_index) const {
+		const player_entity& user_player = m_players[player_index];
 
 		Vector2i coord = Vector2i(user_player.m_position);
 
 		bool r = true;
-		r &= !user_player.m_dead;							// if not player dead...
-		r &= is_walkable(coord);							// and is inside map...
+		r &= !user_player.m_dead;
+		r &= is_walkable(coord);
 
-		for (const bomb& bomb : m_bombs) {					// and no other bombs are there...
-			r &= !(bomb.m_x == coord.x
-				&& bomb.m_y == coord.y
-				&& bomb.m_explosion_tick > m_tick);
+		r &= !is_bomb_at(coord);	
+		r &= (get_bomb(player_index).m_explosion_tick + bomb::COOLDOWN_TICKS) < m_tick;	// and the bomb isn't already placed or in cooldown...
+
+		return r;
+	}
+
+	bool game_state::is_bomb_at(const Vector2i& coord) const noexcept {
+		bool r = false;
+		for (const bomb& bomb : m_bombs) {
+			r &= (bomb.m_explosion_tick > m_tick 
+				&& bomb.m_x == coord.x 
+				&& bomb.m_y == coord.y);
 		}
-		r &= (get_bomb(index).m_explosion_tick + bomb::COOLDOWN_TICKS) < m_tick;	// and the bomb isn't already placed or in cooldown...
 
 		return r;
 	}

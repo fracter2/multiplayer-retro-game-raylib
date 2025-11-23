@@ -312,6 +312,7 @@ namespace meteor {
 		bool is_walkable(const Vector2i& coord) const;
 		void update_player(const uint8& player_index);
 		bool can_place_bomb(const uint8& index) const;
+		bool is_bomb_at(const Vector2i& coord) const noexcept;
 		void apply_bomb_explosion(const bomb& da_bomb);
 		bool explode_at(const Vector2i& coord);
 	};
