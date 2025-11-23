@@ -63,9 +63,9 @@ namespace meteor::client_send_system {
 			// Send unsent input (only unsent input as server ignores older input anyway)
 			int unsent_action_i = (int)game_instance.m_predict_actions.size() - (int)game_instance.m_actions_not_sent;
 
-			for (int i = unsent_action_i; i < game_instance.m_predict_actions.size(); i++) {
+			for (const player_entity::action& action : game_instance.m_predict_actions) {
 				const uint32 action_tick = tick - (game_instance.m_actions_not_sent + 1);					// +1 so when only one is unsent, it's the current tick (as it is)
-				input_action_message message = input_action_message(game_instance.m_predict_actions[i], action_tick);
+				input_action_message message = input_action_message(action, action_tick);
 
 				SAFE_WRITE(message);
 				game_instance.m_actions_not_sent -= 1;
