@@ -277,7 +277,6 @@ namespace meteor {
 		uint32 m_size = 0;
 		player_entity::action m_actions[SIZE] = {};
 		uint32 m_ticks[SIZE] = {};
-
 	};
 #endif // _SERVER
 
@@ -370,10 +369,10 @@ namespace meteor {
 #ifdef _SERVER
 		void push_state_to_history();
 		std::vector<game_state> m_state_history = std::vector<game_state>();
-		mutable int m_states_not_sent = 0;
 		player_action_queue m_player_action_queue[MAX_PLAYERS] = {};
-		mutable bool game_lobby_changed = false;
-		mutable bool queue_game_start = false;			// If the game should start next send tick
+		mutable int  m_states_not_sent = 0;
+		mutable bool m_game_lobby_changed = false;
+		mutable bool m_queue_game_start = false;			// If the game should start next send tick
 #endif
 		
 	};

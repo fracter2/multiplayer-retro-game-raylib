@@ -103,8 +103,8 @@ else {																						\
 
 				// -------- LOBBY STATE MESSAGE --------
 
-				if (game_instance.game_lobby_changed || game_instance.queue_game_start) {
-					game_lobby_message lobby_message = game_lobby_message(game_instance.queue_game_start, game_instance, game_instance.m_status);
+				if (game_instance.m_game_lobby_changed || game_instance.m_queue_game_start) {
+					game_lobby_message lobby_message = game_lobby_message(game_instance.m_queue_game_start, game_instance, game_instance.m_status);
 					SAFE_WRITE(lobby_message);
 				}
 
@@ -164,8 +164,8 @@ else {																						\
 		
 		// Reset dirty checks 
 		game_instance.m_states_not_sent = 0;
-		game_instance.game_lobby_changed = false;
-		
+		game_instance.m_game_lobby_changed = false;
+		game_instance.m_queue_game_start = false;
 
 
 

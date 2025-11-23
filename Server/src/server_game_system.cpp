@@ -20,14 +20,14 @@ namespace meteor::server_game_system {
 		// ======== PRE_GAME ========
 		if (game_instance.m_status == game::status::PRE_GAME) {
 			if (input_state.m_3_just_pressed && game_instance.get_player_count() >= 2) {
-				game_instance.queue_game_start = true;
+				game_instance.m_queue_game_start = true;
 				game_instance.init();
 				game_instance.start();
 				server.m_status = server_state::status::ONLINE;
 			}
 			if (input_state.m_4_just_pressed && game_instance.get_player_count() < MAX_PLAYERS) {
 				game_instance.fill_player_slots_with_bots();
-				game_instance.game_lobby_changed = true;
+				game_instance.m_game_lobby_changed = true;
 			}
 
 			return;
@@ -116,7 +116,7 @@ namespace meteor::server_game_system {
 				game_instance.m_player_info[alive_index].m_player_status = player_info::status::WINNER;
 			}
 
-			game_instance.game_lobby_changed = true;
+			game_instance.m_game_lobby_changed = true;
 		}
 		
 	

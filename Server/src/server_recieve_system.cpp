@@ -26,7 +26,7 @@ namespace meteor::server_recieve_system {
 					conn.set_disconnected();
 
 					game_instance.m_player_info[i].m_player_status = player_info::status::TIMED_OUT;
-					game_instance.game_lobby_changed = true;			// Queue for the send system to send lobby state message
+					game_instance.m_game_lobby_changed = true;			// Queue for the send system to send lobby state message
 				}
 				i++;
 			}
@@ -146,7 +146,7 @@ namespace meteor::server_recieve_system {
 					leave_reason = player_info::status::RAGEQUIT;
 
 				game_instance.m_player_info[client_index].m_player_status = leave_reason;
-				game_instance.game_lobby_changed = true;			// Queue for the send system to send lobby state message
+				game_instance.m_game_lobby_changed = true;			// Queue for the send system to send lobby state message
 
 				break;
 			}//!Disconnect
@@ -188,7 +188,7 @@ namespace meteor::server_recieve_system {
 				if (conn.m_status == connection::status::CONNECTING) {
 					conn.m_status = connection::status::CONNECTED;
 					game_instance.m_player_info[client_index].m_player_status = player_info::status::ACTIVE;
-					game_instance.game_lobby_changed = true;
+					game_instance.m_game_lobby_changed = true;
 					debug::info("%g - client %d joined gracefully", GetTime(), client_index);
 				}
 				
@@ -267,7 +267,7 @@ namespace meteor::server_recieve_system {
 				conn.m_last_recieve_time = time;
 				
 				game_instance.m_player_info[i].m_player_status = player_info::status::JOINING;
-				game_instance.game_lobby_changed = true;			// Queue for the send system to send lobby state message
+				game_instance.m_game_lobby_changed = true;			// Queue for the send system to send lobby state message
 				
 				break;
 			}
