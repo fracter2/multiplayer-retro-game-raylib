@@ -63,6 +63,51 @@ namespace meteor::render {
 		// ==== POST GAME ====
 		else if (game_instance.m_status == game::status::POST_GAME) {
 			// TODO RENDER WIN / LOSE
+
+			//{ // Start game (Key 1) Instructions
+			//	constexpr int font_size = 40;
+			//	constexpr Color color = MAROON;
+			//	const char* text = TextFormat("Press '1' to init server");
+			//	const int text_width = MeasureText(text, font_size);
+			//	const int text_x = (GetScreenWidth() - text_width) / 2;
+			//	const int text_y = 8;
+			//	DrawText(text, text_x + 1, text_y + 1, font_size, BLACK);
+			//	DrawText(text, text_x, text_y, font_size, color);
+			//}
+
+			{ // Display index of winner
+				int winner_index = -1;
+				int i = 0;
+				for (const player_entity& player : game_instance.m_state.m_players) {
+					if (!player.m_dead && winner_index == -1) {
+						winner_index = i; 
+					}
+					else if (!player.m_dead && winner_index >= 0) {
+						winner_index = -2;
+					}
+					i++;
+				}
+
+				constexpr int font_size = 40;
+				constexpr Color color = MAROON;
+				std::string text = "";
+				if (winner_index >= 0) {
+					text += TextFormat("Player %d: %s Won!"
+						, winner_index
+						, game_instance.m_player_info[winner_index].m_name
+					);
+				}
+				else {
+					text += "No winner! Draw!";
+				}
+				
+				const int text_width = MeasureText(text.c_str(), font_size);
+				const int text_x = (GetScreenWidth() - text_width) / 2;
+				const int text_y = 8;
+				DrawText(text.c_str(), text_x + 1, text_y + 1, font_size, BLACK);
+				DrawText(text.c_str(), text_x, text_y, font_size, color);
+			}
+
 		}
 
 
