@@ -80,7 +80,7 @@ namespace meteor {
 		r &= is_walkable(coord);
 
 		r &= !is_bomb_at(coord);	
-		r &= (get_bomb(player_index).m_explosion_tick + bomb::COOLDOWN_TICKS) < m_tick;	// and the bomb isn't already placed or in cooldown...
+		r &= (get_bomb(player_index).m_explosion_tick + bomb::COOLDOWN_TICKS) < m_tick;
 
 		return r;
 	}
@@ -88,18 +88,21 @@ namespace meteor {
 	bool game_state::is_bomb_at(const Vector2i& coord) const noexcept {
 		bool r = false;
 		for (const bomb& bomb : m_bombs) {
-			r &= (bomb.m_explosion_tick > m_tick 
-				&& bomb.m_x == coord.x 
-				&& bomb.m_y == coord.y);
+			r |= (bomb.m_explosion_tick > m_tick 
+				&& bomb.m_x == (uint8)coord.x
+				&& bomb.m_y == (uint8)coord.y);
 		}
 
 		return r;
 	}
 
 	bool game_state::is_walkable(const Vector2i& coord) const {
-		if (is_valid_tile(coord)) 
-			if (!m_tilemap.is_tile_active(coord)) 
+		if (is_valid_tile(coord)) {
+			if (!m_tilemap.is_tile_active(coord)) {
 				return true;
+			}
+		}
+
 		return false;
 	}
 
@@ -154,13 +157,21 @@ namespace meteor {
 
 		if (dir != Vector2(0, 0)) {
 			Vector2 new_pos = player.m_position + dir * (float)speed;
-			if (is_walkable(new_pos)) {
-				player.m_position = new_pos;
+			
+			bool is_on_bomb = is_bomb_at((Vector2i)player.m_position);
+			bool new_is_on_bomb = is_bomb_at((Vector2i)new_pos);
+			
+			bool success = true;
+			success &= is_walkable((Vector2i)new_pos);
+			success &= !(new_is_on_bomb && !is_on_bomb);		// To only allow mooving from a pos with bomb, not into one
+			if ((new_is_on_bomb && !is_on_bomb)) {
+				success = false;
 			}
+
+			if (success)
+				player.m_position = new_pos;
+
 		}
-
-		
-
 	}
 
 	// Returns true if it hit a tile, destroying it, and killing any players on the way
