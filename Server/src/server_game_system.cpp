@@ -69,10 +69,12 @@ namespace meteor::server_game_system {
 			}
 			
 			// PARSE INPUT FOR SERVER to controll bot
-			else if (game_instance.m_player_info[player_index].m_player_status == player_info::status::ACTIVE_BOT && !bot_controlled) {
-				bot_controlled = true;
-				player.m_prev_action = input_to_player_action(input_state, game_instance.m_state, player_index);
+			else if (game_instance.m_player_info[player_index].m_player_status == player_info::status::ACTIVE_BOT) {
 				player.m_prev_action_tick = game_instance.m_state.m_tick;
+				if (!bot_controlled) {
+					bot_controlled = true;
+					player.m_prev_action = input_to_player_action(input_state, game_instance.m_state, player_index);
+				}
 			}
 
 			game_instance.m_state.update_player(player_index);
