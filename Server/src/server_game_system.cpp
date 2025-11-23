@@ -59,7 +59,7 @@ namespace meteor::server_game_system {
 		bool bot_controlled = false;
 		uint8 player_index = 0;
 		for (player_entity& player : game_instance.m_state.m_players) {
-			if (player.m_dead) { player_index++;  continue; }
+			//if (player.m_dead) { player_index++;  continue; }
 
 			// Get next action, if there are any queued up
 			if (!game_instance.m_player_action_queue[player_index].is_empty()) {
