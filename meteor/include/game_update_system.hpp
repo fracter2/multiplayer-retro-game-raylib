@@ -91,7 +91,12 @@ namespace meteor::game_update_system {
 		game_state p_state = game_state(state);
 		
 		// TODO Apply predicted actions to client player and client bomb	// TODO MOVE GAME LOGIC OPERATIONS TO UTILITY CLASS TO SYNC BETWEEN CLIENT/SERVER
-		
+		for (player_entity::action action : game_instance.m_predict_actions) {
+			p_state.m_tick += 1;
+			p_state.m_players[user_index].m_prev_action = action;
+			p_state.update_player(user_index);
+		}
+
 		game_instance.m_predicted_state = p_state;
 
 	}
