@@ -22,85 +22,76 @@ namespace meteor::game_update_system {
 		
 
 		if (game_instance.m_status == game::status::PRE_GAME) {
-			// TODO Lobby? wait to recieve game start message
-
 			return;
 		}
 		else if (game_instance.m_status == game::status::POST_GAME) {
-			// TODO Win / lose screen / stats?
-
 			return;
 		}
 		else if (game_instance.m_status == game::status::INVALID) {
-
 			return;
 		}
 
 
+		else if (game_instance.m_status != game::status::IN_GAME) { 
+			return; 
+		}
+		
 
 		// ======== IN_GAME ========
 
-		if (game_instance.m_state_queue.size() == 0) {							// Extrapolate
+		// Type safe const to reduce word lengths and to emphasise when it's mutable or not (to avoid setting accidently)
+		const auto& state_queue = game_instance.m_state_queue;
+		const auto& state = game_instance.m_state;
+
+		if (state_queue.size() == 0) {
 			// or... not? just freeze?
 			// Extrapolate only to a degree?
 			return;
 		}
 
-		else if (game_instance.m_state_queue[0].is_default()) {					// Interpolate between current and next valid state
+		// INTERPOLATE EMPTY STATES
+		else if (state_queue[0].is_default()) {
 			int count = 0;
-			while (game_instance.m_state_queue[count].is_default()) { count++; }
+			while (state_queue[count].is_default()) { count++; }
 
 			std::vector<game_state> r = {};
-			interp_game_states(game_instance.m_state, game_instance.m_state_queue[count], r);
+			interp_game_states(state, state_queue[count], r);
 			
 			assert(count == r.size());
 
 			count = 0;
-			while (game_instance.m_state_queue[count].is_default()) { 
+			while (state_queue[count].is_default()) {
 				game_instance.m_state_queue[count] = r[count];
 				count++; 
 			}
 		}
 
+		// SET NEXT STATE
 		game_instance.m_prev_state = game_instance.m_state;
-		game_instance.m_state = game_instance.m_state_queue[0];
-		game_instance.m_state_queue.erase(game_instance.m_state_queue.begin());
+		game_instance.m_state = state_queue[0];
+		game_instance.m_state_queue.erase(state_queue.begin());
 
 		
-		// Type safe const to reduce word lengths and to emphasise when it's mutable or not (to avoid setting accidently)
-		const uint8			 user_index  = (uint8)game_instance.m_user_index;
-		const game_state&	 state	     = game_instance.m_state;
-
-
 		// INPUT PARSING
-		game_instance.m_predict_actions.push_back(input_to_player_action(input_state, state, user_index));
-		//game_instance.m_predict_actions.insert(game_instance.m_predict_actions.begin(), input_to_player_action(input_state, state, user_index));
+		const uint8	user_index  = (uint8)game_instance.m_user_index;
+		auto& p_actions = game_instance.m_predict_actions;
+		
+		p_actions.push_back(input_to_player_action(input_state, state, user_index));
 		game_instance.m_actions_not_sent += 1;
 
 
+		// CLIENT SIDE PREDICTION
 		// Remove predicted actions that have been used by the server
 		int ticks_ahead = state.m_tick - state.m_players[user_index].m_prev_action_tick;
-		int ticks_to_remove = (int)game_instance.m_predict_actions.size() - ticks_ahead;
+		int ticks_to_remove = (int)p_actions.size() - ticks_ahead;
 
 		if (ticks_to_remove > 0) {
-			game_instance.m_predict_actions.erase(game_instance.m_predict_actions.begin(), game_instance.m_predict_actions.begin() + (ticks_to_remove));	// second one isn't included!
-			//game_instance.m_predict_actions.erase(game_instance.m_predict_actions.end() - ticks_to_remove, game_instance.m_predict_actions.end());
-			
+			p_actions.erase(p_actions.begin(), p_actions.begin() + (ticks_to_remove));	// second one isn't included!
 		}
 
-		
-		// CLIENT SIDE PREDICTION
 		game_state p_state = game_state(state);
-		if (input_state.m_2_just_pressed) {
-			debug::info("current tick: %d, action tick: %d, predict_actions.size(): %d, state_queue.size(): %d \n",
-				state.m_tick,
-				state.m_players[user_index].m_prev_action_tick,
-				(uint32)game_instance.m_predict_actions.size(),
-				(uint32)game_instance.m_state_queue.size()
-			);
-		}
 
-		for (const player_entity::action action : game_instance.m_predict_actions) {
+		for (const player_entity::action action : p_actions) {
 			p_state.m_tick += 1;
 			p_state.m_players[user_index].m_prev_action = action;
 			p_state.update_player(user_index);
@@ -108,6 +99,16 @@ namespace meteor::game_update_system {
 
 		game_instance.m_predicted_state = p_state;
 
+
+		// DEBUG PRINT
+		if (input_state.m_2_just_pressed) {
+			debug::info("current tick: %d, action tick: %d, predict_actions.size(): %d, state_queue.size(): %d \n",
+				state.m_tick,
+				state.m_players[user_index].m_prev_action_tick,
+				(uint32)p_actions.size(),
+				(uint32)state_queue.size()
+			);
+		}
 	}
 
 
