@@ -158,10 +158,11 @@ namespace meteor::render{
 			// RENDER FPS
 			DrawFPS(2, GetScreenHeight() - 20);
 			
+			int y_offset = 80 + 175 * (game_instance.m_user_index - 1);	// Mimic server alignment for convenience
 
-			render_rtt_graph(MAP_OFFSET + Vector2(120, MAP_SIZE.y + 150), conn, -500.0f);
-			render_send_bytes_hist(MAP_OFFSET + Vector2(240, MAP_SIZE.y + 150), conn, -0.25f);
-			render_recieve_bytes_hist(MAP_OFFSET + Vector2(360, MAP_SIZE.y + 150), conn, -0.25f);
+			render_rtt_graph(HUD_OFFSET + Vector2(300, y_offset), conn, -500.0f);			// seconds to ms, 1px per 2ms
+			render_send_bytes_hist(HUD_OFFSET + Vector2(420, y_offset), conn, -0.25f);		// 1px per 4 bytes
+			render_recieve_bytes_hist(HUD_OFFSET + Vector2(540, y_offset), conn, -0.25f);	// 1px per 4 bytes
 
 			render_connection_stats(Vector2i(80, 20), conn);
 		}
