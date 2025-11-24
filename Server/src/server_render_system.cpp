@@ -137,7 +137,18 @@ namespace meteor::render {
 			// RENDER FPS
 			DrawFPS(2, GetScreenHeight() - 20);
 
-			render_player_info(Vector2i(8, 40), game_instance, server);
+			render_player_info(HUD_OFFSETI + Vector2i(8, 40), game_instance, server);
+
+			float y_offset = 0;
+			for (const connection& conn : server.m_clients) {
+				y_offset += 200;
+				render_rtt_graph(HUD_OFFSET + Vector2(300, y_offset), conn, 0.5f);
+				render_send_bytes_hist(HUD_OFFSET + Vector2(420, y_offset), conn, 0.5f);
+				render_recieve_bytes_hist(HUD_OFFSET + Vector2(540, y_offset), conn, 0.5f);
+
+			}
+			
+
 
 			/*Vector2i offset = HUD_OFFSET + Vector2(80, 20);
 			for (const connection& conn : server.m_clients) {

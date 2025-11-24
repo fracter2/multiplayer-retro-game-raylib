@@ -32,7 +32,7 @@ namespace meteor::render{
 			// TODO REMDER CLIENT PREDICTION / SERVER_AUTH BOX for local player / bomb
 
 
-			render_player_info(Vector2i(8, 40), game_instance);
+			render_player_info(HUD_OFFSETI + Vector2i(8, 40), game_instance);
 		}
 		
 
@@ -42,7 +42,7 @@ namespace meteor::render{
 			//render_bombs(texture, game_instance.m_predicted_state);
 			//render_characters(texture, game_instance.m_predicted_state);
 
-			render_player_info(Vector2i(8, 40), game_instance);
+			render_player_info(HUD_OFFSETI + Vector2i(8, 40), game_instance);
 
 			{ // "Waiting for server to start"
 				constexpr int font_size = 40;
@@ -66,7 +66,7 @@ namespace meteor::render{
 			render_bombs(texture, game_instance.m_predicted_state);
 			render_characters(texture, game_instance.m_predicted_state);
 
-			render_player_info(Vector2i(8, 40), game_instance);
+			render_player_info(HUD_OFFSETI + Vector2i(8, 40), game_instance);
 
 			//{ // "Game Over"
 			//	constexpr int font_size = 40;
@@ -159,13 +159,10 @@ namespace meteor::render{
 			DrawFPS(2, GetScreenHeight() - 20);
 			
 
-			// TODO RENDER RTT in ms (averaged across a second? sepparate peak?)
+			render_rtt_graph(MAP_OFFSET + Vector2(0, MAP_SIZE.y + 200), conn, 0.5f);
+			render_send_bytes_hist(MAP_OFFSET + Vector2(0, MAP_SIZE.y + 200), conn, 0.5f);
+			render_recieve_bytes_hist(MAP_OFFSET + Vector2(0, MAP_SIZE.y + 200), conn, 0.5f);
 
-
-
-			// TODO RENDER BYTES SENT PER SECOND
-
-			// TODO RENDER GRAPH WITH BYTES/s AND RTT
 			render_connection_stats(Vector2i(80, 20), conn);
 		}
 
