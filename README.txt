@@ -10,6 +10,7 @@ This is my hand-in for the final assignment in the course Network Programming fo
 It is a simple remake of Bomberman in Raylib/c++ with terrible gameplay but functioning multiplayer.
 The network code is implemented using UDP in a server / client configuration.
 
+Bombs explode in straight horizontal and vertical lines, even though there is no visual for it. bombs block movement.
 
 ---- HOW TO USE ----
 The server and client can (and should) be run in visual studio using the debugger. 
