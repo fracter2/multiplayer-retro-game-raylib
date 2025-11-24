@@ -11,7 +11,7 @@ namespace meteor::client_recieve_system {
 
 	
 	void update(
-		double time,
+		double& next_tick_time,
 		udp_socket& socket,
 		connection& conn,
 		game& game

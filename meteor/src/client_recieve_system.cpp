@@ -8,7 +8,7 @@
 
 namespace meteor::client_recieve_system {
 
-	void update(double time, udp_socket& socket, connection& conn, game& game_instance) {
+	void update(double& next_tick_time, udp_socket& socket, connection& conn, game& game_instance) {
 
 		// note: timeout
 		if (conn.get_status() != connection::status::DISCONNECTED
@@ -93,6 +93,7 @@ namespace meteor::client_recieve_system {
 					game_instance.m_user_index = packet.m_player_id;
 					game_instance.m_status = game::status::PRE_GAME;
 
+					next_tick_time = GetTime(); // Queue next tick imidiately to start latency well off
 					break;
 				}
 				default:
