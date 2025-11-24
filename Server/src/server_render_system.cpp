@@ -45,9 +45,9 @@ namespace meteor::render {
 			{ // Toggle broadcast and start game (key 2 & 3) Instructions
 				constexpr int font_size = 20;
 				constexpr Color color = MAROON;
-				const char* text = TextFormat("Press '2' to toggle broadcasts (%s) and '3' to START GAME (%s) and '4' to add BOTS"
+				const char* text = TextFormat("Press '2' to toggle broadcasts (%s) \n - Press '3' to START GAME (%s) and '4' to add BOTS"
 					, server.m_broadcast? "ON" : "OFF"
-					, game_instance.get_player_count() >= 2? "CAN START      " : "TOO FEW PLAYERS"
+					, game_instance.get_player_count() >= 2? "CAN START" : "TOO FEW PLAYERS"
 				);
 				const int text_width = MeasureText(text, font_size);
 				const int text_x = (GetScreenWidth() - text_width) / 2;
