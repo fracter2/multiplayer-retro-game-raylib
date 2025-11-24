@@ -13,6 +13,7 @@
 #include "server_send_system.hpp"
 #include "server_render_system.hpp"
 #include "server_game_system.hpp"
+#include "ui.hpp"
 
 //#define _SERVER   // Already defined as a "global" macro in server proj file
 
@@ -31,8 +32,8 @@ int main()
 	udp_socket   socket = {};
 	server_state server = {};
 
-	game			   game_instance = {};
-	input::input_state input = {};
+	game		game_instance = {};
+	input_state input = {};
 
 	double next_tick_time = GetTime();
 	uint32 ticks = 0;
@@ -72,7 +73,8 @@ int main()
 			next_tick_time += TICK_TIME;
 			ticks += 1;
 
-			input::update(input);
+			input.update();
+
 			ui::debug_skip_recieve_check(server, input);
 
 			server_game_system::update(ticks, dt, game_instance, input, server);

@@ -5,34 +5,12 @@
 #include "common.hpp"
 
 
-namespace meteor::input {
-
-	/*
-	enum class input_type : uint8 {
-		LATENCY,
-		POSITION,
-		ENTITY_STATE
-	};
-	*/
+namespace meteor {
 
 	struct input_state {
 		input_state() = default;
 
-		input_state(bool up, bool down, bool left, bool right, bool place_bomb, bool lmb, bool esc);
-
-		/* TODO make it use induvidual bits like below, to save space. low prio as it's shouldn't be sent over network anyway.
-		uint8 m_bits = 0;
-
-		void set_true(input_type input) {
-			uint8 bitmask = 1 << (uint8)input;			// x << y is bit shifting x left by y bits
-			m_bits | bitmask;							// | is bitwise OR. To set bitmasked bits to 1
-		}
-
-		void set_false(input_type input) {
-			uint8 bitmask = ~(1 << (uint8)input);		// ~ is bitwise "complement" operator, flips all 1 and 0
-			m_bits & bitmask;							// & is bitwise AND. To flip (un-)bitmasked value to 0
-		}
-		*/
+		void update();
 
 		bool m_up = false;
 		bool m_down = false;
@@ -48,16 +26,31 @@ namespace meteor::input {
 		bool m_1 = false;						// 
 		bool m_1_just_pressed = false;			// Server toggle online / offline. Client quit-game
 
-		bool m_2 = false;						// Client print debug info mid-game
+		bool m_2 = false;						// (press or hold) Client print debug info mid-game
 		bool m_2_just_pressed = false;			// Server toggle broadcasts
 
-		bool m_3 = false;						// Server start game.
-		bool m_3_just_pressed = false;			// 
+		bool m_3 = false;						// 
+		bool m_3_just_pressed = false;			// Server start game.
 
-		bool m_4 = false;						// Server fill lobby with bots
-		bool m_4_just_pressed = false;			// 
+		bool m_4 = false;						// 
+		bool m_4_just_pressed = false;			// Server fill lobby with bots
+
+		bool m_5 = false;						// Server & Client (hold) Skip any recieve packet (simulate packet loss)
+		bool m_5_just_pressed = false;			// 
+
+		bool m_6 = false;						// 
+		bool m_6_just_pressed = false;			// Server Toggle sending fewer game state updates (3 * 20/s default -> 1 * 20/s) // TODO
+
+		bool m_7 = false;						// 
+		bool m_7_just_pressed = false;			// Server & client lessen time to next tick // TODO
+
+		bool m_8 = false;						// 
+		bool m_8_just_pressed = false;			// Server & client increase time to next tick // TODO
+
+		bool m_9 = false;						// 
+		bool m_9_just_pressed = false;			// Server & client Allow instant ACK replies // TODO
 	};
 
 
-	void update(input_state& state);
+	
 }

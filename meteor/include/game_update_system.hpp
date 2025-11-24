@@ -18,7 +18,7 @@ namespace meteor::game_update_system {
 	
 	
 
-	void update(game& game_instance, const input::input_state& input_state) {
+	void update(game& game_instance, const input_state& input) {
 
 		if (game_instance.m_status == game::status::PRE_GAME) {
 			return;
@@ -75,7 +75,7 @@ namespace meteor::game_update_system {
 		const uint8	user_index  = (uint8)game_instance.m_user_index;
 		auto& p_actions = game_instance.m_predict_actions;
 		
-		p_actions.push_back(input_to_player_action(input_state, state, user_index));
+		p_actions.push_back(input_to_player_action(input, state, user_index));
 		game_instance.m_actions_not_sent += 1;
 
 
@@ -100,7 +100,7 @@ namespace meteor::game_update_system {
 
 
 		// DEBUG PRINT
-		if (input_state.m_2_just_pressed) {
+		if (input.m_2_just_pressed) {
 			debug::info("current tick: %d, action tick: %d, predict_actions.size(): %d, state_queue.size(): %d \n",
 				state.m_tick,
 				state.m_players[user_index].m_prev_action_tick,

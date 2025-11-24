@@ -5,46 +5,37 @@
 #include "input.hpp"
 #include "raylib.h"
 
-namespace meteor::input {
+namespace meteor {
 
-	input_state::input_state(bool up, bool down, bool left, bool right, bool place_bomb, bool lmb, bool esc)
-		: m_up(up)
-		, m_down(down)
-		, m_left(left)
-		, m_right(right)
-		, m_place_bomb(place_bomb)
-		, m_lmb(lmb)
-		, m_lmb_just_pressed(lmb)
-		, m_esc(esc)
-		, m_esc_just_pressed(esc)
-		, m_1(false)
-		, m_1_just_pressed(false)
-		, m_2(false)
-		, m_2_just_pressed(false)
-		, m_3(false)
-		, m_3_just_pressed(false)
-	{
-	}
 
-	void update(input_state& state) {
-		//input_state state;
-		state.m_up = IsKeyDown(KEY_W) or IsKeyDown(KEY_UP);
-		state.m_down = IsKeyDown(KEY_S) or IsKeyDown(KEY_DOWN);
-		state.m_left = IsKeyDown(KEY_A) or IsKeyDown(KEY_LEFT);
-		state.m_right = IsKeyDown(KEY_D) or IsKeyDown(KEY_RIGHT);
-		state.m_place_bomb = IsKeyDown(KEY_SPACE);
-		state.m_lmb_just_pressed = (!state.m_lmb) and IsMouseButtonDown(MOUSE_BUTTON_LEFT);
-		state.m_lmb = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
-		state.m_esc_just_pressed = (!state.m_esc) and IsKeyDown(KEY_ESCAPE);
-		state.m_esc = IsKeyDown(KEY_ESCAPE);
+	void input_state::update() {
+		m_up = IsKeyDown(KEY_W) or IsKeyDown(KEY_UP);
+		m_down = IsKeyDown(KEY_S) or IsKeyDown(KEY_DOWN);
+		m_left = IsKeyDown(KEY_A) or IsKeyDown(KEY_LEFT);
+		m_right = IsKeyDown(KEY_D) or IsKeyDown(KEY_RIGHT);
+		m_place_bomb = IsKeyDown(KEY_SPACE);
+		m_lmb_just_pressed = (!m_lmb) and IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+		m_lmb = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+		m_esc_just_pressed = (!m_esc) and IsKeyDown(KEY_ESCAPE);
+		m_esc = IsKeyDown(KEY_ESCAPE);
 
-		state.m_1_just_pressed = !(state.m_1) and IsKeyDown(KEY_ONE);			// Toggle server online / offline. Client quit-game
-		state.m_1 = IsKeyDown(KEY_ONE);
-		state.m_2_just_pressed = !(state.m_2) and IsKeyDown(KEY_TWO);			// Toggle server send broadcast / client join broadcast
-		state.m_2 = IsKeyDown(KEY_TWO);
-		state.m_3_just_pressed = !(state.m_3) and IsKeyDown(KEY_THREE);			// Server start game
-		state.m_3 = IsKeyDown(KEY_THREE);
-		state.m_4_just_pressed = !(state.m_4) and IsKeyDown(KEY_FOUR);			// Server fill lobby with bots
-		state.m_4 = IsKeyDown(KEY_FOUR);
+		m_1_just_pressed = !(m_1) and IsKeyDown(KEY_ONE);
+		m_1 = IsKeyDown(KEY_ONE);
+		m_2_just_pressed = !(m_2) and IsKeyDown(KEY_TWO);
+		m_2 = IsKeyDown(KEY_TWO);
+		m_3_just_pressed = !(m_3) and IsKeyDown(KEY_THREE);	
+		m_3 = IsKeyDown(KEY_THREE);
+		m_4_just_pressed = !(m_4) and IsKeyDown(KEY_FOUR);
+		m_4 = IsKeyDown(KEY_FOUR);
+		m_5_just_pressed = !(m_5) and IsKeyDown(KEY_FIVE);
+		m_5 = IsKeyDown(KEY_FIVE);
+		m_6_just_pressed = !(m_6) and IsKeyDown(KEY_SIX);
+		m_6 = IsKeyDown(KEY_SIX);
+		m_7_just_pressed = !(m_7) and IsKeyDown(KEY_SEVEN);
+		m_7 = IsKeyDown(KEY_SEVEN);
+		m_8_just_pressed = !(m_8) and IsKeyDown(KEY_EIGHT);
+		m_8 = IsKeyDown(KEY_EIGHT);
+		m_9_just_pressed = !(m_9) and IsKeyDown(KEY_NINE);
+		m_9 = IsKeyDown(KEY_NINE);
 	}
 }

@@ -7,7 +7,7 @@
 #include "common.hpp"
 
 namespace meteor {
-	static player_entity::action input_to_player_action(const input::input_state& input, const game_state& state, const int player_index) {
+	static player_entity::action input_to_player_action(const input_state& input, const game_state& state, const int player_index) {
 		player_entity::action action = player_entity::action::INVALID;
 		const bool vertical_active = input.m_up != input.m_down;
 		const bool horizontal_active = input.m_left != input.m_right;

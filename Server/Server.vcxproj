@@ -26,6 +26,7 @@
     <ClCompile Include="..\meteor\src\network.cpp" />
     <ClCompile Include="..\meteor\src\network_layer.cpp" />
     <ClCompile Include="..\meteor\src\protocol.cpp" />
+    <ClCompile Include="..\meteor\src\ui.cpp" />
     <ClCompile Include="src\server.cpp" />
     <ClCompile Include="src\server_game_system.cpp" />
     <ClCompile Include="src\server_recieve_system.cpp" />

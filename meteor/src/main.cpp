@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 	connection  server_connection = {};
 
 	game			   game_instance = {};
-	input::input_state input = {};
+	input_state input = {};
 	
 	double next_tick_time = GetTime();
 	uint32 ticks = 0;
@@ -70,14 +70,14 @@ int main(int argc, char **argv)
 		
 
 
-		client_recieve_system::update(time, socket, server_connection, game_instance);
+		client_recieve_system::update(next_tick_time, socket, server_connection, game_instance);
 
 		// tick loop
 		if (time >= next_tick_time) {
 			next_tick_time += TICK_TIME;
 			ticks += 1;
 
-			input::update(input);
+			input.update();
 
 			ui::quit_check(server_connection, input);
 			ui::debug_skip_recieve_check(server_connection, input);

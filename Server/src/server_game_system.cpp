@@ -9,23 +9,23 @@
 namespace meteor::server_game_system {
 
 
-	void update(const uint32& app_tick, const double& dt, game& game_instance, const input::input_state& input_state, server_state& server) {
+	void update(const uint32& app_tick, const double& dt, game& game_instance, const input_state& input, server_state& server) {
 
 
-		if (input_state.m_2_just_pressed) {
+		if (input.m_2_just_pressed) {
 			server.m_broadcast = !server.m_broadcast;
 		}
 
 
 		// ======== PRE_GAME ========
 		if (game_instance.m_status == game::status::PRE_GAME) {
-			if (input_state.m_3_just_pressed && game_instance.get_player_count() >= 2) {
+			if (input.m_3_just_pressed && game_instance.get_player_count() >= 2) {
 				game_instance.m_queue_game_start = true;
 				game_instance.init();
 				game_instance.start();
 				server.m_status = server_state::status::ONLINE;
 			}
-			if (input_state.m_4_just_pressed && game_instance.get_player_count() < MAX_PLAYERS) {
+			if (input.m_4_just_pressed && game_instance.get_player_count() < MAX_PLAYERS) {
 				game_instance.fill_player_slots_with_bots();
 				game_instance.m_game_lobby_changed = true;
 			}
@@ -41,7 +41,7 @@ namespace meteor::server_game_system {
 
 		// ======== INVALID ========
 		else if (game_instance.m_status == game::status::INVALID) {
-			if (input_state.m_1_just_pressed && server.m_status == server_state::status::OFFLINE) {
+			if (input.m_1_just_pressed && server.m_status == server_state::status::OFFLINE) {
 				game_instance.m_status = game::status::PRE_GAME;
 				server.m_status = server_state::status::ONLINE_JOINABLE;
 
@@ -74,7 +74,7 @@ namespace meteor::server_game_system {
 
 				if (game_instance.m_player_info[player_index].m_player_status == player_info::status::ACTIVE_BOT && !bot_controlled) {
 					bot_controlled = true;
-					player.m_prev_action = input_to_player_action(input_state, game_instance.m_state, player_index);
+					player.m_prev_action = input_to_player_action(input, game_instance.m_state, player_index);
 				}
 			}
 
