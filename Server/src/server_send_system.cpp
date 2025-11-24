@@ -81,7 +81,7 @@ else {																						\
 			switch (conn.get_status()) {
 			case connection::status::CONNECTING: {
 				debug::info("%g - sending connect response to client: %d", GetTime(), client_index);
-				connect_packet packet;
+				connect_packet packet = connect_packet(client_index, false);
 				packet.write(writer);
 
 				conn.send_stream(socket, stream_send);
