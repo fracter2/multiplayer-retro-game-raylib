@@ -39,6 +39,10 @@ namespace meteor {
 		uint32 get_recieve_sequence() const { return m_recieve_sequence; }
 		uint32 get_recieve_acknowledge() const { return m_recieve_acknowledge; }
 
+		const std::vector<uint32>& get_send_bytes_history() const { return m_send_bytes_history; }
+		const std::vector<uint32>& get_recieve_bytes_history() const { return m_recieve_bytes_history; }
+		const std::vector<double>& get_rtt_history() const { return m_rtt_history; }
+
 		double get_prev_rtt() const { if (m_rtt_history.empty()) return 0; else return m_rtt_history.front(); }
 
 		ip_endpoint m_endpoint		 = {};
