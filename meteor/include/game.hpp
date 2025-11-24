@@ -36,11 +36,12 @@ namespace meteor {
 	};*/
 
 	struct Vector2i {
-		Vector2i() = default;
-		Vector2i(const int& x, const int& y) : x(x), y(y) {};
-		Vector2i(const Vector2& a) : x((int)a.x), y((int)a.y) {};
+		constexpr Vector2i() = default;
+		constexpr Vector2i(const int& x, const int& y) : x(x), y(y) {};
+		constexpr Vector2i(const Vector2& a) : x((int)a.x), y((int)a.y) {};
 
-		int x, y = 0;
+		int x = 0;
+		int y = 0;
 		Vector2i operator+(const Vector2i& a) const { return Vector2i(x + a.x, y + a.y); }
 		Vector2i operator-(const Vector2i& a) const { return Vector2i(x - a.x, y - a.y); }
 		Vector2i operator*(const Vector2i& a) const { return Vector2i(x * a.x, y * a.y); }
