@@ -38,6 +38,7 @@ namespace meteor::render {
 	//static constexpr Vector2 MAP_OFFSET = Vector2(((WINDOW_WIDTH - MAP_SIZE.x) / 2), 80);
 	static constexpr Vector2 MAP_OFFSET = Vector2(80, 80);
 	static constexpr Vector2 HUD_OFFSET = Vector2(MAP_OFFSET.x + MAP_SIZE.x, MAP_OFFSET.y);
+	static constexpr Vector2i HUD_OFFSETI = Vector2i((int)MAP_OFFSET.x + (int)MAP_SIZE.x, (int)MAP_OFFSET.y);
 
 	
 
@@ -156,8 +157,8 @@ namespace meteor::render {
 			str += ")\n\n";
 			i++;
 		}
-		const int x = (int)HUD_OFFSET.x + coord.x;
-		const int y = (int)HUD_OFFSET.y + coord.y;
+		const int x = coord.x;
+		const int y = coord.y;
 		DrawText(str.c_str(), x + 1, y + 1, font_size, color_backdrop);
 		DrawText(str.c_str(), x, y, font_size, color);
 	}
@@ -188,13 +189,32 @@ namespace meteor::render {
 			str += ")\n\n";
 			i++;
 		}
-		const int x = (int)HUD_OFFSET.x + coord.x;
-		const int y = (int)HUD_OFFSET.y + coord.y;
+		const int x = coord.x;
+		const int y = coord.y;
 		DrawText(str.c_str(), x + 1, y + 1, font_size, color_backdrop);
 		DrawText(str.c_str(), x, y, font_size, color);
 	}
 #endif
 
+	static void render_rtt_graph(const Vector2 offset, const connection& conn, const float range_mult) {
+		const auto& hist = conn.get_rtt_history();
+		for (int i = 0; i < hist.size(); i++) {
+			DrawLineV(offset + Vector2((float)i, 0), offset + Vector2((float)i, (float)hist[i] * range_mult), MAROON);
+		}
+	}
 
+	static void render_send_bytes_hist(const Vector2 offset, const connection& conn, const float range_mult) {
+		const auto& hist = conn.get_send_bytes_history();
+		for (int i = 0; i < hist.size(); i++) {
+			DrawLineV(offset + Vector2((float)i, 0), offset + Vector2((float)i, (float)hist[i] * range_mult), DARKGREEN);
+		}
+	}
+
+	static void render_recieve_bytes_hist(const Vector2 offset, const connection& conn, const float range_mult) {
+		const auto& hist = conn.get_recieve_bytes_history();
+		for (int i = 0; i < hist.size(); i++) {
+			DrawLineV(offset + Vector2((float)i, 0), offset + Vector2((float)i, (float)hist[i] * range_mult), DARKGREEN);
+		}
+	}
 
 }
