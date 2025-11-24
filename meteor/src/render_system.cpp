@@ -159,9 +159,9 @@ namespace meteor::render{
 			DrawFPS(2, GetScreenHeight() - 20);
 			
 
-			render_rtt_graph(MAP_OFFSET + Vector2(0, MAP_SIZE.y + 200), conn, 0.5f);
-			render_send_bytes_hist(MAP_OFFSET + Vector2(0, MAP_SIZE.y + 200), conn, 0.5f);
-			render_recieve_bytes_hist(MAP_OFFSET + Vector2(0, MAP_SIZE.y + 200), conn, 0.5f);
+			render_rtt_graph(MAP_OFFSET + Vector2(0, MAP_SIZE.y + 200), conn, -500.0f);
+			render_send_bytes_hist(MAP_OFFSET + Vector2(0, MAP_SIZE.y + 200), conn, -0.5f);
+			render_recieve_bytes_hist(MAP_OFFSET + Vector2(0, MAP_SIZE.y + 200), conn, -0.5f);
 
 			render_connection_stats(Vector2i(80, 20), conn);
 		}

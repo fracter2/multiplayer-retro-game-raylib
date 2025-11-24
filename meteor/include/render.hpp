@@ -199,7 +199,7 @@ namespace meteor::render {
 	static void render_rtt_graph(const Vector2 offset, const connection& conn, const float range_mult) {
 		const auto& hist = conn.get_rtt_history();
 		for (int i = 0; i < hist.size(); i++) {
-			DrawLineV(offset + Vector2((float)i, 0), offset + Vector2((float)i, (float)hist[i] * range_mult), MAROON);
+			DrawLineV(offset + Vector2((float)i, 0), offset + Vector2((float)i, (float)hist[i] * range_mult), DARKBLUE);
 		}
 	}
 
@@ -213,7 +213,7 @@ namespace meteor::render {
 	static void render_recieve_bytes_hist(const Vector2 offset, const connection& conn, const float range_mult) {
 		const auto& hist = conn.get_recieve_bytes_history();
 		for (int i = 0; i < hist.size(); i++) {
-			DrawLineV(offset + Vector2((float)i, 0), offset + Vector2((float)i, (float)hist[i] * range_mult), DARKGREEN);
+			DrawLineV(offset + Vector2((float)i, 0), offset + Vector2((float)i, (float)hist[i] * range_mult), DARKPURPLE);
 		}
 	}
 

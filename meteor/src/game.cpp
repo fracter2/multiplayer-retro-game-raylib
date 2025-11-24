@@ -7,6 +7,12 @@
 
 namespace meteor {
 
+
+	//Vector2i::Vector2i() = default;
+	//Vector2i::Vector2i(const int& x, const int& y) : x(x), y(y) {};
+	//Vector2i::Vector2i(const Vector2& a) : x((int)a.x), y((int)a.y) {};
+
+
 	void game::init() {
 
 		m_state.m_tilemap.set_all(true);

@@ -142,9 +142,9 @@ namespace meteor::render {
 			float y_offset = 0;
 			for (const connection& conn : server.m_clients) {
 				y_offset += 200;
-				render_rtt_graph(HUD_OFFSET + Vector2(300, y_offset), conn, 0.5f);
-				render_send_bytes_hist(HUD_OFFSET + Vector2(420, y_offset), conn, 0.5f);
-				render_recieve_bytes_hist(HUD_OFFSET + Vector2(540, y_offset), conn, 0.5f);
+				render_rtt_graph(HUD_OFFSET + Vector2(300, y_offset), conn, -500.0f);			// seconds to ms, 1px per 2ms
+				render_send_bytes_hist(HUD_OFFSET + Vector2(420, y_offset), conn, -0.5f);		// 1px per 2 bytes
+				render_recieve_bytes_hist(HUD_OFFSET + Vector2(540, y_offset), conn, -0.5f);	// 1px per 2 bytes
 
 			}
 			
