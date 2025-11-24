@@ -69,7 +69,7 @@ namespace meteor::client_send_system {
 				const player_entity::action& action = game_instance.m_predict_actions[i];
 			//for (const player_entity::action& action : game_instance.m_predict_actions) {
 
-				const uint32 action_tick = tick - (game_instance.m_actions_not_sent + 1);					// +1 so when only one is unsent, it's the current tick (as it is)
+				const uint32 action_tick = tick - (game_instance.m_actions_not_sent - 1);					// +1 so when only one is unsent, it's the current tick (as it is)
 				input_action_message message = input_action_message(action, action_tick);
 
 				SAFE_WRITE(message);
