@@ -6,8 +6,6 @@
 #include "game.hpp"
 #include "connection.hpp"
 
-#include "ui.hpp"
-
 #ifdef _SERVER
 #include "server_state.hpp"
 #endif // _SERVER

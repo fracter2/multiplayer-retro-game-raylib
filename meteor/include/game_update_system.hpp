@@ -19,7 +19,6 @@ namespace meteor::game_update_system {
 	
 
 	void update(game& game_instance, const input::input_state& input_state) {
-		
 
 		if (game_instance.m_status == game::status::PRE_GAME) {
 			return;

@@ -17,7 +17,8 @@
 #include "client_recieve_system.hpp"
 #include "game_update_system.hpp"
 #include "render_system.hpp"
-//#include "ui.hpp"
+#include "ui.hpp"
+
 
 //#define _CLIENT // This is also added in project settings, making it "global"
 
@@ -77,6 +78,8 @@ int main(int argc, char **argv)
 			ticks += 1;
 
 			input::update(input);
+
+			ui::quit_check(server_connection, input);
 
 			game_update_system::update(game_instance, input);
 
