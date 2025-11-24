@@ -139,7 +139,8 @@ namespace meteor::client_recieve_system {
 
 				conn.log_recieve_stream(stream_size);
 				conn.set_disconnected();
-				
+				game_instance.m_status = game::status::INVALID;
+
 				break;
 			}//!Disconnect
 
