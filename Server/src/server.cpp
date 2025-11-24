@@ -76,6 +76,7 @@ int main()
 			input.update();
 
 			ui::debug_skip_recieve_check(server, input);
+			ui::debug_send_less_states(server, input);
 
 			server_game_system::update(ticks, dt, game_instance, input, server);
 

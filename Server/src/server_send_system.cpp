@@ -113,7 +113,7 @@ else {																						\
 				// Send unsent game states (not reliable-transmittion, client only cares about latest)
 				// Consider using reverse iterator to simplify(?)
 				
-				int queued_states_count = game_instance.m_states_not_sent;						// Make local for this conn-loop. Reset at end of update()
+				int queued_states_count = game_instance.m_states_not_sent;
 				if (queued_states_count >= 1) {
 					const uint32 state_tick = game_instance.m_state.m_tick;
 					game_state_message state_message = game_state_message(game_instance.m_state);
@@ -121,8 +121,11 @@ else {																						\
 					
 					queued_states_count--;
 				}
-				
-				while (queued_states_count >= 1) {
+
+				if (server.m_debug_send_less_states) {
+					queued_states_count = 0;
+				}
+				else while (queued_states_count >= 1) {
 					const uint32 state_tick = game_instance.m_state.m_tick - queued_states_count;
 					game_state_message state_message = game_state_message(game_instance.m_state_history[queued_states_count - 1]);
 					SAFE_WRITE(state_message);
@@ -130,6 +133,7 @@ else {																						\
 					queued_states_count--;
 				}
 				
+
 				conn.send_payload(socket, stream_send);
 
 				break;

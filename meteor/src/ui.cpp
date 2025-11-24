@@ -22,5 +22,12 @@ namespace meteor::ui {
 		if (input.m_5) { server.m_debug_skip_recieve = true; }
 		else { server.m_debug_skip_recieve = false; }
 	}
+
+	void debug_send_less_states(server_state& server, const input_state& input) {
+		if (input.m_6_just_pressed) { 
+			server.m_debug_send_less_states = !server.m_debug_send_less_states;
+		}
+	}
+
 #endif
 }
