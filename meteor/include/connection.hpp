@@ -54,9 +54,11 @@ namespace meteor {
 
 
 		ip_endpoint m_endpoint = {};
+		bool m_debug_skip_recieve = false;
 
 	private:
 		status m_status = status::DISCONNECTED;
+		
 
 		double m_last_recieve_time   = 0;
 		uint32 m_send_sequence		 = 0;

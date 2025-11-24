@@ -44,6 +44,7 @@ namespace meteor::server_recieve_system {
 			}
 
 			if (sender_endpoint == local_endpoint) { continue; }
+			if (server.m_debug_skip_recieve) { break; }
 
 			// ======== OFFLINE ========
 			if (server.m_status == server_state::status::OFFLINE) {
@@ -159,6 +160,8 @@ namespace meteor::server_recieve_system {
 				const int packet_size = stream_recieve.size();
 				payload_packet packet;
 				if (!packet.read(reader)) { debug::info("%g - error reading payload package", GetTime()); print_error_code(); break; }
+
+				
 
 				uint32 r_index = 0;
 				uint8 client_index = 0;

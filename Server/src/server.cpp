@@ -73,6 +73,7 @@ int main()
 			ticks += 1;
 
 			input::update(input);
+			ui::debug_skip_recieve_check(server, input);
 
 			server_game_system::update(ticks, dt, game_instance, input, server);
 

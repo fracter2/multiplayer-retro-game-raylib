@@ -12,7 +12,7 @@ namespace meteor::client_recieve_system {
 
 		// note: timeout
 		if (conn.get_status() != connection::status::DISCONNECTED
-			&& time > conn.get_last_recieve_time() + TIMEOUT)
+			&& GetTime() > conn.get_last_recieve_time() + TIMEOUT)
 		{
 			debug::info("Timeout");
 			conn.set_disconnected();
@@ -30,6 +30,8 @@ namespace meteor::client_recieve_system {
 				debug::info("socket recieve failed. aborting recieve.");
 				return;	// skip entire method in case it gets resolved next loop
 			}
+
+			if (conn.m_debug_skip_recieve) { break; }
 
 			// Only accept non-server packages if in DISCONNECTED state
 			if (conn.get_status() != connection::status::DISCONNECTED && sender_endpoint != conn.m_endpoint) {

@@ -80,6 +80,7 @@ int main(int argc, char **argv)
 			input::update(input);
 
 			ui::quit_check(server_connection, input);
+			ui::debug_skip_recieve_check(server_connection, input);
 
 			game_update_system::update(game_instance, input);
 
