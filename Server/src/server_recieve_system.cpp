@@ -194,7 +194,7 @@ namespace meteor::server_recieve_system {
 				
 				
 				if (!conn.can_recieve(packet)) continue;
-				else conn.log_payload(packet, packet_size);
+				else conn.log_recieve_payload(packet, packet_size);
 
 
 				// ---- MESSAGES ----

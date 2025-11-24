@@ -45,7 +45,9 @@ namespace meteor {
 		return true;
 	}
 
-	void connection::log_payload(const payload_packet& packet, const uint32 size) {
+	void connection::log_recieve_payload(const payload_packet& packet, const uint32 size) {
+		log_recieve_stream(size);
+		
 		// Logg RTT
 		int messages_just_acked = packet.m_acknowledge - m_recieve_acknowledge;
 		assert(messages_just_acked >= 0); // dont read older packets!!
@@ -62,6 +64,12 @@ namespace meteor {
 		while (m_rtt_history.size() >= MAX_LOGGED_PACKETS)
 			m_rtt_history.pop_back();
 
+		// Update state
+		m_recieve_sequence = packet.m_sequence;
+		m_recieve_acknowledge = packet.m_acknowledge;
+	}
+
+	void connection::log_recieve_stream(const uint32 size) {
 		// Logg Bytes
 		m_recieve_bytes_history.insert(m_recieve_bytes_history.begin(), size);
 		while (m_recieve_bytes_history.size() >= MAX_LOGGED_PACKETS)
@@ -69,8 +77,6 @@ namespace meteor {
 
 		// Update state
 		m_last_recieve_time = GetTime();
-		m_recieve_sequence = packet.m_sequence;
-		m_recieve_acknowledge = packet.m_acknowledge;
 	}
 
 	bool connection::send_payload(udp_socket& socket, byte_stream& stream) {

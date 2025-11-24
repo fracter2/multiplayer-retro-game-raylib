@@ -30,7 +30,8 @@ namespace meteor {
 		connection(ip_endpoint endpoint, status status = status::DISCONNECTED);
 
 		bool can_recieve(const payload_packet& packet) const;
-		void log_payload(const payload_packet& packet, const uint32 size);
+		void log_recieve_payload(const payload_packet& packet, const uint32 size);				// TODO FIX RECIEVE RTT
+		void log_recieve_stream(const uint32 size);												// TODO MAKE NON-PAYLOAD RECIEVES ALWAYS USE THIS, and make m_last_recieve_time PRIVATE
 		bool send_payload(udp_socket& socket, byte_stream& stream);
 		bool send_stream(udp_socket& socket, byte_stream& stream);
 		void set_disconnected();

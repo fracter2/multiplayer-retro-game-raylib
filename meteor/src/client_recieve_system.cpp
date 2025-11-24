@@ -151,7 +151,7 @@ namespace meteor::client_recieve_system {
 				if (!packet.read(reader)) { debug::info("%g - error reading payload package", GetTime()); print_error_code(); break; }
 				
 				if (!conn.can_recieve(packet)) continue;
-				else conn.log_payload(packet, packet_size);
+				else conn.log_recieve_payload(packet, packet_size);
 
 				uint32 msg_sequence = packet.m_sequence; // TODO FOR RELIABLE MESSAGES, set by message_type::SEQUENCE_WRAP, ignore message if conn.sequence is higher.
 				
