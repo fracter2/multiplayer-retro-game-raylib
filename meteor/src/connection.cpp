@@ -54,6 +54,7 @@ namespace meteor {
 
 		while (messages_just_acked > 0) {
 			if (messages_just_acked > m_un_acked_send_times.size()) { debug::info("%g - AJABAJA BROKEN SEQUENCING", GetTime()); }
+
 			m_rtt_history.insert(m_rtt_history.begin(), GetTime() - m_un_acked_send_times.front());
 			m_un_acked_send_times.pop_back();
 			messages_just_acked--;
@@ -73,17 +74,16 @@ namespace meteor {
 	}
 
 	bool connection::send_payload(udp_socket& socket, byte_stream& stream) {
-		if (send_stream(socket, stream)) {
-			m_send_sequence++;
-			m_un_acked_send_times.push_back(GetTime());
+		if (!send_stream(socket, stream)) { return false; }
 
-			assert(m_un_acked_send_times.size() == m_send_sequence - m_recieve_acknowledge);
-			if (!(m_un_acked_send_times.size() == m_send_sequence - m_recieve_acknowledge)) {
-				debug::info("%g - AJABAJA BROKEN SEQUENCING", GetTime());
-			}
-			return true;
+		m_send_sequence++;
+		m_un_acked_send_times.push_back(GetTime());
+
+		assert(m_un_acked_send_times.size() == m_send_sequence - m_recieve_acknowledge);
+		if (!(m_un_acked_send_times.size() == m_send_sequence - m_recieve_acknowledge)) {
+			debug::info("%g - AJABAJA BROKEN SEQUENCING", GetTime());
 		}
-		return false;
+		return true;
 	}
 
 	bool connection::send_stream(udp_socket& socket, byte_stream& stream) {
