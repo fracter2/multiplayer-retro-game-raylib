@@ -43,14 +43,19 @@ namespace meteor::input {
 		bool m_lmb_just_pressed = false;
 		bool m_esc = false;
 		bool m_esc_just_pressed = false;
-		bool m_1 = false;						
-		bool m_1_just_pressed = false;			// Toggle server online / offline. Client quit-game
-		bool m_2 = false;
-		bool m_2_just_pressed = false;			// Toggle server broadcast. Client join broadcast
-		bool m_3 = false;
-		bool m_3_just_pressed = false;			// Server start game
-		bool m_4 = false;
-		bool m_4_just_pressed = false;			// Server fill lobby with bots
+												// What each key does for server & client, aligned with/without "just_pressed" in mind
+												//
+		bool m_1 = false;						// 
+		bool m_1_just_pressed = false;			// Server toggle online / offline. Client quit-game
+
+		bool m_2 = false;						// Client print debug info mid-game
+		bool m_2_just_pressed = false;			// Server toggle broadcasts
+
+		bool m_3 = false;						// Server start game.
+		bool m_3_just_pressed = false;			// 
+
+		bool m_4 = false;						// Server fill lobby with bots
+		bool m_4_just_pressed = false;			// 
 	};
 
 
