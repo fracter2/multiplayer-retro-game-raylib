@@ -114,6 +114,10 @@ namespace meteor::game_update_system {
 			}
 		}
 
+		if (input_state.m_2_just_pressed) {
+			debug::info("---- \n");
+		}
+
 		game_instance.m_predicted_state = p_state;
 
 	}
