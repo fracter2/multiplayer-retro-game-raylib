@@ -16,8 +16,8 @@ The server and client can (and should) be run in visual studio using the debugge
 Select either the server or client(meteor) project in the "configure startup projects" drop-down menu, and run. 
  - I have not been able to run them simultaneously from the same computer, probably because of issues with sockets, but I have not looked into it. 
 
-Gameplay is controlled by WASD and SPACEBAR.
-Every other control uses numbers 1-4, the important ones displayed on screen.
+WASD to move and SPACEBAR to place bombs.
+Every other input uses numbers 1-5, the important ones displayed on screen.
 
 For the server:
 '1' Starts the server.
@@ -26,9 +26,14 @@ For the server:
 '4' Fills the lobby with bots (pre-match only, are replaced by incoming connections).
 	- bots are controlled by server using the same WASD + SPACE, for easy debugging.
 
+
 For the client:
 '1' Quit match, gracefully (sends disconnect and awaits response).
 '2' Print debug info (mid-game).
+
+
+For both:
+'5' (hold) pauses receiving packets (reads but ignores) to simulate packet loss
 
 
 ---- COLLABORATORS ----
