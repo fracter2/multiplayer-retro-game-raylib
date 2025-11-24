@@ -241,14 +241,14 @@ namespace meteor {
 
 		void consume_next() {
 			assert(m_size > 0);
-			const int newest = (int)m_size - 1;
-			for (int i = 0; i < newest; i++) {
+			const int last = (int)m_size - 1;
+			for (int i = 0; i < last; i++) {
 				m_actions[i] = m_actions[i + 1];
 				m_ticks[i] = m_ticks[i + 1];
 			}
-			// Since everything was moved down a step, the last becomes empty
-			m_actions[newest] = {};
-			m_ticks[newest] = {};
+			// Since everything was moved down a step, the last is removed
+			m_actions[last] = {};
+			m_ticks[last] = {};
 			m_size--;
 		}
 
