@@ -92,7 +92,7 @@ namespace meteor::game_update_system {
 		// CLIENT SIDE PREDICTION
 		game_state p_state = game_state(state);
 		if (input_state.m_2_just_pressed) {
-			debug::info(TextFormat("predicted tick: %i, action: %d, player pos: %f, %f"),
+			debug::info("predicted tick: %d, action: %d, player pos: %f, %f",
 				p_state.m_tick,
 				(uint8)p_state.m_players[user_index].m_prev_action,
 				p_state.m_players[user_index].m_position.x,
@@ -105,7 +105,7 @@ namespace meteor::game_update_system {
 			p_state.m_players[user_index].m_prev_action = action;
 			p_state.update_player(user_index);
 			if (input_state.m_2_just_pressed) { 
-				debug::info(TextFormat("predicted tick: %i, action: %d, player pos: %f, %f"), 
+				debug::info("predicted tick: %d, action: %d, player pos: %f, %f",
 					p_state.m_tick, 
 					(uint8)action, 
 					p_state.m_players[user_index].m_position.x,
