@@ -55,10 +55,13 @@ namespace meteor {
 		assert(messages_just_acked <= m_un_acked_send_times.size());
 
 		while (messages_just_acked > 0) {
-			if (messages_just_acked > m_un_acked_send_times.size()) { debug::info("%g - AJABAJA BROKEN SEQUENCING", GetTime()); }
+			if (messages_just_acked > m_un_acked_send_times.size()) { 
+				debug::error("%g - AJABAJA BROKEN SEQUENCING", GetTime()); 
+				break;
+			}
 
 			m_rtt_history.insert(m_rtt_history.begin(), GetTime() - m_un_acked_send_times.front());
-			m_un_acked_send_times.pop_back();
+			m_un_acked_send_times.erase(m_un_acked_send_times.begin());
 			messages_just_acked--;
 		}
 		while (m_rtt_history.size() >= MAX_LOGGED_PACKETS)
