@@ -11,8 +11,8 @@ namespace meteor::client_recieve_system {
 	void update(double time, udp_socket& socket, connection& conn, game& game_instance) {
 
 		// note: timeout
-		if (conn.m_status != connection::status::DISCONNECTED
-			&& time > conn.m_last_recieve_time + TIMEOUT) 
+		if (conn.get_status() != connection::status::DISCONNECTED
+			&& time > conn.get_last_recieve_time() + TIMEOUT)
 		{
 			debug::info("Timeout");
 			conn.set_disconnected();
@@ -32,7 +32,7 @@ namespace meteor::client_recieve_system {
 			}
 
 			// Only accept non-server packages if in DISCONNECTED state
-			if ((conn.m_status != connection::status::DISCONNECTED && sender_endpoint != conn.m_endpoint)) {
+			if (conn.get_status() != connection::status::DISCONNECTED && sender_endpoint != conn.m_endpoint) {
 				debug::info("%g - !! ignoring - pck from NON-SERVER endpoint: %d.%d.%d.%d:%d, data size: %d",
 					GetTime(),
 					sender_endpoint.address().a(),
@@ -46,7 +46,7 @@ namespace meteor::client_recieve_system {
 
 			// Read stream
 			byte_stream_reader reader(stream_recieve);
-			//debug::info("%g - recieving, data size: %d", GetTime(), stream_recieve.size());
+			const int stream_size = stream_recieve.size();
 
 			uint8 p = reader.peek();
 			if (p > (uint8)protocol_packet_type::PAYLOAD) {	// check if it's above max protocol uint8
@@ -67,12 +67,12 @@ namespace meteor::client_recieve_system {
 				if (packet.m_magic != PROTOCOL_MAGIC) { debug::info("%g - recieved bad connect magic version", GetTime()); break; }
 
 				
-				switch (conn.m_status) {
+				switch (conn.get_status()) {
 				case connection::status::DISCONNECTED:
 				{
 					conn = connection(sender_endpoint);
-					conn.m_status = connection::status::CONNECTING;
-					conn.m_last_recieve_time = time;
+					conn.set_connecting();
+					conn.log_recieve_stream(stream_size);
 					debug::info("%g - recieved broadcast from server with %d player, attempting join", GetTime(), packet.m_player_id);
 					debug::info("server endpoint: %d.%d.%d.%d:%d",
 						sender_endpoint.m_address.a(),
@@ -85,7 +85,8 @@ namespace meteor::client_recieve_system {
 				case connection::status::CONNECTING:
 				{
 					if (packet.m_broadcast) { break; }
-					conn.m_status = connection::status::CONNECTED;
+					conn.set_connected();
+					conn.log_recieve_stream(stream_size);
 					debug::info("%g - gracefully connected to server as player %d", GetTime(), packet.m_player_id);
 
 					game_instance = game();		// Reset game. note that we aren't allocating with "new", so no memory leaks.
@@ -96,7 +97,7 @@ namespace meteor::client_recieve_system {
 				}
 				default:
 				{
-					debug::info("%g - recieved connect package when irrellevant", GetTime());
+					debug::info("%g - recieved connect package when irrellevant. Not logged.", GetTime());
 					break;
 				}
 				}//!Status switch
@@ -111,7 +112,7 @@ namespace meteor::client_recieve_system {
 				disconnect_packet packet;
 				if (!packet.read(reader)) { debug::info("%g - error reading disconnect package", GetTime()); print_error_code(); break; }
 
-				switch (conn.m_status) {
+				switch (conn.get_status()) {
 				case connection::status::DISCONNECTING:
 				{
 					debug::info("%g - Gracefully disconnected", GetTime());
@@ -136,7 +137,7 @@ namespace meteor::client_recieve_system {
 				}
 				}//!Status switch
 
-				conn.m_last_recieve_time = time;
+				conn.log_recieve_stream(stream_size);
 				conn.set_disconnected();
 				
 				break;
@@ -150,7 +151,7 @@ namespace meteor::client_recieve_system {
 				payload_packet packet;
 				if (!packet.read(reader)) { debug::info("%g - error reading payload package", GetTime()); print_error_code(); break; }
 				
-				if (!conn.can_recieve(packet)) continue;
+				if (!conn.can_recieve_payload(packet)) continue;
 				else conn.log_recieve_payload(packet, packet_size);
 
 				uint32 msg_sequence = packet.m_sequence; // TODO FOR RELIABLE MESSAGES, set by message_type::SEQUENCE_WRAP, ignore message if conn.sequence is higher.

@@ -28,7 +28,7 @@ namespace meteor::client_send_system {
 		byte_stream stream_send;
 		byte_stream_writer writer(stream_send);
 
-		switch (conn.m_status) {
+		switch (conn.get_status()) {
 		case connection::status::CONNECTING: {
 			debug::info("sending connect package");
 			connect_packet packet;

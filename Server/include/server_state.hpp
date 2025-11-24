@@ -26,7 +26,7 @@ namespace meteor {
 			uint32 i = 0;
 			for (connection& conn : m_clients) {
 				if (conn.m_endpoint == endpoint
-				&& conn.m_status != connection::status::DISCONNECTED) { 
+				&& conn.get_status() != connection::status::DISCONNECTED) { 
 					r_index = i;
 					return true; 
 				}
@@ -38,7 +38,7 @@ namespace meteor {
 		bool has_client(const ip_endpoint& endpoint) {
 			for (connection& conn : m_clients) {
 				if (conn.m_endpoint == endpoint
-					&& conn.m_status != connection::status::DISCONNECTED) {
+					&& conn.get_status() != connection::status::DISCONNECTED) {
 					return true;
 				}
 			}
@@ -49,7 +49,7 @@ namespace meteor {
 		bool has_client_recently_left(const ip_endpoint& endpoint) {
 			for (connection& conn : m_clients) {
 				if (conn.m_endpoint == endpoint
-					&& conn.m_status == connection::status::DISCONNECTED) {
+					&& conn.get_status() == connection::status::DISCONNECTED) {
 					return true;
 				}
 			}
@@ -59,7 +59,7 @@ namespace meteor {
 		uint32 get_client_count() const {
 			uint32 i = 0;
 			for (const connection& conn : m_clients) {
-				if (conn.m_status != connection::status::DISCONNECTED) { i++; }
+				if (conn.get_status() != connection::status::DISCONNECTED) { i++; }
 			}
 			return i;
 		}

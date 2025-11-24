@@ -64,7 +64,7 @@ int main()
 		
 
 		//client_recieve_system::update(time, socket, server_connection, game);
-		server_recieve_system::update(time, server, socket, game_instance, local_endpoint);
+		server_recieve_system::update(server, socket, game_instance, local_endpoint);
 		
 
 		// tick loop

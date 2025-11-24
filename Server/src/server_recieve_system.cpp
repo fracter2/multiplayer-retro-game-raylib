@@ -14,13 +14,13 @@
 namespace meteor::server_recieve_system {
 
 
-	void update(const double time, server_state& server, udp_socket& socket, game& game_instance, ip_endpoint& local_endpoint) {
+	void update(server_state& server, udp_socket& socket, game& game_instance, ip_endpoint& local_endpoint) {
 
 		{// timeout check
 			uint32 i = 0;
 			for (connection& conn : server.m_clients) {
-				if (conn.m_status != connection::status::DISCONNECTED
-				&& time > conn.m_last_recieve_time + TIMEOUT)
+				if (conn.get_status() != connection::status::DISCONNECTED
+				&& GetTime() > conn.get_last_recieve_time() + TIMEOUT)
 				{
 					debug::info("Timeout player: %d", i);
 					conn.set_disconnected();
@@ -61,11 +61,10 @@ namespace meteor::server_recieve_system {
 
 			// ======== ONLINE ========
 			
-			// Read stream
 			byte_stream_reader reader(stream_recieve);
-			//debug::info("%g - recieving, data size: %d", GetTime(), stream_recieve.size());
+			const int stream_size = stream_recieve.size();
 			
-			if (reader.peek() >= (uint8)protocol_packet_type::MAX) {	// check if it's above max protocol uint8
+			if (reader.peek() >= (uint8)protocol_packet_type::MAX) {
 				debug::info("%g ignoring - recieved unknown protocol: %f", GetTime(), reader.peek());
 				continue;
 			}
@@ -85,7 +84,8 @@ namespace meteor::server_recieve_system {
 
 				if (!server.has_client(sender_endpoint)) {
 					if (server.m_status == server_state::status::ONLINE_JOINABLE) {
-						join_lobby(time, server, socket, game_instance, reader, sender_endpoint, packet);
+						join_lobby(server, game_instance, reader, sender_endpoint, packet, stream_size);
+
 						break;
 					}
 					// Reply with DISCONNECT packet if in pre-game phase or recently left, to get them to realize theyre disconnected (may help if there's packet loss)
@@ -116,6 +116,7 @@ namespace meteor::server_recieve_system {
 			// ======== DISCONNECT ========
 			case protocol_packet_type::DISCONNECT:
 			{
+				
 				disconnect_packet packet;
 				if (!packet.read(reader)) { debug::info("%g - error reading disconnect package", GetTime()); print_error_code(); break; }
 
@@ -138,8 +139,8 @@ namespace meteor::server_recieve_system {
 
 				debug::info("%g - Gracefully Disconnecting client %d", GetTime(), client_index);
 				connection& conn = server.m_clients[client_index];
-				conn.m_status = connection::status::DISCONNECTING;	// Queue for the send system to send disconnect package
-				conn.m_last_recieve_time = time;
+				conn.set_disconnecting();
+				conn.log_recieve_stream(stream_size);
 
 				player_info::status leave_reason = player_info::status::USER_LEFT;
 				if (game_instance.m_player_info[client_index].m_player_status == player_info::status::LOSER) 
@@ -185,15 +186,16 @@ namespace meteor::server_recieve_system {
 				assert(conn.m_endpoint == sender_endpoint);
 				
 				// Conn status check
-				if (conn.m_status == connection::status::CONNECTING) {
-					conn.m_status = connection::status::CONNECTED;
+				if (conn.get_status() == connection::status::CONNECTING) {
+					conn.set_connected();
+					conn.log_recieve_stream(stream_size);
 					game_instance.m_player_info[client_index].m_player_status = player_info::status::ACTIVE;
 					game_instance.m_game_lobby_changed = true;
 					debug::info("%g - client %d joined gracefully", GetTime(), client_index);
 				}
 				
 				
-				if (!conn.can_recieve(packet)) continue;
+				if (!conn.can_recieve_payload(packet)) continue;
 				else conn.log_recieve_payload(packet, packet_size);
 
 
@@ -256,16 +258,16 @@ namespace meteor::server_recieve_system {
 	} // !update()
 
 
-	void join_lobby(const double& time, server_state& server, udp_socket& socket, game& game_instance, byte_stream_reader& reader, ip_endpoint sender_endpoint, connect_packet packet) {
+	void join_lobby(server_state& server, game& game_instance, byte_stream_reader& reader,const ip_endpoint& sender_endpoint, const connect_packet& packet, const int stream_size) {
 
 		// TODO Insert sender IP and set conn to "Connecting". Set to "Connected" when recieving first payload
 		uint8 i = 0;
 		for (connection& conn : server.m_clients) {
-			if (conn.m_status == connection::status::DISCONNECTED) {
-				conn.m_status = connection::status::CONNECTING;
+			if (conn.get_status() == connection::status::DISCONNECTED) {
+				conn.set_connecting();
 				conn.m_endpoint = sender_endpoint;
-				conn.m_last_recieve_time = time;
-				
+				conn.log_recieve_stream(stream_size);
+
 				game_instance.m_player_info[i].m_player_status = player_info::status::JOINING;
 				game_instance.m_game_lobby_changed = true;			// Queue for the send system to send lobby state message
 				

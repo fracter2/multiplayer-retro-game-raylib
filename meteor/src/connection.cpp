@@ -28,7 +28,7 @@ namespace meteor {
 		m_rtt_history.reserve(MAX_LOGGED_PACKETS + 1);
 	}
 
-	bool connection::can_recieve(const payload_packet& packet) const {
+	bool connection::can_recieve_payload(const payload_packet& packet) const noexcept {
 		if (m_status != connection::status::CONNECTED) {
 			debug::info("%g - recieved payload package when irrelevant", GetTime());
 			return false;
@@ -109,7 +109,7 @@ namespace meteor {
 
 	void connection::set_disconnected() {
 		//conn.m_endpoint = {};				// We could let this stay until it is overriden by new player. This way we know who "recently deleted" 
-										// and can reply with more disconnect packets, in case of packet loss.
+											// and can reply with more disconnect packets, in case of packet loss.
 		m_status = connection::status::DISCONNECTED;
 		m_send_sequence = 0;
 		m_recieve_sequence = 0;
@@ -125,6 +125,16 @@ namespace meteor {
 		m_rtt_history = { 0 };
 
 		m_un_acked_send_times.clear();
+	}
+
+	void connection::set_disconnecting() {
+		m_status = connection::status::DISCONNECTING;
+	}
+	void connection::set_connected() {
+		m_status = connection::status::CONNECTED;
+	}
+	void connection::set_connecting() {
+		m_status = connection::status::CONNECTING;
 	}
 }
 

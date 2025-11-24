@@ -78,7 +78,7 @@ else {																						\
 			byte_stream_writer writer(stream_send);
 
 
-			switch (conn.m_status) {
+			switch (conn.get_status()) {
 			case connection::status::CONNECTING: {
 				debug::info("%g - sending connect response to client: %d", GetTime(), client_index);
 				connect_packet packet;
