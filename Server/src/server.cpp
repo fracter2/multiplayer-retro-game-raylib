@@ -77,6 +77,8 @@ int main()
 
 			ui::debug_skip_recieve_check(server, input);
 			ui::debug_send_less_states(server, input);
+			ui::delay_tick(next_tick_time, input);
+			ui::quicken_tick(next_tick_time, input);
 
 			server_game_system::update(game_instance, input, server);
 

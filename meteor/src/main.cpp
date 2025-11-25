@@ -87,6 +87,8 @@ int main(int argc, char **argv)
 
 			ui::quit_check(server_connection, input);
 			ui::debug_skip_recieve_check(server_connection, input);
+			ui::delay_tick(next_tick_time, input);
+			ui::quicken_tick(next_tick_time, input);
 
 			game_update_system::update(game_instance, input);
 

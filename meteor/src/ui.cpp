@@ -5,16 +5,33 @@
 #include "ui.hpp"
 
 namespace meteor::ui {
+
+
+	void delay_tick(double& next_tick_time, input_state input) {
+		if (input.m_7_just_pressed) {
+			next_tick_time += 0.002;
+		}
+	}
+
+	void quicken_tick(double& next_tick_time, input_state input) {
+		if (input.m_8_just_pressed) {
+			next_tick_time -= 0.002;
+		}
+	}
+
+#ifdef _CLIENT
 	void quit_check(connection& conn, const input_state& input) {
 		if (input.m_1_just_pressed && conn.get_status() == connection::status::CONNECTED) {
 			conn.set_disconnecting();
 		}
 	}
 
+
 	void debug_skip_recieve_check(connection& conn, const input_state& input) {
 		if (input.m_5) { conn.m_debug_skip_recieve = true; }
 		else { conn.m_debug_skip_recieve = false; }
 	}
+#endif
 
 #ifdef _SERVER
 
