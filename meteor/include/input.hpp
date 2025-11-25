@@ -39,7 +39,7 @@ namespace meteor {
 		bool m_5_just_pressed = false;			// 
 
 		bool m_6 = false;						// 
-		bool m_6_just_pressed = false;			// Server Toggle sending fewer game state updates (3 * 20/s default -> 1 * 20/s) // TODO
+		bool m_6_just_pressed = false;			// Server Toggle sending fewer game state updates (3 * 20/s default -> 1 * 20/s)
 
 		bool m_7 = false;						// 
 		bool m_7_just_pressed = false;			// Server & client lessen time to next tick // TODO

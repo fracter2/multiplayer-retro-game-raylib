@@ -68,6 +68,15 @@ int main(int argc, char **argv)
 		running &= !WindowShouldClose();
 		time = GetTime();
 		
+		// ---- TODO BEFORE THIS IS DONE ----
+		// TODO APPLY INTERPOLATION FLAG on game-states AND SHOW INTERPOLATION FROM-TOO ON CLIENT
+		// TODO FIX CLIENT-PREDICTION TWERKING (is it because interpolated-states dont increment input tick?)
+
+		// TODO ADD SUMMARY OF BYTES PER SECOND AND MAKE SEND/RECIEVE ACCUMULATE & LOGG EVER TICK (instead of per-packet)
+		// TODO WRITE ABOUT GAME_STATE SEND RATE IN README
+		// TODO WRITE ABOUT PLAYER PREDICTION IN README
+		// TODO WRITE ABOUT INPUT LAGG IN README
+		// TODO WRITE ABOUT...
 
 
 		client_recieve_system::update(next_tick_time, socket, server_connection, game_instance);
