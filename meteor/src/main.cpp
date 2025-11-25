@@ -18,6 +18,7 @@
 #include "game_update_system.hpp"
 #include "render_system.hpp"
 #include "ui.hpp"
+#include "lag_optimizer.hpp"
 
 
 //#define _CLIENT // This is also added in project settings, making it "global"
@@ -39,8 +40,7 @@ int main(int argc, char **argv)
 	ip_endpoint local_endpoint = {};
 	udp_socket  socket = {};
 	connection  server_connection = {};
-
-	game			   game_instance = {};
+	game		game_instance = {};
 	input_state input = {};
 	
 	double next_tick_time = GetTime();
@@ -82,6 +82,8 @@ int main(int argc, char **argv)
 		if (time >= next_tick_time) {
 			next_tick_time += TICK_TIME;
 			ticks += 1;
+
+			lag_optimizer(next_tick_time, game_instance);
 
 			input.update();
 

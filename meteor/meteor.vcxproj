@@ -108,6 +108,7 @@
     <ClCompile Include="src\connection.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\input.cpp" />
+    <ClCompile Include="src\lag_optimizer.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ui.cpp" />
     <ClCompile Include="src\messages.cpp" />
@@ -125,6 +126,7 @@
     <ClInclude Include="include\game_update_system.hpp" />
     <ClInclude Include="include\input.hpp" />
     <ClInclude Include="include\input_to_player_action.hpp" />
+    <ClInclude Include="include\lag_optimizer.hpp" />
     <ClInclude Include="include\render.hpp" />
     <ClInclude Include="include\ui.hpp" />
     <ClInclude Include="include\messages.hpp" />
