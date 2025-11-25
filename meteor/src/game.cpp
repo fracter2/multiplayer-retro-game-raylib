@@ -7,12 +7,6 @@
 
 namespace meteor {
 
-
-	//Vector2i::Vector2i() = default;
-	//Vector2i::Vector2i(const int& x, const int& y) : x(x), y(y) {};
-	//Vector2i::Vector2i(const Vector2& a) : x((int)a.x), y((int)a.y) {};
-
-
 	void game::init() {
 
 		m_state.m_tilemap.set_all(true);
@@ -23,7 +17,6 @@ namespace meteor {
 			|| m_player_info[i].m_player_status == player_info::status::ACTIVE_BOT) {
 				player.m_dead = false;
 				player.m_prev_action = player_entity::action::STAND_STILL;
-				
 			}
 
 			const Vector2i coord = GET_PLAYER_START_TILE(i);
@@ -62,6 +55,7 @@ namespace meteor {
 			|| player.m_player_status == player_info::status::TIMED_OUT
 			|| player.m_player_status == player_info::status::KICKED
 			|| player.m_player_status == player_info::status::USER_LEFT) {
+
 				player.m_player_status = player_info::status::ACTIVE_BOT;
 				player.m_name[0] = 'b';	// TODO We really need to make this a std::string
 				player.m_name[1] = 'o';
@@ -111,11 +105,6 @@ namespace meteor {
 
 		return false;
 	}
-
-	/*Vector2 game_state::move_and_collide(const Vector2& pos, const Vector2& vel) const {
-		if (is_walkable(Vector2(pos + vel))) return Vector2(pos + vel);
-		else return pos;
-	}*/
 
 	void game_state::update_player(const uint8& player_index) {
 		const double speed = player_entity::MOVE_SPEED * TICK_TIME;
