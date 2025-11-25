@@ -388,18 +388,19 @@ namespace meteor {
 		int ticks_between = to.m_tick - from.m_tick;
 		if (ticks_between <= 0) { return; }
 
-		game_state state = game_state(from);
+		
 
 		// +1 since the first is just the 'from' state
 		for (int i = 1; i < ticks_between; i++) {
 			const float fraction = (float)(i) / (float)(ticks_between);;
+			game_state state = game_state(from);
 			state.m_tick += i;
 			state.m_interpolated = true;
 
 			int plr_i = 0;
 			for (player_entity& player : state.m_players) {
 				player.m_position = Vector2Lerp(from.m_players[plr_i].m_position, to.m_players[plr_i].m_position, fraction);
-				player.m_prev_action_tick++;
+				player.m_prev_action_tick += i;;
 				plr_i++;
 			}
 			result_arr.push_back(state);
