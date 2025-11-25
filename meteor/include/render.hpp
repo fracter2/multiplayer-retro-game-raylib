@@ -103,6 +103,7 @@ namespace meteor::render {
 		}
 	}
 
+#ifdef _CLIENT
 	static void render_interpolated_pos(const Texture& texture, const game& game_instance, const Color tint_from = WHITE, const Color tint_to = WHITE) {
 		if (!game_instance.m_state.m_interpolated) return;
 		
@@ -125,6 +126,7 @@ namespace meteor::render {
 		}
 		
 	}
+#endif // _CLIENT
 
 	// Returns sec as ms with one digit after '.'
 	static std::string sec_to_ms_str_pretty(const double sec) {
