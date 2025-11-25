@@ -40,13 +40,14 @@ namespace meteor {
 		void set_connecting();
 
 		status get_status() const noexcept				{ return m_status; }
-		double get_last_recieve_time() const noexcept	{ return m_last_recieve_time; }
+		double get_last_recieve_time() const noexcept	{ return m_recieve_times.front(); }
 		uint32 get_send_sequence() const noexcept		{ return m_send_sequence; }
 		uint32 get_recieve_sequence() const noexcept	{ return m_recieve_sequence; }
 		uint32 get_recieve_acknowledge() const noexcept { return m_recieve_acknowledge; }
 
 		const std::vector<uint32>& get_send_bytes_history() const noexcept		{ return m_send_bytes_history; }
 		const std::vector<uint32>& get_recieve_bytes_history() const noexcept	{ return m_recieve_bytes_history; }
+		const std::vector<double>& get_recieve_times() const noexcept			{ return m_recieve_times; }
 		const std::vector<double>& get_rtt_history() const noexcept				{ return m_rtt_history; }
 
 		double get_prev_rtt() const noexcept { if (m_rtt_history.empty()) return 0; else return m_rtt_history.front(); }
@@ -58,15 +59,17 @@ namespace meteor {
 
 	private:
 		status m_status				 = status::DISCONNECTED;
-		double m_last_recieve_time   = 0;
+		//double m_last_recieve_time   = 0;
 		uint32 m_send_sequence		 = 0;
 		uint32 m_recieve_sequence	 = 0;
 		uint32 m_recieve_acknowledge = 0;
 
 		std::vector<uint32> m_send_bytes_history = { 0 };
 		std::vector<uint32> m_recieve_bytes_history = { 0 };
+		std::vector<double> m_recieve_times = { 0 };
 		std::vector<double> m_rtt_history = { 0 };
 		std::vector<double> m_un_acked_send_times = {};
+
 
 		// Reliable messages history here? allow any message
 		// std::vector<any message> m_reliable_messages_history		// maybe one std::vector for each message type?

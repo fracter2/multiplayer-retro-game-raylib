@@ -16,7 +16,6 @@ namespace meteor {
 
 	connection::connection(ip_endpoint endpoint, status status)
 		: m_endpoint(endpoint)
-		, m_last_recieve_time(0)
 		, m_status(status)
 		, m_send_sequence(0)
 		, m_recieve_sequence(0)
@@ -79,7 +78,9 @@ namespace meteor {
 			m_recieve_bytes_history.pop_back();
 
 		// Update state
-		m_last_recieve_time = GetTime();
+		m_recieve_times.insert(m_recieve_times.begin(), GetTime());
+		while (m_recieve_times.size() >= MAX_LOGGED_PACKETS)
+			m_recieve_times.pop_back();
 	}
 
 	bool connection::send_payload(udp_socket& socket, byte_stream& stream) {
