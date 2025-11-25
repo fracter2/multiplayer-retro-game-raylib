@@ -380,11 +380,12 @@ namespace meteor {
 
 
 	static void interp_game_states(const game_state& from, const game_state& to, std::vector<game_state>& result_arr) {
-		if (to.m_tick - from.m_tick <= 0) { return; }
+		int ticks_between = to.m_tick - from.m_tick;
+		if (ticks_between <= 0) { return; }
 
-		// Skip 0 since that is just the 'from' state
-		for (int i = 1; i < (int)to.m_tick; i++) {
-			const float fraction = (float)(i) / (float)(to.m_tick);
+		// +1 since the first is just the 'from' state
+		for (int i = 1; i < ticks_between; i++) {
+			const float fraction = (float)(i) / (float)(ticks_between);
 			game_state state = game_state(from);
 			state.m_tick += i;
 
