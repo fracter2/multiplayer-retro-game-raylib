@@ -115,14 +115,16 @@ namespace meteor::render {
 			}
 		}
 
-		const int offset = (int)tilemap::TILE_PIXEL_LENGTH / 2;
+		const int offset = - (int)tilemap::TILE_PIXEL_LENGTH / 2 + (int)MAP_OFFSET.x;
 		const int length = (int)tilemap::TILE_PIXEL_LENGTH;
 		for (const player_entity& player : game_instance.m_prev_non_interp_state.m_players) {
-			DrawRectangleLines((int)player.m_position.x - offset, (int)player.m_position.y - offset, length, length, tint_from);
+			const Vector2 pos = Vector2(player.m_position * (float)tilemap::TILE_PIXEL_LENGTH);
+			DrawRectangleLines((int)pos.x + offset, (int)pos.y - offset, length, length, tint_from);
 		}
 		
 		for (const player_entity& player : next_non_interp_state.m_players) {
-			DrawRectangleLines((int)player.m_position.x - offset, (int)player.m_position.y - offset, length, length, tint_to);
+			const Vector2 pos = Vector2(player.m_position * (float)tilemap::TILE_PIXEL_LENGTH);
+			DrawRectangleLines((int)pos.x + offset, (int)pos.y - offset, length, length, tint_to);
 		}
 		
 	}
