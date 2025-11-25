@@ -87,7 +87,7 @@ namespace meteor::game_update_system {
 		int ticks_to_remove = (int)p_actions.size() - ticks_ahead;
 
 		if (ticks_to_remove > 0) {
-			p_actions.erase(p_actions.begin(), p_actions.begin() + (ticks_to_remove));	// second one isn't included!
+			p_actions.erase(p_actions.begin(), p_actions.begin() + (ticks_to_remove));
 		}
 
 		game_state p_state = game_state(state);
