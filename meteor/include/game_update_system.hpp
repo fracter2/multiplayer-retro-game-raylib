@@ -103,11 +103,12 @@ namespace meteor::game_update_system {
 
 		// DEBUG PRINT
 		if (input.m_2) {
-			debug::info("current tick: %d, action tick: %d, predict_actions.size(): %d, state_queue.size(): %d \n",
+			debug::info("current tick: %d, action tick: %d, predict_actions.size(): %d, state_queue.size(): %d%s \n",
 				state.m_tick,
 				state.m_players[user_index].m_prev_action_tick,
 				(uint32)p_actions.size(),
-				(uint32)state_queue.size()
+				(uint32)state_queue.size(),
+				state.m_interpolated ? ", interpolated state" : ""
 			);
 		}
 	}
