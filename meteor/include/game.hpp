@@ -366,7 +366,7 @@ namespace meteor {
 
 		game_state m_predicted_state = {};							// Result state from m_state having predicted actions applied.
 		game_state m_prev_state = {};								// Previously played state, used for split-frame interpolation (if needed)
-		game_state m_prev_non_interp_state = {};								// Previously played state, used for split-frame interpolation (if needed)
+		game_state m_prev_non_interp_state = {};					// Previously played state, used for split-frame interpolation (if needed)
 
 		std::vector<game_state> m_state_queue = std::vector<game_state>();
 

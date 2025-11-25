@@ -6,7 +6,6 @@
 #include "common.hpp"
 #include "protocol.hpp"
 #include "raylib.h"
-#include <algorithm>
 
 namespace meteor {
 	
@@ -30,8 +29,8 @@ namespace meteor {
 		connection(ip_endpoint endpoint, status status = status::DISCONNECTED);
 
 		bool can_recieve_payload(const payload_packet& packet) const noexcept;
-		void log_recieve_payload(const payload_packet& packet, const uint32 size);				// TODO FIX RECIEVE RTT
-		void log_recieve_stream(const uint32 size);												// TODO MAKE NON-PAYLOAD RECIEVES ALWAYS USE THIS, and make m_last_recieve_time PRIVATE
+		void log_recieve_payload(const payload_packet& packet, const uint32 size);
+		void log_recieve_stream(const uint32 size);
 		bool send_payload(udp_socket& socket, byte_stream& stream);
 		bool send_stream(udp_socket& socket, byte_stream& stream);
 
@@ -40,15 +39,15 @@ namespace meteor {
 		void set_connected();
 		void set_connecting();
 
-		status get_status() const noexcept { return m_status; }
-		double get_last_recieve_time() const noexcept { return m_last_recieve_time; }
-		uint32 get_send_sequence() const noexcept { return m_send_sequence; }
-		uint32 get_recieve_sequence() const noexcept { return m_recieve_sequence; }
+		status get_status() const noexcept				{ return m_status; }
+		double get_last_recieve_time() const noexcept	{ return m_last_recieve_time; }
+		uint32 get_send_sequence() const noexcept		{ return m_send_sequence; }
+		uint32 get_recieve_sequence() const noexcept	{ return m_recieve_sequence; }
 		uint32 get_recieve_acknowledge() const noexcept { return m_recieve_acknowledge; }
 
-		const std::vector<uint32>& get_send_bytes_history() const noexcept { return m_send_bytes_history; }
-		const std::vector<uint32>& get_recieve_bytes_history() const noexcept { return m_recieve_bytes_history; }
-		const std::vector<double>& get_rtt_history() const noexcept { return m_rtt_history; }
+		const std::vector<uint32>& get_send_bytes_history() const noexcept		{ return m_send_bytes_history; }
+		const std::vector<uint32>& get_recieve_bytes_history() const noexcept	{ return m_recieve_bytes_history; }
+		const std::vector<double>& get_rtt_history() const noexcept				{ return m_rtt_history; }
 
 		double get_prev_rtt() const noexcept { if (m_rtt_history.empty()) return 0; else return m_rtt_history.front(); }
 
@@ -56,13 +55,12 @@ namespace meteor {
 		ip_endpoint m_endpoint = {};
 		bool m_debug_skip_recieve = false;
 
-	private:
-		status m_status = status::DISCONNECTED;
-		
 
+	private:
+		status m_status				 = status::DISCONNECTED;
 		double m_last_recieve_time   = 0;
 		uint32 m_send_sequence		 = 0;
-		uint32 m_recieve_sequence	 = 0;	// Used as send-ack
+		uint32 m_recieve_sequence	 = 0;
 		uint32 m_recieve_acknowledge = 0;
 
 		std::vector<uint32> m_send_bytes_history = { 0 };
@@ -76,18 +74,4 @@ namespace meteor {
 		// Remove everything that has been ACKed
 	};
 
-	
-
-
-	/*
-	struct server_connection_syncer {
-		server_connection_syncer() = default;
-
-		connection m_connection		   = {};
-		double	   m_last_checked_time = 0;
-		//double	   m_next_update_time  = 0;
-		//bool	   m_auto_connect	   = false;
-
-	};
-	*/
 } // !meteor
