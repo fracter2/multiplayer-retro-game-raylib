@@ -119,23 +119,27 @@ namespace meteor::client_recieve_system {
 				case connection::status::DISCONNECTING:
 				{
 					debug::info("%g - Gracefully disconnected", GetTime());
+					game_instance.m_player_info[game_instance.m_user_index].m_player_status = player_info::status::GRACEFULLY_DISCONNECTED;
 					break;
 				}
 				case connection::status::CONNECTING:
 				{
 					debug::info("%g - Denied connection", GetTime());
+					game_instance.m_player_info[game_instance.m_user_index].m_player_status = player_info::status::KICKED;
 					break;
 				}
 				case connection::status::CONNECTED:
 				{
-					// note: I assume this does not need to be gracefull, as it is more rare and gracefullness wouldn't help the kicked / unkicked players
+					// I assume this does not need to be gracefull, as it is more rare and gracefullness wouldn't help the kicked / unkicked players
 					debug::info("%g - Got kicked (server initiated disconnect)", GetTime());
+					game_instance.m_player_info[game_instance.m_user_index].m_player_status = player_info::status::KICKED;
 					break;
 				}
 
 				default:
 				{
 					debug::info("%g - recieved disconnect package when irrellevant", GetTime());
+					game_instance.m_player_info[game_instance.m_user_index].m_player_status = player_info::status::UKNOWN_EXIT_CAUSE;
 					break;
 				}
 				}//!Status switch
