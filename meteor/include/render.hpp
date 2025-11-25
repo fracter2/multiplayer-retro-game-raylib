@@ -103,6 +103,29 @@ namespace meteor::render {
 		}
 	}
 
+	static void render_interpolated_pos(const Texture& texture, const game& game_instance, const Color tint_from = WHITE, const Color tint_to = WHITE) {
+		if (!game_instance.m_state.m_interpolated) return;
+		
+		game_state next_non_interp_state;		
+		for (const game_state& state : game_instance.m_state_queue) {	// Guaranteed to find a non-interpolated state because you can only interpolate between 2 valid states.
+			if (!state.m_interpolated) {
+				next_non_interp_state = game_state(state);
+				break;
+			}
+		}
+
+		const int offset = (int)tilemap::TILE_PIXEL_LENGTH / 2;
+		const int length = (int)tilemap::TILE_PIXEL_LENGTH;
+		for (const player_entity& player : game_instance.m_prev_non_interp_state.m_players) {
+			DrawRectangleLines((int)player.m_position.x - offset, (int)player.m_position.y - offset, length, length, tint_from);
+		}
+		
+		for (const player_entity& player : next_non_interp_state.m_players) {
+			DrawRectangleLines((int)player.m_position.x - offset, (int)player.m_position.y - offset, length, length, tint_to);
+		}
+		
+	}
+
 	// Returns sec as ms with one digit after '.'
 	static std::string sec_to_ms_str_pretty(const double sec) {
 		std::string r = "";

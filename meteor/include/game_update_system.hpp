@@ -66,7 +66,9 @@ namespace meteor::game_update_system {
 		}
 
 		// SET NEXT STATE
-		game_instance.m_prev_state = game_instance.m_state;
+		game_instance.m_prev_state = state;
+		if (!state.m_interpolated) 
+			game_instance.m_prev_non_interp_state = state;
 		game_instance.m_state = state_queue[0];
 		game_instance.m_state_queue.erase(state_queue.begin());
 

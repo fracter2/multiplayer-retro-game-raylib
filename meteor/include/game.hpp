@@ -172,6 +172,9 @@ namespace meteor {
 			KICKED,
 			TIMED_OUT,
 			SERVER_TIMED_OUT,
+			GRACEFULLY_DISCONNECTED,
+			DENIED_CONN_PROBABLY_FULL,
+			UKNOWN_EXIT_CAUSE,
 			MAX
 		};
 
@@ -303,6 +306,7 @@ namespace meteor {
 		bomb		  m_bombs[MAX_PLAYERS] = {};
 		tilemap		  m_tilemap = {};
 		uint32		  m_tick = 0;
+		bool		  m_interpolated = false;
 
 		const player_entity& get_player(const int index) const;
 		const bomb& get_bomb(const int index) const;
@@ -362,6 +366,7 @@ namespace meteor {
 
 		game_state m_predicted_state = {};							// Result state from m_state having predicted actions applied.
 		game_state m_prev_state = {};								// Previously played state, used for split-frame interpolation (if needed)
+		game_state m_prev_non_interp_state = {};								// Previously played state, used for split-frame interpolation (if needed)
 
 		std::vector<game_state> m_state_queue = std::vector<game_state>();
 
@@ -388,6 +393,7 @@ namespace meteor {
 			const float fraction = (float)(i) / (float)(ticks_between);
 			game_state state = game_state(from);
 			state.m_tick += i;
+			state.m_interpolated = true;
 
 			int plr_i = 0;
 			for (player_entity& player : state.m_players) {
