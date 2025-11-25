@@ -392,6 +392,7 @@ namespace meteor {
 			int plr_i = 0;
 			for (player_entity& player : state.m_players) {
 				player.m_position = Vector2Lerp(player.m_position, to.m_players[plr_i].m_position, fraction);
+				player.m_prev_action_tick++;
 				plr_i++;
 			}
 			result_arr.push_back(state);
