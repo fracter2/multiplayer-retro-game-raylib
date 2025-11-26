@@ -22,36 +22,49 @@ Select either the server or client(meteor) project in the "configure startup pro
 WASD to move and SPACEBAR to place bombs.
 Every other input uses numbers 1-6, the important ones displayed in-game.
 
+
 For the server:
 '1' Starts the server.
 '2' Toggles sending broadcasts (default on. only way to join).
 '3' Starts the match. Disables joining.
 '4' Fills the lobby with bots (pre-match only, are replaced by players joining).
-	- bots are controlled by server using the same WASD + SPACE.
+	- bots are controlled by server
 '6' Toggle sending less game-state updates (forces interpolation on client side)
+
 
 For the client:
 '1' Quit match, gracefully (sends disconnect and awaits response).
-'2' Print debug info (mid-game).
+'2' (hold) print debug info (in-game).
 
 
 For both:
 '5' (hold) pauses receiving packets (reads but ignores) to simulate packet loss
+'7' Decreases time until next tick by 2ms
+'8' Increases time until next tick by 2ms
 
 
 ---- FURTHER DETAILS ---- 
 The game logic runs at a fixed 60hz (aka 60 ticks/s). 
-Network "receive" happens roughly as often as possible, while network "send" occurs every third tick, so 20hz.
+ - There are exceptions, notably pressing '7' or '8' to offset the next tick.
+ - The client also has a "lag optimizer" that quickens the next tick by 2ms if the client is behind.
+
+Network "receive" happens roughly as often as possible, while network "send" occurs every third tick, so at 20hz.
 
 The RTT is calculated by comparing the time a particular pck was sent, and the time it was acknowledged.
 Because network "send" occurs at fixed intervals, the resulting RTT is always slightly lower than displayed.
 
-While in an active match, "Input delay" refers to the delay between the current game-tick and the tick that 
-the input from the player was pressed. So, if a player presses UP on game-tick 20, and the server receives & uses it
+"Input delay" refers to the delay between the current game-tick and the tick the players input was pressed. 
+ - So, if a player presses UP on game-tick 20, and the server receives & uses it
 on the servers game-tick 25, the input delay is 5 game-ticks.
 
-Clients predict their own movement, bomb and tilemap. 
-To visualize this, the server-authoritative state is rendered underneath with a BLUE tint.
+The BLUE Player and bomb sprite are the game-state position for each.
+This is because clients predict their own state (only their character, bomb and tilemap).
+ - You can hold '5' on either client or server to test this!
+
+The red and blue squares represent state interpolated positions. 
+They appear when the current state was interpolated between 2 valid states (from blue to red).
+They only show for characters as they are the only thing that move.
+ - You can press '6' on server or hold '5' on the client to show this!
 
 
 ---- COLLABORATORS ----
