@@ -238,7 +238,7 @@ namespace meteor::render {
 		constexpr int font_size = 14;
 		constexpr Color color = DARKBLUE;
 		constexpr Color color_backdrop = BLACK;
-		std::string str = TextFormat("avrg rtt: %f.01", avrg);
+		std::string str = TextFormat("avrg rtt: \n%s", sec_to_ms_str_pretty(avrg).c_str());
 		DrawText(str.c_str(), (int)offset.x + 1, (int)offset.y + 1, font_size, color_backdrop);
 		DrawText(str.c_str(), (int)offset.x, (int)offset.y, font_size, color);
 	}
@@ -260,7 +260,7 @@ namespace meteor::render {
 		constexpr int font_size = 14;
 		constexpr Color color = DARKGREEN;
 		constexpr Color color_backdrop = BLACK;
-		std::string str = TextFormat("avrg out/s: %f.01", avrg);
+		std::string str = TextFormat("avrg out/s: \n%.01f", avrg);
 		DrawText(str.c_str(), (int)offset.x + 1, (int)offset.y + 1, font_size, color_backdrop);
 		DrawText(str.c_str(), (int)offset.x, (int)offset.y, font_size, color);
 	}
@@ -282,7 +282,7 @@ namespace meteor::render {
 		constexpr int font_size = 14;
 		constexpr Color color = DARKPURPLE;
 		constexpr Color color_backdrop = BLACK;
-		std::string str = TextFormat("avrg in/s: %f.01", avrg);
+		std::string str = TextFormat("avrg in/s: \n%.01f", avrg);
 		DrawText(str.c_str(), (int)offset.x + 1, (int)offset.y + 1, font_size, color_backdrop);
 		DrawText(str.c_str(), (int)offset.x, (int)offset.y, font_size, color);
 	}
