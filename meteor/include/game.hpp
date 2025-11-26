@@ -14,9 +14,7 @@
 
 namespace meteor {
 
-	static constexpr int MAX_PLAYERS = 4;
-	constexpr int TICK_RATE = 60;
-	constexpr double TICK_TIME = 1.0 / TICK_RATE;
+
 
 
 	struct Vector2i {

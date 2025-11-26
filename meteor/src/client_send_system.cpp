@@ -20,7 +20,7 @@ namespace meteor::client_send_system {
 	void update(const uint32& ticks, udp_socket& socket, connection& conn, const ip_endpoint& client_endpoint, const game& game_instance) {
 
 		// Only perform send update once every third tick
-		if (ticks % TICKS_PER_UPDATE != 0) {
+		if (ticks % TICKS_PER_NETWORK_SEND != 0) {
 			return;
 		}
 

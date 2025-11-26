@@ -6,8 +6,6 @@
 #include "network.hpp"
 
 namespace meteor::server_send_system {
-	constexpr uint32 TICKS_PER_UPDATE = 3;	// 60hz / 3 = 20hz
-
 
 	void update(
 		const uint32& ticks,

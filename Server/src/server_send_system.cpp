@@ -45,7 +45,7 @@ else {																						\
 
 
 		// Only perform send update once every third tick
-		if (ticks % TICKS_PER_UPDATE != 0) {
+		if (ticks % TICKS_PER_NETWORK_SEND != 0) {
 			return;
 		}
 
