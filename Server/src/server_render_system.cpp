@@ -62,18 +62,6 @@ namespace meteor::render {
 
 		// ==== POST GAME ====
 		else if (game_instance.m_status == game::status::POST_GAME) {
-			// TODO RENDER WIN / LOSE
-
-			//{ // Start game (Key 1) Instructions
-			//	constexpr int font_size = 40;
-			//	constexpr Color color = MAROON;
-			//	const char* text = TextFormat("Press '1' to init server");
-			//	const int text_width = MeasureText(text, font_size);
-			//	const int text_x = (GetScreenWidth() - text_width) / 2;
-			//	const int text_y = 8;
-			//	DrawText(text, text_x + 1, text_y + 1, font_size, BLACK);
-			//	DrawText(text, text_x, text_y, font_size, color);
-			//}
 
 			{ // Display index of winner
 				int winner_index = -1;
@@ -107,16 +95,10 @@ namespace meteor::render {
 				DrawText(text.c_str(), text_x + 1, text_y + 1, font_size, BLACK);
 				DrawText(text.c_str(), text_x, text_y, font_size, color);
 			}
-
 		}
-
-
 
 		// ==== INVALID (MENU) ====
 		else {
-
-			
-
 			{ // Start game (Key 1) Instructions
 				constexpr int font_size = 40;
 				constexpr Color color = MAROON;
@@ -146,19 +128,7 @@ namespace meteor::render {
 				render_recieve_bytes_hist(HUD_OFFSET + Vector2(540, y_offset), conn, -0.25f);	// 1px per 4 bytes
 				y_offset += 175;
 			}
-			
 
-
-			/*Vector2i offset = HUD_OFFSET + Vector2(80, 20);
-			for (const connection& conn : server.m_clients) {
-				render_connection_stats(offset, game_instance, conn);
-				offset = offset + Vector2i(0, 140);
-			}*/
-			// TODO RENDER RTT in ms (averaged across a second? sepparate peak?)
-
-			// TODO RENDER BYTES SENT PER SECOND
-
-			// TODO RENDER GRAPH WITH BYTES/s AND RTT
 		}
 
 	}

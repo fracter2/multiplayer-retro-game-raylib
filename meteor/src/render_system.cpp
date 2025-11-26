@@ -2,7 +2,6 @@
 
 #pragma once
 
-//#include "render_system.hpp"
 #include "render.hpp"
 
 namespace meteor::render{
@@ -54,7 +53,6 @@ namespace meteor::render{
 
 		// ==== POST GAME ====
 		else if (game_instance.m_status == game::status::POST_GAME) {
-			// TODO RENDER WIN / LOSE
 
 			render_map(texture, game_instance.m_predicted_state.get_tilemap());
 			render_bombs(texture, game_instance.m_predicted_state);
@@ -101,7 +99,6 @@ namespace meteor::render{
 
 		// ==== INVALID / MENU ====
 		else {
-			// TODO RENDER MENU
 			{ // "In Menu"
 				constexpr int font_size = 40;
 				constexpr Color color = MAROON;
@@ -127,11 +124,6 @@ namespace meteor::render{
 			}
 #endif 
 
-			// TODO RENDER BUTTONS / INPUT AREAS
-
-			// TODO RENDER AVAILABLE SERVERS IN NETWORK
-
-			// TODO RENDER POPUPS / NOTIFICATIONS (timeout or disconnect)
 		}
 		
 
@@ -141,7 +133,7 @@ namespace meteor::render{
 			// RENDER FPS
 			DrawFPS(2, GetScreenHeight() - 20);
 			
-			int y_offset = 80 + 175 * (game_instance.m_user_index - 1);	// Mimic server alignment for convenience
+			int y_offset = 80 + 175 * (game_instance.m_user_index);	// Mimic server alignment for convenience
 
 			render_rtt_graph(HUD_OFFSET + Vector2(300, (float)y_offset), conn, -500.0f);			// seconds to ms, 1px per 2ms
 			render_send_bytes_hist(HUD_OFFSET + Vector2(420, (float)y_offset), conn, -0.25f);		// 1px per 4 bytes

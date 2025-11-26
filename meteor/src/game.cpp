@@ -265,6 +265,41 @@ namespace meteor {
 		}
 		m_state.m_tick += 1;
 	}
+
+
+	void player_action_queue::consume_next() {
+		assert(m_size > 0);
+		const int last = (int)m_size - 1;
+		for (int i = 0; i < last; i++) {
+			m_actions[i] = m_actions[i + 1];
+			m_ticks[i] = m_ticks[i + 1];
+		}
+		// Since everything was moved down a step, the last is removed
+		m_actions[last] = {};
+		m_ticks[last] = {};
+		m_size--;
+	}
+
+	std::pair<player_entity::action, uint32> player_action_queue::read_next() {
+		assert(!is_empty());
+
+		std::pair<player_entity::action, uint32> r = std::pair<player_entity::action, uint32>(m_actions[0], m_ticks[0]);
+		consume_next();
+
+		return r;
+	}
+
+	void player_action_queue::append_new(player_entity::action action, uint32 tick) {
+		while (m_size >= SIZE) consume_next();
+
+		if (m_size < SIZE) {
+			m_actions[m_size] = action;
+			m_ticks[m_size] = tick;
+			m_size++;
+		}
+		return;
+	}
+
 #endif
 
 }

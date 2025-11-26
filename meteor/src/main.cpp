@@ -1,18 +1,9 @@
 // main.cpp
 
 #include <thread>
-//#include <chrono>
 #include <cstdio>
 #include <stdio.h>
 
-//#include "common.hpp"
-//#include "timer.hpp"
-//#include "messages.hpp"
-//#include "protocol.hpp"
-//#include "connection.hpp"
-//#include "game.hpp"
-
-//#include "input.hpp"
 #include "client_send_system.hpp"
 #include "client_recieve_system.hpp"
 #include "game_update_system.hpp"
@@ -21,7 +12,7 @@
 #include "lag_optimizer.hpp"
 
 
-//#define _CLIENT // This is also added in project settings, making it "global"
+//#define _CLIENT // This is added in project settings, making it "global"
 
 
 int main(int argc, char **argv)
@@ -29,7 +20,6 @@ int main(int argc, char **argv)
 	static constexpr std::string_view window_title = "Bomberman CLIENT";
 
 	InitWindow(meteor::render::WINDOW_WIDTH, meteor::render::WINDOW_HEIGHT, window_title.data());
-	//InitAudioDevice();	// No audio (yet)
 	SetExitKey(0);			// Esc
 
 	using namespace meteor;
@@ -69,9 +59,6 @@ int main(int argc, char **argv)
 		time = GetTime();
 		
 		// ---- TODO BEFORE THIS IS DONE ----
-		// TODO APPLY INTERPOLATION FLAG on game-states AND SHOW INTERPOLATION FROM-TOO ON CLIENT
-		// TODO FIX CLIENT-PREDICTION TWERKING (is it because interpolated-states dont increment input tick?)
-
 		// TODO ADD SUMMARY OF BYTES PER SECOND AND MAKE SEND/RECIEVE ACCUMULATE & LOGG EVER TICK (instead of per-packet)
 		// TODO WRITE ABOUT...
 

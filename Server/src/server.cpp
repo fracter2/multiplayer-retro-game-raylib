@@ -42,7 +42,6 @@ int main()
 	bool   running = true;
 
 	Texture texture = LoadTexture("../meteor/data/tiles.png");
-	// TODO assert texture is actually loaded
 	
 	// ==== INIT ====
 	network::startup boot;
@@ -63,10 +62,7 @@ int main()
 		running &= !WindowShouldClose();
 		time = GetTime();
 		
-
-		//client_recieve_system::update(time, socket, server_connection, game);
 		server_recieve_system::update(server, socket, game_instance, local_endpoint);
-		
 
 		// tick loop
 		if (time >= next_tick_time) {
@@ -98,7 +94,4 @@ int main()
 	CloseWindow();
 	return 0;
 } // !server
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
 
