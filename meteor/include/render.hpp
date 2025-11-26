@@ -226,6 +226,21 @@ namespace meteor::render {
 		for (int i = 0; i < hist.size(); i++) {
 			DrawLineV(offset + Vector2((float)i, 0), offset + Vector2((float)i, (float)hist[i] * range_mult), DARKBLUE);
 		}
+
+		double avrg = 0;
+		int count = 0;
+		for (const double& rtt : hist) {
+			count++;
+			avrg += rtt;
+		}
+		avrg = avrg / (double)count;
+
+		constexpr int font_size = 14;
+		constexpr Color color = DARKBLUE;
+		constexpr Color color_backdrop = BLACK;
+		std::string str = TextFormat("avrg rtt: %f.01", avrg);
+		DrawText(str.c_str(), (int)offset.x + 1, (int)offset.y + 1, font_size, color_backdrop);
+		DrawText(str.c_str(), (int)offset.x, (int)offset.y, font_size, color);
 	}
 
 	static void render_send_bytes_hist(const Vector2 offset, const connection& conn, const float range_mult) {
@@ -233,6 +248,21 @@ namespace meteor::render {
 		for (int i = 0; i < hist.size(); i++) {
 			DrawLineV(offset + Vector2((float)i, 0), offset + Vector2((float)i, (float)hist[i] * range_mult), DARKGREEN);
 		}
+
+		double avrg = 0;
+		int count = 0;
+		for (const uint32& bytes : hist) {
+			count++;
+			avrg += (double)bytes;
+		}
+		avrg = avrg / (double)(count / NETWORK_SEND_RATE);
+
+		constexpr int font_size = 14;
+		constexpr Color color = DARKGREEN;
+		constexpr Color color_backdrop = BLACK;
+		std::string str = TextFormat("avrg out/s: %f.01", avrg);
+		DrawText(str.c_str(), (int)offset.x + 1, (int)offset.y + 1, font_size, color_backdrop);
+		DrawText(str.c_str(), (int)offset.x, (int)offset.y, font_size, color);
 	}
 
 	static void render_recieve_bytes_hist(const Vector2 offset, const connection& conn, const float range_mult) {
@@ -240,6 +270,21 @@ namespace meteor::render {
 		for (int i = 0; i < hist.size(); i++) {
 			DrawLineV(offset + Vector2((float)i, 0), offset + Vector2((float)i, (float)hist[i] * range_mult), DARKPURPLE);
 		}
+
+		double avrg = 0;
+		int count = 0;
+		for (const uint32& bytes : hist) {
+			count++;
+			avrg += (double)bytes;
+		}
+		avrg = avrg / (double)(count / NETWORK_SEND_RATE);
+
+		constexpr int font_size = 14;
+		constexpr Color color = DARKPURPLE;
+		constexpr Color color_backdrop = BLACK;
+		std::string str = TextFormat("avrg in/s: %f.01", avrg);
+		DrawText(str.c_str(), (int)offset.x + 1, (int)offset.y + 1, font_size, color_backdrop);
+		DrawText(str.c_str(), (int)offset.x, (int)offset.y, font_size, color);
 	}
 
 }
