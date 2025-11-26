@@ -44,8 +44,6 @@ namespace meteor::server_game_system {
 			if (input.m_1_just_pressed && server.m_status == server_state::status::OFFLINE) {
 				game_instance.m_status = game::status::PRE_GAME;
 				server.m_status = server_state::status::ONLINE_JOINABLE;
-
-				// NOTE it does not reset the game or server
 			}
 			return;
 		}
@@ -59,7 +57,6 @@ namespace meteor::server_game_system {
 		bool bot_controlled = false;
 		uint8 player_index = 0;
 		for (player_entity& player : game_instance.m_state.m_players) {
-			//if (player.m_dead) { player_index++;  continue; }
 
 			// Get next action, if there are any queued up
 			if (!game_instance.m_player_action_queue[player_index].is_empty()) {
