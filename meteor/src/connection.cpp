@@ -73,9 +73,10 @@ namespace meteor {
 
 	void connection::log_recieve_stream(const uint32 size) {
 		// Logg Bytes
-		m_recieve_bytes_history.insert(m_recieve_bytes_history.begin(), size);
-		while (m_recieve_bytes_history.size() >= MAX_LOGGED_PACKETS)
-			m_recieve_bytes_history.pop_back();
+		m_recieve_bytes_history.front() += size;
+		//m_recieve_bytes_history.insert(m_recieve_bytes_history.begin(), size);
+		//while (m_recieve_bytes_history.size() >= MAX_LOGGED_PACKETS)
+		//	m_recieve_bytes_history.pop_back();
 
 		// Update state
 		m_recieve_times.insert(m_recieve_times.begin(), GetTime());
@@ -101,11 +102,23 @@ namespace meteor {
 
 		if (!socket.send_to(m_endpoint, stream)) { print_error_code(); return false; }
 
-		m_send_bytes_history.insert(m_send_bytes_history.begin(), stream.size());
-		while (m_send_bytes_history.size() >= MAX_LOGGED_PACKETS)
-			m_send_bytes_history.pop_back();
+		m_send_bytes_history.front() += stream.size();
+		//m_send_bytes_history.insert(m_send_bytes_history.begin(), stream.size());
+		//while (m_send_bytes_history.size() >= MAX_LOGGED_PACKETS)
+		//	m_send_bytes_history.pop_back();
 
 		return true;
+	}
+
+	void connection::increment_recieve_history() {
+		m_recieve_bytes_history.insert(m_recieve_bytes_history.begin(), 0);
+		while (m_recieve_bytes_history.size() >= MAX_LOGGED_PACKETS)
+			m_recieve_bytes_history.pop_back();
+	}
+	void connection::increment_send_history() {
+		m_send_bytes_history.insert(m_send_bytes_history.begin(), 0);
+		while (m_send_bytes_history.size() >= MAX_LOGGED_PACKETS)
+			m_send_bytes_history.pop_back();
 	}
 
 	void connection::set_disconnected() {

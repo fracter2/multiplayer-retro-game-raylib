@@ -24,6 +24,8 @@ namespace meteor::client_send_system {
 			return;
 		}
 
+		conn.increment_recieve_history();
+		conn.increment_send_history();
 
 		byte_stream stream_send;
 		byte_stream_writer writer(stream_send);

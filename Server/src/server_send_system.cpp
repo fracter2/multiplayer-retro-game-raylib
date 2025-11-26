@@ -74,6 +74,9 @@ else {																						\
 		uint8 client_index = 0;
 		for (connection& conn : server.m_clients) {
 
+			conn.increment_recieve_history();
+			conn.increment_send_history();
+
 			byte_stream stream_send;
 			byte_stream_writer writer(stream_send);
 

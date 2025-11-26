@@ -33,6 +33,8 @@ namespace meteor {
 		void log_recieve_stream(const uint32 size);
 		bool send_payload(udp_socket& socket, byte_stream& stream);
 		bool send_stream(udp_socket& socket, byte_stream& stream);
+		void increment_recieve_history();
+		void increment_send_history();
 
 		void set_disconnected();
 		void set_disconnecting();
@@ -59,7 +61,6 @@ namespace meteor {
 
 	private:
 		status m_status				 = status::DISCONNECTED;
-		//double m_last_recieve_time   = 0;
 		uint32 m_send_sequence		 = 0;
 		uint32 m_recieve_sequence	 = 0;
 		uint32 m_recieve_acknowledge = 0;
