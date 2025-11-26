@@ -124,7 +124,7 @@ namespace meteor::render {
 		
 		for (const player_entity& player : next_non_interp_state.m_players) {
 			const Vector2 pos = Vector2(player.m_position * (float)tilemap::TILE_PIXEL_LENGTH);
-			DrawRectangleLines((int)pos.x + offset, (int)pos.y - offset, length, length, tint_to);
+			DrawRectangleLines((int)pos.x + offset, (int)pos.y + offset, length, length, tint_to);
 		}
 		
 	}
