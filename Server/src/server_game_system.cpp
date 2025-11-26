@@ -58,18 +58,21 @@ namespace meteor::server_game_system {
 		uint8 player_index = 0;
 		for (player_entity& player : game_instance.m_state.m_players) {
 
+			auto& queue = game_instance.m_player_action_queue[player_index];
+			auto& status = game_instance.m_player_info[player_index].m_player_status;
+
 			// Get next action, if there are any queued up
-			if (!game_instance.m_player_action_queue[player_index].is_empty()) {
-				std::pair<player_entity::action, uint32> r = game_instance.m_player_action_queue[player_index].read_next();
+			if (!queue.is_empty()) {
+				std::pair<player_entity::action, uint32> r = queue.read_next();
 				player.m_prev_action = r.first;	
 				player.m_prev_action_tick = r.second;
 			}
 			
-			// PARSE INPUT FOR SERVER to controll bot
-			else if (game_instance.m_player_info[player_index].m_player_status != player_info::status::ACTIVE) {
+			// Bot input
+			else if (status != player_info::status::ACTIVE) {
 				player.m_prev_action_tick = game_instance.m_state.m_tick;
 
-				if (game_instance.m_player_info[player_index].m_player_status == player_info::status::ACTIVE_BOT && !bot_controlled) {
+				if (status == player_info::status::ACTIVE_BOT && !bot_controlled && !player.m_dead) {
 					bot_controlled = true;
 					player.m_prev_action = input_to_player_action(input, game_instance.m_state, player_index);
 				}
