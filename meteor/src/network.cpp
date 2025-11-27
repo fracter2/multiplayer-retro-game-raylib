@@ -350,7 +350,7 @@ namespace meteor
       }
       
 //#ifdef SET_BROADCAST
-      char broadcast = '1';
+      const char broadcast = '1';
       if (setsockopt(fd, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast)) < 0) {
           //std::cout << "Error in setting Broadcast option";
           closesocket(fd);
