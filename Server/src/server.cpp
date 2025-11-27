@@ -27,7 +27,6 @@ int main()
 	using namespace meteor;
 
 	// ==== APP DATA ====
-	constexpr uint16 PORT = 54321;
 	ip_endpoint  local_endpoint = {};
 	udp_socket   socket = {};
 	server_state server = {};

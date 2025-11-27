@@ -26,7 +26,6 @@ int main(int argc, char **argv)
 
 
 	// ==== APP DATA ====
-	constexpr uint16 PORT = 54321;
 	ip_endpoint local_endpoint = {};
 	udp_socket  socket = {};
 	connection  server_connection = {};

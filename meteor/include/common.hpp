@@ -28,4 +28,6 @@ namespace meteor {
 	constexpr uint32 TICKS_PER_NETWORK_SEND = 3;	// 60hz / 3 = 20hz
 	constexpr int NETWORK_SEND_RATE = TICK_RATE / (int)TICKS_PER_NETWORK_SEND;
 
+	constexpr uint16 PORT = 54321;
+
 }
