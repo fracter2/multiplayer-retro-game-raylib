@@ -19,7 +19,6 @@ namespace meteor::server_recieve_system {
 	void join_lobby(
 		server_state& server, 
 		game& game_instance, 
-		byte_stream_reader& reader, 
 		const ip_endpoint& sender_endpoint, 
 		const connect_packet& packet,
 		const int stream_size

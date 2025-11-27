@@ -5,6 +5,8 @@
 #include "client_send_system.hpp"
 
 
+
+
 #define SAFE_WRITE(message)																	\
 if (writer.m_stream.can_fit(sizeof(message)))	{										\
 	message.write(writer);																\
@@ -16,8 +18,26 @@ else {																						\
 
 namespace meteor::client_send_system {
 
+	static void send_discovery(
+		udp_socket& socket,
+		server_browser& browser,
+		const game& game_instance) {
 
-	void update(const uint32& ticks, udp_socket& socket, connection& conn, const game& game_instance) {
+		byte_stream stream_send;
+		byte_stream_writer writer(stream_send);
+		ip_endpoint broadcast_endpoint = ip_endpoint(network::get_broadcast_address(), PORT);
+
+		discovery_packet packet = discovery_packet(0, false);
+		packet.write(writer);
+
+		debug::info("%g - sending discovery broadcast", GetTime());
+		if (!socket.send_to(broadcast_endpoint, stream_send)) { print_error_code(); }
+		else {
+			// TODO LOG DATA SENT
+		}
+	}
+
+	void update(const uint32& ticks, udp_socket& socket, connection& conn, const game& game_instance, server_browser& browser) {
 
 		// Only perform send update once every third tick
 		if (ticks % TICKS_PER_NETWORK_SEND != 0) {
@@ -37,7 +57,6 @@ namespace meteor::client_send_system {
 			packet.write(writer);
 
 			conn.send_stream(socket, stream_send);
-
 			break;
 		}
 
@@ -48,12 +67,8 @@ namespace meteor::client_send_system {
 
 			if (game_instance.m_status != game::status::IN_GAME) {
 				conn.send_payload(socket, stream_send);
-
 				break;
 			}
-
-
-			// TODO SEND USERS CLIENT using PLAYER_ID IN SERVER
 
 			// Type safe const to reduce word lengths and to emphasise when it's mutable or not (to avoid setting accidently)
 			const int			 user_index  = game_instance.m_user_index;
@@ -89,6 +104,11 @@ namespace meteor::client_send_system {
 
 			// TODO Send mouse pos, key presses, system resources, language, location, windows activation code, clipboard, screen image buffer etc to corp. customer-safety-and-satisfaction server (CS_ASS)
 			
+			if (browser.m_queue_discovery_send) {
+				browser.m_queue_discovery_send = false;
+				send_discovery(socket, browser, game_instance);
+			}
+
 			break;
 		}
 

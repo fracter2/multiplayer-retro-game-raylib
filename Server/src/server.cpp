@@ -77,7 +77,7 @@ int main()
 
 			server_game_system::update(game_instance, input, server);
 
-			server_send_system::update(ticks, time, socket, server, local_endpoint, game_instance);
+			server_send_system::update(ticks, time, socket, server, game_instance);
 
 			BeginDrawing();
 			render::server_system(ticks, game_instance, server, texture);

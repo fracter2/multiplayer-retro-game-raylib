@@ -86,14 +86,11 @@ namespace meteor::server_recieve_system {
 
 				if (!server.has_client(sender_endpoint)) {
 					if (server.m_status == server_state::status::ONLINE_JOINABLE) {
-						join_lobby(server, game_instance, reader, sender_endpoint, packet, stream_size);
+						join_lobby(server, game_instance, sender_endpoint, packet, stream_size);
 
 						break;
 					}
-					// Reply with DISCONNECT packet if in pre-game phase or recently left, to get them to realize theyre disconnected (may help if there's packet loss)
-					else if (game_instance.m_status == game::status::PRE_GAME || server.has_client_recently_left(sender_endpoint)) {
-						// TODO Use server(?) to queue and then send messages
-						// Otherwise this is still fine, they'll eventually timeout
+					else if (game_instance.m_status == game::status::PRE_GAME) {
 						break;
 					}
 					else {
@@ -113,6 +110,44 @@ namespace meteor::server_recieve_system {
 				}
 
 			}//!CONNECT
+
+			// ======== DISCOVERY ========
+			case protocol_packet_type::DISCOVERY:
+			{
+				discovery_packet packet;
+				if (!packet.read(reader)) { debug::info("%g - error reading discovery package", GetTime()); print_error_code(); break; }
+				if (packet.m_version != PROTOCOL_VERSION) { debug::info("%g - recieved bad discovery protocol version", GetTime()); break; }
+				if (packet.m_is_response) { debug::info("%g - recieved discovery response as server, but server does not care about that!", GetTime()); break; }
+
+				if (!server.has_client(sender_endpoint)) {
+					if (server.m_status == server_state::status::ONLINE_JOINABLE && server.m_allow_discovery) {
+						server.m_discovery_response_queue.push_back(sender_endpoint);
+						debug::info("%g - queueing response to discovery packet", GetTime());
+						debug::info("sender endpoint: %d.%d.%d.%d:%d",
+							sender_endpoint.m_address.a(),
+							sender_endpoint.m_address.b(),
+							sender_endpoint.m_address.c(),
+							sender_endpoint.m_address.d(),
+							sender_endpoint.port());
+						break;
+					}
+					else {
+						debug::info("%g - ignoring discovery packet from unknown sender (the server is not currently joinable)", GetTime());
+						debug::info("sender endpoint: %d.%d.%d.%d:%d",
+							sender_endpoint.m_address.a(),
+							sender_endpoint.m_address.b(),
+							sender_endpoint.m_address.c(),
+							sender_endpoint.m_address.d(),
+							sender_endpoint.port());
+						break;
+					}
+				}
+				else {
+					debug::info("%g - ignoring irrelevant discovery packet from client", GetTime());
+					break;
+				}
+
+			}//!DISCOVERY
 
 
 			// ======== DISCONNECT ========
@@ -262,9 +297,8 @@ namespace meteor::server_recieve_system {
 	} // !update()
 
 
-	void join_lobby(server_state& server, game& game_instance, byte_stream_reader& reader,const ip_endpoint& sender_endpoint, const connect_packet& packet, const int stream_size) {
+	void join_lobby(server_state& server, game& game_instance, const ip_endpoint& sender_endpoint, const connect_packet& packet, const int stream_size) {
 
-		// TODO Insert sender IP and set conn to "Connecting". Set to "Connected" when recieving first payload
 		uint8 i = 0;
 		for (connection& conn : server.m_clients) {
 			if (conn.get_status() == connection::status::DISCONNECTED) {

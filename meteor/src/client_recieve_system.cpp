@@ -5,10 +5,11 @@
 #include "client_recieve_system.hpp"
 #include "protocol.hpp"
 #include "messages.hpp"
+#include "server_browser.hpp"
 
 namespace meteor::client_recieve_system {
 
-	void update(double& next_tick_time, udp_socket& socket, connection& conn, game& game_instance) {
+	void update(double& next_tick_time, udp_socket& socket, connection& conn, game& game_instance, server_browser& browser) {
 
 		// note: timeout
 		if (conn.get_status() != connection::status::DISCONNECTED
@@ -72,7 +73,8 @@ namespace meteor::client_recieve_system {
 				switch (conn.get_status()) {
 				case connection::status::DISCONNECTED:
 				{
-					conn = connection(sender_endpoint);
+					debug::info("%g - recieved connect packet while not tryina join.", GetTime());
+					/*conn = connection(sender_endpoint);
 					conn.set_connecting();
 					conn.log_recieve_stream(stream_size);
 					debug::info("%g - recieved broadcast from server with %d player, attempting join", GetTime(), packet.m_player_id);
@@ -81,12 +83,11 @@ namespace meteor::client_recieve_system {
 						sender_endpoint.m_address.b(),
 						sender_endpoint.m_address.c(),
 						sender_endpoint.m_address.d(),
-						sender_endpoint.port());
+						sender_endpoint.port());*/
 					break;
 				}
 				case connection::status::CONNECTING:
 				{
-					if (packet.m_broadcast) { break; }
 					conn.set_connected();
 					conn.log_recieve_stream(stream_size);
 					debug::info("%g - gracefully connected to server as player %d", GetTime(), packet.m_player_id);
@@ -108,6 +109,39 @@ namespace meteor::client_recieve_system {
 				break;
 			}//!CONNECT
 
+
+			// ======== DISCOVERY ========
+			case protocol_packet_type::DISCOVERY:
+			{
+				discovery_packet packet;
+				if (!packet.read(reader)) { debug::info("%g - error reading discovery package", GetTime()); print_error_code(); break; }
+				if (!packet.m_is_response) { debug::info("%g - recieved discovery pack from another client. ignoring.", GetTime()); break; }
+				if (packet.m_version != PROTOCOL_VERSION) { debug::info("%g - recieved bad discovery protocol version", GetTime()); break; }
+
+				debug::info("%g - recieved discovery response with %d players", GetTime(), packet.m_player_count);
+				debug::info("server endpoint: %d.%d.%d.%d:%d",
+					sender_endpoint.m_address.a(),
+					sender_endpoint.m_address.b(),
+					sender_endpoint.m_address.c(),
+					sender_endpoint.m_address.d(),
+					sender_endpoint.port());
+
+				switch (conn.get_status()) {
+				case connection::status::DISCONNECTED:
+				{
+					browser.m_entries.push_back(server_browser::entry(sender_endpoint, packet.m_player_count));
+					conn.log_recieve_stream(stream_size);
+					break;
+				}
+				default:
+				{
+					debug::info("%g - recieved discovery package when irrellevant. Not logged.", GetTime());
+					break;
+				}
+				}//!Status switch
+
+				break;
+			}//!DISCOVERY
 
 			// ======== DISCONNECT ========
 			case protocol_packet_type::DISCONNECT:

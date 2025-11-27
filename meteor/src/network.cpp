@@ -82,6 +82,16 @@ namespace meteor
            print_error_code();
            return false;
        }
+       
+       ip_endpoint endp;
+       network::get_bound_address(socket, endp);
+       debug::info("local address bind set to: %d.%d.%d.%d: %d",
+           endp.m_address.a(),
+           endp.m_address.b(),
+           endp.m_address.c(),
+           endp.m_address.d(),
+           endp.port());
+
        return true;
    }
 

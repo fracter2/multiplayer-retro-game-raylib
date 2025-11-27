@@ -14,6 +14,7 @@ namespace meteor
 
    enum class protocol_packet_type : uint8 {
 	  CONNECT,
+	  DISCOVERY,
 	  DISCONNECT,
 	  PAYLOAD,
 	  MAX		// Used to check if its out-of-range. Keep as highest value
@@ -26,7 +27,7 @@ namespace meteor
 
    struct connect_packet {
 	   connect_packet();
-	   connect_packet(uint8 id, bool broadcast);
+	   connect_packet(uint8 id);
 
 	   bool write(byte_stream_writer& writer);
 	   bool read(byte_stream_reader& reader);
@@ -34,8 +35,20 @@ namespace meteor
 	   uint8 m_type = (uint8)protocol_packet_type::CONNECT;
 	   uint32 m_magic = 0;
 	   uint32 m_version = 0; 
-	   uint8 m_player_id = 0;			// client player index, or when sent from server as broadcast: players already in lobby
-	   bool m_broadcast = false;
+	   uint8 m_player_id = 0;
+   };
+
+   struct discovery_packet {
+	   discovery_packet();
+	   discovery_packet(uint8 player_count, bool is_response);
+
+	   bool write(byte_stream_writer& writer);
+	   bool read(byte_stream_reader& reader);
+
+	   uint8 m_type = (uint8)protocol_packet_type::DISCOVERY;
+	   uint32 m_version = 0;
+	   uint8 m_player_count = 0;
+	   bool m_is_response = false;
    };
 
    struct disconnect_packet {
@@ -47,7 +60,6 @@ namespace meteor
 
 	   uint8 m_type = (uint8)protocol_packet_type::DISCONNECT;
 	   uint8 m_reason = 0;
-	   //char m_message[256] = {};
    };
 
    struct payload_packet {

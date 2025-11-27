@@ -12,7 +12,6 @@ namespace meteor::server_send_system {
 		const double time,
 		udp_socket& socket,
 		server_state& server,
-		const ip_endpoint& local_endpoint,
 		const game& game_instance
 	);
 }

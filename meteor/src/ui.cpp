@@ -31,6 +31,15 @@ namespace meteor::ui {
 		if (input.m_5) { conn.m_debug_skip_recieve = true; }
 		else { conn.m_debug_skip_recieve = false; }
 	}
+
+	void discover_servers(const input_state& input, server_browser& browser, const game& state) {
+
+		if (input.m_1_just_pressed && state.m_status == game::status::INVALID) {
+			browser.m_entries.clear();
+			browser.m_queue_discovery_send = true;
+		}
+	}
+
 #endif
 
 #ifdef _SERVER

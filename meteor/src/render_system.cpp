@@ -102,7 +102,7 @@ namespace meteor::render{
 			{ // "In Menu"
 				constexpr int font_size = 40;
 				constexpr Color color = MAROON;
-				const char* text = TextFormat("Not connected, waiting for server broadcast");
+				const char* text = TextFormat("Main menu. Press '1' to discover available LAN server");
 				const int text_width = MeasureText(text, font_size);
 				const int text_x = (GetScreenWidth() - text_width) / 2;
 				const int text_y = 8;
@@ -110,7 +110,7 @@ namespace meteor::render{
 				DrawText(text, text_x, text_y, font_size, color);
 			}
 
-#ifdef _CLIENT
+
 			if (game_instance.m_user_index != -1) { // "Disconnect reason"
 				constexpr int font_size = 40;
 				constexpr Color color = MAROON;
@@ -122,7 +122,7 @@ namespace meteor::render{
 				DrawText(text.c_str(), text_x + 1, text_y + 1, font_size, BLACK);
 				DrawText(text.c_str(), text_x, text_y, font_size, color);
 			}
-#endif 
+
 
 		}
 		

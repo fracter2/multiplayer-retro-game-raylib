@@ -10,7 +10,7 @@
 #include "render_system.hpp"
 #include "ui.hpp"
 #include "lag_optimizer.hpp"
-
+#include "server_browser.hpp"
 
 //#define _CLIENT // This is added in project settings, making it "global"
 
@@ -26,11 +26,11 @@ int main(int argc, char **argv)
 
 
 	// ==== APP DATA ====
-	ip_endpoint local_endpoint = {};
 	udp_socket  socket = {};
 	connection  server_connection = {};
 	game		game_instance = {};
 	input_state input = {};
+	server_browser browser = {};
 	
 	double next_tick_time = GetTime();
 	uint32 ticks = 0;
@@ -40,22 +40,19 @@ int main(int argc, char **argv)
 
 	Texture texture = LoadTexture("data/tiles.png");
 
+
 	// ==== INIT ====
 	network::startup boot;
 	setup_socket_no_endpoint(socket);
 
-	// update loop
+
+	// ==== UPDATE LOOP ====
 	while (running) {
 		dt = GetFrameTime();
 		running &= !WindowShouldClose();
 		time = GetTime();
-		
-		// ---- TODO BEFORE THIS IS DONE ----
-		// TODO ADD SUMMARY OF BYTES PER SECOND AND MAKE SEND/RECIEVE ACCUMULATE & LOGG EVER TICK (instead of per-packet)
-		// TODO WRITE ABOUT...
 
-
-		client_recieve_system::update(next_tick_time, socket, server_connection, game_instance);
+		client_recieve_system::update(next_tick_time, socket, server_connection, game_instance, browser);
 
 		// tick loop
 		if (time >= next_tick_time) {
@@ -70,10 +67,12 @@ int main(int argc, char **argv)
 			ui::debug_skip_recieve_check(server_connection, input);
 			ui::delay_tick(next_tick_time, input);
 			ui::quicken_tick(next_tick_time, input);
+			ui::discover_servers(input, browser, game_instance);
 
 			game_update_system::update(game_instance, input);
 
-			client_send_system::update(ticks, socket, server_connection, game_instance);
+			client_send_system::update(ticks, socket, server_connection, game_instance, browser);
+
 
 			BeginDrawing();
 			render::client_system(ticks, game_instance, server_connection, texture);

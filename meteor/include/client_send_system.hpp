@@ -8,7 +8,7 @@
 #include "protocol.hpp"
 #include "connection.hpp"
 #include "game.hpp"
-
+#include "server_browser.hpp"
 //#include "input.hpp"
 
 namespace meteor::client_send_system {
@@ -21,7 +21,8 @@ namespace meteor::client_send_system {
 		const uint32& ticks,
 		udp_socket& socket,
 		connection& connection,
-		const game& game_instance
+		const game& game_instance,
+		server_browser& browser
 	);
 	
 	

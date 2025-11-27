@@ -5,6 +5,11 @@
 #include "input.hpp"
 #include "connection.hpp"
 
+#ifdef _CLIENT
+#include "server_browser.hpp"
+#include "game.hpp"
+#endif
+
 #ifdef _SERVER
 #include "server_state.hpp"
 #endif
@@ -18,6 +23,7 @@ namespace meteor::ui {
 #ifdef _CLIENT
 	void quit_check(connection& conn, const input_state& input);
 	void debug_skip_recieve_check(connection& conn, const input_state& input);
+	void discover_servers(const input_state& input, server_browser& browser, const game& state);
 #endif
 
 #ifdef _SERVER

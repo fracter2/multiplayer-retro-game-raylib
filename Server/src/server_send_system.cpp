@@ -7,24 +7,50 @@
 
 namespace meteor::server_send_system {
 
-	static void send_broadcast(udp_socket& socket,
+	//static void send_broadcast(
+	//	udp_socket& socket,
+	//	server_state& server,
+	//	const ip_endpoint& local_endpoint,
+	//	const game& game_instance) {
+
+	//	byte_stream stream_send;
+	//	byte_stream_writer writer(stream_send);
+	//	ip_endpoint broadcast_endpoint = ip_endpoint(network::get_broadcast_address(), local_endpoint.m_port);
+
+	//	connect_packet packet = connect_packet((uint8)server.get_client_count(), true);
+	//	packet.write(writer);
+
+	//	debug::info("%g - sending broadcast", GetTime());
+	//	if (!socket.send_to(broadcast_endpoint, stream_send)) { print_error_code(); }
+	//	else {
+	//		// TODO LOG DATA SENT
+	//	}
+	//}
+
+	static void send_discovery_responses(
+		udp_socket& socket,
 		server_state& server,
-		const ip_endpoint& local_endpoint,
 		const game& game_instance) {
+	
+		for (const ip_endpoint& endp : server.m_discovery_response_queue) {
 
-		byte_stream stream_send;
-		byte_stream_writer writer(stream_send);
-		ip_endpoint broadcast_endpoint = ip_endpoint(network::get_broadcast_address(), local_endpoint.m_port);
+			byte_stream stream_send;
+			byte_stream_writer writer(stream_send);
 
-		connect_packet packet = connect_packet((uint8)server.get_client_count(), true);
-		packet.write(writer);
+			discovery_packet packet = discovery_packet((uint8)server.get_client_count(), true);
+			packet.write(writer);
 
-		debug::info("%g - sending broadcast", GetTime());
-		if (!socket.send_to(broadcast_endpoint, stream_send)) { print_error_code(); }
-		else {
-			// TODO LOG DATA SENT
+			debug::info("%g - sending broadcast", GetTime());
+			if (!socket.send_to(endp, stream_send)) { print_error_code(); return; }
+			else {
+				// TODO LOG DATA SENT
+			}
+
 		}
+
+		server.m_discovery_response_queue.clear();
 	}
+
 
 #define SAFE_WRITE(message)																	\
 if (writer.m_stream.can_fit(sizeof(message)))	{										\
@@ -35,12 +61,12 @@ else {																						\
 	break;																						\
 }
 
+
 	void update(
 		const uint32& ticks,
 		const double time,
 		udp_socket& socket,
 		server_state& server,
-		const ip_endpoint& local_endpoint,
 		const game& game_instance) {
 
 
@@ -63,11 +89,12 @@ else {																						\
 			assert(game_instance.m_status == game::status::PRE_GAME);		// Only allow joinable in PRE_GAME (lobby) state
 			assert(server.get_client_count() < MAX_PLAYERS);				// Ensure we've handled player counts correctly
 			
-			if (server.m_broadcast && server.m_next_broadcast_tick <= ticks) {
+			/*if (server.m_broadcast && server.m_next_broadcast_tick <= ticks) {
 				send_broadcast(socket, server, local_endpoint, game_instance);
 				server.m_next_broadcast_tick = ticks + server_state::BROADCAST_IDLE_TICKS;
 				
-			}
+			}*/
+			send_discovery_responses(socket, server, game_instance);
 		}
 
 		// ======== ITERATE CLIENTS ========
@@ -84,7 +111,7 @@ else {																						\
 			switch (conn.get_status()) {
 			case connection::status::CONNECTING: {
 				debug::info("%g - sending connect response to client: %d", GetTime(), client_index);
-				connect_packet packet = connect_packet(client_index, false);
+				connect_packet packet = connect_packet(client_index);
 				packet.write(writer);
 
 				conn.send_stream(socket, stream_send);

@@ -128,6 +128,7 @@
     <ClInclude Include="include\input_to_player_action.hpp" />
     <ClInclude Include="include\lag_optimizer.hpp" />
     <ClInclude Include="include\render.hpp" />
+    <ClInclude Include="include\server_browser.hpp" />
     <ClInclude Include="include\ui.hpp" />
     <ClInclude Include="include\messages.hpp" />
     <ClInclude Include="include\network.hpp" />
