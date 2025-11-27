@@ -43,14 +43,7 @@ int main(int argc, char **argv)
 
 	// ==== INIT ====
 	network::startup boot;
-	setup_socket_endpoint(socket, local_endpoint, PORT);
-
-	debug::info("local endpoint: %d.%d.%d.%d:%d",
-		local_endpoint.m_address.a(),
-		local_endpoint.m_address.b(),
-		local_endpoint.m_address.c(),
-		local_endpoint.m_address.d(),
-		local_endpoint.port());
+	setup_socket_no_endpoint(socket);
 
 	// update loop
 	while (running) {

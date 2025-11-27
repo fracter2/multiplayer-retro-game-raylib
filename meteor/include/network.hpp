@@ -191,6 +191,6 @@ namespace meteor
 
 
    bool setup_socket_endpoint(udp_socket& socket, ip_endpoint& local_endpoint, const uint16 port);
-
+   bool setup_socket_no_endpoint(udp_socket& socket);
 
 } // !meteor

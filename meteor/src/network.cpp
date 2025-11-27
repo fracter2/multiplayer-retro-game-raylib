@@ -75,6 +75,16 @@ namespace meteor
       }
    } // !clock
 
+   bool setup_socket_no_endpoint(meteor::udp_socket& socket) {
+       using namespace meteor;
+       if (!socket.open()) {
+           debug::info("socket.open() failed!");
+           print_error_code();
+           return false;
+       }
+       return true;
+   }
+
    bool setup_socket_endpoint(meteor::udp_socket& socket, meteor::ip_endpoint& local_endpoint, const meteor::uint16 port) {
        using namespace meteor;
        std::vector<ip_address> local_adresses = {};
