@@ -68,6 +68,7 @@ int main(int argc, char **argv)
 			ui::delay_tick(next_tick_time, input);
 			ui::quicken_tick(next_tick_time, input);
 			ui::discover_servers(input, browser, game_instance);
+			ui::update_server_browser(input, browser, server_connection);
 
 			game_update_system::update(game_instance, input);
 
@@ -75,7 +76,7 @@ int main(int argc, char **argv)
 
 
 			BeginDrawing();
-			render::client_system(ticks, game_instance, server_connection, texture);
+			render::client_system(ticks, game_instance, server_connection, texture, browser);
 			EndDrawing();
 
 		} //!tick loop

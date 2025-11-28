@@ -26,7 +26,7 @@ namespace meteor {
 		static constexpr uint32 MAX_LOGGED_PACKETS = 20 * 5; // Max logged packets. 20/s * 5 sec
 
 		connection();
-		connection(ip_endpoint endpoint, status status = status::DISCONNECTED);
+		connection(ip_endpoint endpoint, double first_recieve_time, status status = status::DISCONNECTED);
 
 		bool can_recieve_payload(const payload_packet& packet) const noexcept;
 		void log_recieve_payload(const payload_packet& packet, const uint32 size);

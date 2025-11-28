@@ -8,6 +8,7 @@
 #include <string_view>
 #include <string>
 #include <type_traits>
+#include <format>
 
 namespace meteor {
 	using uint64 = unsigned long long;

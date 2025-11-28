@@ -14,7 +14,7 @@ namespace meteor {
 
 	}
 
-	connection::connection(ip_endpoint endpoint, status status)
+	connection::connection(ip_endpoint endpoint, double first_recieve_time, status status)
 		: m_endpoint(endpoint)
 		, m_status(status)
 		, m_send_sequence(0)
@@ -25,6 +25,16 @@ namespace meteor {
 		m_recieve_bytes_history.reserve(MAX_LOGGED_PACKETS + 1);
 		m_send_bytes_history.reserve(MAX_LOGGED_PACKETS + 1);
 		m_rtt_history.reserve(MAX_LOGGED_PACKETS + 1);
+		m_recieve_times.reserve(MAX_LOGGED_PACKETS + 1);
+		
+		if (m_recieve_times.empty()) {
+			m_recieve_times.push_back(first_recieve_time);
+		}
+		else {
+			m_recieve_times.front() = first_recieve_time;
+		}
+		
+		
 	}
 
 	bool connection::can_recieve_payload(const payload_packet& packet) const noexcept {

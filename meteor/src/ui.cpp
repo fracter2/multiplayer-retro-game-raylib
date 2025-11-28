@@ -40,6 +40,33 @@ namespace meteor::ui {
 		}
 	}
 
+	void update_server_browser(const input_state& input, server_browser& browser, connection& conn) {
+		if (input.m_up_just_pressed)   browser.m_select_index--;
+		if (input.m_down_just_pressed) browser.m_select_index++;
+		
+		if (browser.m_select_index < 0)								 browser.m_select_index = 0;
+		if (browser.m_select_index > (browser.m_entries.size() - 1)) browser.m_select_index = (int)(browser.m_entries.size() - 1);
+
+		if (browser.m_entries.empty()) return;
+		if (conn.get_status() != connection::status::DISCONNECTED) return;
+
+		if (input.m_place_bomb_just_pressed) {
+			conn = connection(
+				browser.m_entries[browser.m_select_index].m_endpoint, 
+				GetTime(), 
+				connection::status::CONNECTING
+			);
+
+			debug::info("%g - selected server, attempting join", GetTime());
+			debug::info("server endpoint: %d.%d.%d.%d:%d",
+				conn.m_endpoint.m_address.a(),
+				conn.m_endpoint.m_address.b(),
+				conn.m_endpoint.m_address.c(),
+				conn.m_endpoint.m_address.d(),
+				conn.m_endpoint.port());
+		}
+	}
+
 #endif
 
 #ifdef _SERVER

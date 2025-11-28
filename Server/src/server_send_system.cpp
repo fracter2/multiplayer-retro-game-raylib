@@ -7,26 +7,6 @@
 
 namespace meteor::server_send_system {
 
-	//static void send_broadcast(
-	//	udp_socket& socket,
-	//	server_state& server,
-	//	const ip_endpoint& local_endpoint,
-	//	const game& game_instance) {
-
-	//	byte_stream stream_send;
-	//	byte_stream_writer writer(stream_send);
-	//	ip_endpoint broadcast_endpoint = ip_endpoint(network::get_broadcast_address(), local_endpoint.m_port);
-
-	//	connect_packet packet = connect_packet((uint8)server.get_client_count(), true);
-	//	packet.write(writer);
-
-	//	debug::info("%g - sending broadcast", GetTime());
-	//	if (!socket.send_to(broadcast_endpoint, stream_send)) { print_error_code(); }
-	//	else {
-	//		// TODO LOG DATA SENT
-	//	}
-	//}
-
 	static void send_discovery_responses(
 		udp_socket& socket,
 		server_state& server,
@@ -40,7 +20,7 @@ namespace meteor::server_send_system {
 			discovery_packet packet = discovery_packet((uint8)server.get_client_count(), true);
 			packet.write(writer);
 
-			debug::info("%g - sending broadcast", GetTime());
+			debug::info("%g - sending discovery response", GetTime());
 			if (!socket.send_to(endp, stream_send)) { print_error_code(); return; }
 			else {
 				// TODO LOG DATA SENT
@@ -84,16 +64,11 @@ else {																						\
 		// ======== ONLINE ========
 
 		
-		// Broadcast check
+		// Discovery response check
 		if (server.m_status == server_state::status::ONLINE_JOINABLE) {
 			assert(game_instance.m_status == game::status::PRE_GAME);		// Only allow joinable in PRE_GAME (lobby) state
 			assert(server.get_client_count() < MAX_PLAYERS);				// Ensure we've handled player counts correctly
 			
-			/*if (server.m_broadcast && server.m_next_broadcast_tick <= ticks) {
-				send_broadcast(socket, server, local_endpoint, game_instance);
-				server.m_next_broadcast_tick = ticks + server_state::BROADCAST_IDLE_TICKS;
-				
-			}*/
 			send_discovery_responses(socket, server, game_instance);
 		}
 

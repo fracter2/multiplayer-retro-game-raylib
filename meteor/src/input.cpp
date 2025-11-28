@@ -9,13 +9,21 @@ namespace meteor {
 
 
 	void input_state::update() {
+		m_up_just_pressed = !(m_up) and (IsKeyDown(KEY_W) or IsKeyDown(KEY_UP));
 		m_up = IsKeyDown(KEY_W) or IsKeyDown(KEY_UP);
+
+		m_down_just_pressed = !(m_down) and (IsKeyDown(KEY_S) or IsKeyDown(KEY_DOWN));
 		m_down = IsKeyDown(KEY_S) or IsKeyDown(KEY_DOWN);
+
 		m_left = IsKeyDown(KEY_A) or IsKeyDown(KEY_LEFT);
 		m_right = IsKeyDown(KEY_D) or IsKeyDown(KEY_RIGHT);
+
+		m_place_bomb_just_pressed = !(m_place_bomb) and (IsKeyDown(KEY_SPACE));
 		m_place_bomb = IsKeyDown(KEY_SPACE);
+
 		m_lmb_just_pressed = (!m_lmb) and IsMouseButtonDown(MOUSE_BUTTON_LEFT);
 		m_lmb = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+
 		m_esc_just_pressed = (!m_esc) and IsKeyDown(KEY_ESCAPE);
 		m_esc = IsKeyDown(KEY_ESCAPE);
 

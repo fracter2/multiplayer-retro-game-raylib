@@ -73,7 +73,7 @@ namespace meteor::client_recieve_system {
 				switch (conn.get_status()) {
 				case connection::status::DISCONNECTED:
 				{
-					debug::info("%g - recieved connect packet while not tryina join.", GetTime());
+					debug::info("%g - recieved connect packet while disconnected.", GetTime());
 					/*conn = connection(sender_endpoint);
 					conn.set_connecting();
 					conn.log_recieve_stream(stream_size);

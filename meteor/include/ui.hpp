@@ -24,6 +24,7 @@ namespace meteor::ui {
 	void quit_check(connection& conn, const input_state& input);
 	void debug_skip_recieve_check(connection& conn, const input_state& input);
 	void discover_servers(const input_state& input, server_browser& browser, const game& state);
+	void update_server_browser(const input_state& input, server_browser& browser, connection& conn);
 #endif
 
 #ifdef _SERVER

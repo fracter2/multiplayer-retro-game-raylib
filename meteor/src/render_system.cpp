@@ -8,7 +8,7 @@ namespace meteor::render{
 	
 	
 
-	void client_system(const uint32& tick, const game& game_instance, const connection& conn, const Texture& texture) {
+	void client_system(const uint32& tick, const game& game_instance, const connection& conn, const Texture& texture, const server_browser& browser) {
 
 		// TODO CLEAR
 		ClearBackground(SKYBLUE);
@@ -118,10 +118,24 @@ namespace meteor::render{
 				text += player_info::status_to_str(game_instance.m_player_info[game_instance.m_user_index].m_player_status);
 				const int text_width = MeasureText(text.c_str(), font_size);
 				const int text_x = (GetScreenWidth() - text_width) / 2;
-				const int text_y = 300;
+				const int text_y = 120;
 				DrawText(text.c_str(), text_x + 1, text_y + 1, font_size, BLACK);
 				DrawText(text.c_str(), text_x, text_y, font_size, color);
 			}
+
+
+			{ // Controls display
+				constexpr int font_size = 16;
+				constexpr Color color = MAROON;
+				const char* text = TextFormat(" W and S to browse up and down. SPACE to connect");
+				const int text_width = MeasureText(text, font_size);
+				const int text_x = 12;
+				const int text_y = WINDOW_HEIGHT - 40;
+				DrawText(text, text_x + 1, text_y + 1, font_size, BLACK);
+				DrawText(text, text_x, text_y, font_size, color);
+			}
+
+			render_server_browser(browser);
 
 
 		}
@@ -131,15 +145,26 @@ namespace meteor::render{
 		// ==== STATISTICS ====
 		{
 			// RENDER FPS
-			DrawFPS(2, GetScreenHeight() - 20);
+			DrawFPS(2, 20);
 			
-			int y_offset = 80 + 175 * (game_instance.m_user_index);	// Mimic server alignment for convenience
+			int y_offset = 60 + 175 * (game_instance.m_user_index);	// Mimic server alignment for convenience
 
 			render_rtt_graph(HUD_OFFSET + Vector2(300, (float)y_offset), conn, -500.0f);			// seconds to ms, 1px per 2ms
 			render_send_bytes_hist(HUD_OFFSET + Vector2(430, (float)y_offset), conn, -0.25f);		// 1px per 4 bytes
 			render_recieve_bytes_hist(HUD_OFFSET + Vector2(560, (float)y_offset), conn, -0.25f);	// 1px per 4 bytes
 
-			render_connection_stats(Vector2i(80, 20), conn);
+			render_connection_stats(Vector2i(20, 45), conn);
+		}
+
+		{ // Start game (Key 1) Instructions
+			constexpr int font_size = 16;
+			constexpr Color color = MAROON;
+			const char* text = TextFormat("'5' (hold) simulate packet loss - '7' increase time to next tick 2ms - '8' decrease time to next tick 2ms");
+			const int text_width = MeasureText(text, font_size);
+			const int text_x = 12;
+			const int text_y = WINDOW_HEIGHT - 20;
+			DrawText(text, text_x + 1, text_y + 1, font_size, BLACK);
+			DrawText(text, text_x, text_y, font_size, color);
 		}
 
 	}

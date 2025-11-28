@@ -6,6 +6,11 @@
 #include "game.hpp"
 #include "connection.hpp"
 
+#ifdef _CLIENT
+#include "server_browser.hpp"
+#endif
+
+
 #ifdef _SERVER
 #include "server_state.hpp"
 #endif // _SERVER
@@ -128,6 +133,55 @@ namespace meteor::render {
 		}
 		
 	}
+
+
+	static void render_server_browser(const server_browser& browser) {
+
+		if (browser.m_entries.empty()) {
+			constexpr int font_size = 30;
+			constexpr Color color = MAROON;
+			std::string text = TextFormat("No servers found");
+			const int text_width = MeasureText(text.c_str(), font_size);
+			const int text_x = (GetScreenWidth() - text_width) / 2;
+			const int text_y = 160;
+			
+			DrawText(text.c_str(), text_x + 1, text_y + 1, font_size, BLACK);
+			DrawText(text.c_str(), text_x, text_y, font_size, color);
+			return;
+		}
+
+
+		constexpr int font_size = 30;
+		constexpr Color color = MAROON;
+		constexpr int line_spacing = 25;
+
+		int i = 0;
+		for (const server_browser::entry& entry : browser.m_entries) {
+			std::string text = std::format("Server {} [{} / {}]: {}.{}.{}.{}: {} {}", 
+				i, 
+				entry.m_players,
+				MAX_PLAYERS,
+				entry.m_endpoint.m_address.a(),
+				entry.m_endpoint.m_address.b(),
+				entry.m_endpoint.m_address.c(),
+				entry.m_endpoint.m_address.d(),
+				entry.m_endpoint.port(),
+				browser.m_select_index == i ? "(Selected)" : ""
+			);
+
+			const int text_width = MeasureText(text.c_str(), font_size);
+			const int text_x = (GetScreenWidth() - text_width) / 2;
+			const int text_y = 160 + i * line_spacing;
+			int new_font_size = browser.m_select_index == i ? font_size : font_size + 6;
+
+			DrawText(text.c_str(), text_x + 1, text_y + 1, new_font_size, BLACK);
+			DrawText(text.c_str(), text_x, text_y, new_font_size, color);
+			i++;
+		}
+
+
+	}
+
 #endif // _CLIENT
 
 	// Returns sec as ms with one digit after '.'

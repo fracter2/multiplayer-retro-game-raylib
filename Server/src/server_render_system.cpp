@@ -25,16 +25,6 @@ namespace meteor::render {
 		// ==== IN GAME ====
 		if (game_instance.m_status == game::status::IN_GAME) {
 
-
-			// TODO RENDER BACKGROUND
-
-
-			// TODO RENDER NAMES (if there are names)
-
-			// TODO REMDER INTERPOLATION FROM / TO (if toggled)
-
-			// TODO REMDER CLIENT PREDICTION / SERVER_AUTH BOX for local player / bomb
-
 		}
 
 
@@ -42,11 +32,11 @@ namespace meteor::render {
 		else if (game_instance.m_status == game::status::PRE_GAME) {
 			
 
-			{ // Toggle broadcast and start game (key 2 & 3) Instructions
+			{ // Toggle broadcast and start game (key 2 & 3 & 4) Instructions
 				constexpr int font_size = 20;
 				constexpr Color color = MAROON;
-				const char* text = TextFormat("Press '2' to toggle broadcasts (%s) \n - Press '3' to START GAME (%s) and '4' to add BOTS"
-					, server.m_broadcast? "ON" : "OFF"
+				const char* text = TextFormat("Press '2' to toggle server discovery (%s) \n - Press '3' to START GAME (%s) \n - '4' to add BOTS"
+					, server.m_allow_discovery? "ON" : "OFF"
 					, game_instance.get_player_count() >= 2? "CAN START" : "TOO FEW PLAYERS"
 				);
 				const int text_width = MeasureText(text, font_size);
@@ -54,7 +44,6 @@ namespace meteor::render {
 				const int text_y = 8;
 				DrawText(text, text_x + 1, text_y + 1, font_size, BLACK);
 				DrawText(text, text_x, text_y, font_size, color);
-				//DrawTextPro
 			}
 		}
 
@@ -109,7 +98,6 @@ namespace meteor::render {
 				DrawText(text, text_x + 1, text_y + 1, font_size, BLACK);
 				DrawText(text, text_x, text_y, font_size, color);
 			}
-
 		}
 
 
@@ -128,6 +116,18 @@ namespace meteor::render {
 				render_recieve_bytes_hist(HUD_OFFSET + Vector2(560, y_offset), conn, -0.25f);	// 1px per 4 bytes
 				y_offset += 175;
 			}
+
+			{ // Start game (Key 1) Instructions
+				constexpr int font_size = 16;
+				constexpr Color color = MAROON;
+				const char* text = TextFormat(" '5' (hold) simulate packet loss \n '6' toggle sending fewer game-states \n '7' increase time to next tick 2ms \n '8' decrease time to next tick 2ms");
+				const int text_width = MeasureText(text, font_size);
+				const int text_x = 12;
+				const int text_y = WINDOW_HEIGHT - 100;
+				DrawText(text, text_x + 1, text_y + 1, font_size, BLACK);
+				DrawText(text, text_x, text_y, font_size, color);
+			}
+			
 
 		}
 

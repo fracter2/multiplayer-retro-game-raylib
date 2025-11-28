@@ -25,7 +25,14 @@ namespace meteor {
 
 		server_browser() = default;
 
+		void reset() {
+			m_entries.clear();
+			m_select_index = 0;
+		}
+
 		std::vector<entry> m_entries = {};
 		bool m_queue_discovery_send = false;
+		int m_select_index = 0;
+
 	};
 }

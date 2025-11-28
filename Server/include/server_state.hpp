@@ -67,8 +67,6 @@ namespace meteor {
 		bool m_debug_skip_recieve = false;
 		bool m_debug_send_less_states = false;
 		bool m_allow_discovery = true;
-		bool m_broadcast = true;
-		uint32 m_next_broadcast_tick = 0;
 		status m_status = status::OFFLINE;
 		connection m_clients[MAX_PLAYERS] = {};
 		std::vector<ip_endpoint> m_discovery_response_queue = {};

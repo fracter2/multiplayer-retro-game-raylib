@@ -13,7 +13,7 @@ namespace meteor::server_game_system {
 
 
 		if (input.m_2_just_pressed) {
-			server.m_broadcast = !server.m_broadcast;
+			server.m_allow_discovery = !server.m_allow_discovery;
 		}
 
 
