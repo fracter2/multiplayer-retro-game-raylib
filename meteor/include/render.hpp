@@ -172,10 +172,9 @@ namespace meteor::render {
 			const int text_width = MeasureText(text.c_str(), font_size);
 			const int text_x = (GetScreenWidth() - text_width) / 2;
 			const int text_y = 160 + i * line_spacing;
-			int new_font_size = browser.m_select_index == i ? font_size : font_size + 6;
 
-			DrawText(text.c_str(), text_x + 1, text_y + 1, new_font_size, BLACK);
-			DrawText(text.c_str(), text_x, text_y, new_font_size, color);
+			DrawText(text.c_str(), text_x + 1, text_y + 1, font_size, BLACK);
+			DrawText(text.c_str(), text_x, text_y, font_size, color);
 			i++;
 		}
 
