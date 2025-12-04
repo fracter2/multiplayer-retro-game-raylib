@@ -17,7 +17,7 @@ Bombs also block movement.
 ---- HOW TO USE ----
 The server and client can (and should) be run in visual studio using the debugger. 
 Select either the server or client(meteor) project in the "configure startup projects" drop-down menu, and run. 
- - I have not been able to run them simultaneously from the same computer, probably because of issues with sockets, but I have not looked into it. 
+ - You can run both the server and client(s) from the launcher.
 
 WASD to move and SPACEBAR to place bombs.
 Every other input uses numbers 1-6, the important ones displayed in-game.
